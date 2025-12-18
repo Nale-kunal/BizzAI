@@ -224,7 +224,7 @@ const Return = () => {
             // Clear draft from localStorage on successful completion
             localStorage.removeItem('returnDraft');
 
-            alert('Return created successfully!');
+            alert('Items returned successfully!');
             navigate('/sales/returned-items');
         } catch (error) {
             console.error('Error creating return:', error);
