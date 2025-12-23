@@ -4,7 +4,7 @@ import Item from "../models/Item.js";
 import Customer from "../models/Customer.js";
 import Transaction from "../models/Transaction.js";
 import { generateInvoicePDF } from "../utils/invoiceGenerator.js";
-import { sendEmail } from "../utils/emailService.js";
+import { sendEmail, generateInvoiceHTML } from "../utils/emailService.js";
 import { info, error } from "../utils/logger.js";
 
 /**
@@ -224,15 +224,19 @@ export const createInvoice = async (req, res) => {
     }
 
     // Generate invoice PDF + Email it + Log it
-    const populatedInvoice = await Invoice.findById(invoice._id).populate("customer");
+    const populatedInvoice = await Invoice.findById(invoice._id)
+      .populate("customer")
+      .populate("items.item", "name sku");
     const pdfPath = await generateInvoicePDF(populatedInvoice);
 
     if (populatedInvoice.customer?.email) {
+      const htmlContent = generateInvoiceHTML(populatedInvoice);
       await sendEmail(
         populatedInvoice.customer.email,
         `Invoice ${invoiceNo}`,
         `Thank you for your purchase! Attached is your invoice ${invoiceNo}.`,
-        pdfPath
+        pdfPath,
+        htmlContent
       );
     }
 
