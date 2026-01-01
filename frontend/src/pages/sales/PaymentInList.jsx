@@ -6,7 +6,7 @@ import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 const PaymentInList = () => {
     const navigate = useNavigate();

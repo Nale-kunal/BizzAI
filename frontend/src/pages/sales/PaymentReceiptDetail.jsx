@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 const PaymentReceiptDetail = () => {
     const { id } = useParams();
@@ -255,15 +255,15 @@ const PaymentReceiptDetail = () => {
                     )}
 
                     {/* Summary and Status Section */}
-                     <div className="px-8 py-6 border-t border-gray-200 bg-white dark:bg-white print:px-6 print:py-4 print:bg-white print:border-gray-300">
-                         <div className="flex justify-center">
-                              <div className="w-full md:w-144">
-                                 <div className="space-y-6 bg-white dark:bg-white print:bg-white p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-200 print:border print:border-gray-300 text-xl">
+                    <div className="px-8 py-6 border-t border-gray-200 bg-white dark:bg-white print:px-6 print:py-4 print:bg-white print:border-gray-300">
+                        <div className="flex justify-center">
+                            <div className="w-full md:w-144">
+                                <div className="space-y-6 bg-white dark:bg-white print:bg-white p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-200 print:border print:border-gray-300 text-xl">
                                     <div className="flex justify-between py-3 text-base">
                                         <span className="text-gray-900 dark:text-gray-900 print:text-black">Total Payment Received:</span>
                                         <span className="font-bold text-gray-900 dark:text-gray-900 print:text-black">₹{payment.totalAmount.toFixed(2)}</span>
                                     </div>
-                                    
+
                                     {/* <div className="flex justify-between py-2 text-sm">
                                         <span className="text-gray-900 dark:text-gray-900 print:text-black">Allocated to Invoices:</span>
                                         <span className="font-bold text-gray-900 dark:text-gray-200 print:text-black">
