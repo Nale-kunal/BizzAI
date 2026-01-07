@@ -35,6 +35,9 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5174",
+  "http://localhost:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:5173",
   process.env.FRONTEND_URL,      // production frontend
   /\.vercel\.app$/               // ✅ ALL Vercel preview URLs
 ];
@@ -44,6 +47,12 @@ app.use(
     origin: function (origin, callback) {
       // Allow server-to-server / Postman / curl
       if (!origin) return callback(null, true);
+
+      // In development, allow all localhost origins
+      if (process.env.NODE_ENV !== 'production' && origin &&
+        (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))) {
+        return callback(null, true);
+      }
 
       const isAllowed = allowedOrigins.some((allowed) =>
         allowed instanceof RegExp
