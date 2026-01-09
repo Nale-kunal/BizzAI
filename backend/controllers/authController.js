@@ -133,9 +133,12 @@ export const forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: "Email is required" });
 
+    console.log(`🔐 Password reset requested for: ${email}`);
+
     const user = await User.findOne({ email });
     if (!user) {
       // Respond success even if user missing to avoid user enumeration
+      console.log(`   ⚠️  User not found, but responding with success message for security`);
       return res.status(200).json({ message: "If this email exists, a reset link has been sent" });
     }
 
@@ -147,9 +150,13 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
     await user.save();
+    console.log(`   ✅ Reset token saved to database`);
 
     const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const resetUrl = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+    console.log(`   📍 Frontend URL: ${baseUrl}`);
+    console.log(`   🔗 Reset URL generated: ${resetUrl}`);
 
     const mailSent = await sendEmail(
       email,
@@ -158,12 +165,17 @@ export const forgotPassword = async (req, res) => {
     );
 
     if (!mailSent) {
-      return res.status(500).json({ message: "Failed to send reset email" });
+      console.error(`   ❌ Email sending failed for ${email}`);
+      console.error(`   → Check EMAIL_USER and EMAIL_PASS environment variables`);
+      console.error(`   → Verify Gmail App Password is correctly configured`);
+      return res.status(500).json({ message: "Failed to send reset email. Please contact support." });
     }
 
+    console.log(`   ✅ Password reset email sent successfully to ${email}`);
     res.status(200).json({ message: "Reset link sent if the email exists" });
   } catch (error) {
-    console.error("Forgot Password Error:", error);
+    console.error("❌ Forgot Password Error:", error);
+    console.error(`   Error details:`, error.message);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
