@@ -7,7 +7,7 @@ import PageHeader from "../../components/PageHeader";
 import FormInput from "../../components/FormInput";
 import CustomerSelectionModal from "../../components/CustomerSelectionModal";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 const PaymentIn = () => {
   const navigate = useNavigate();
@@ -602,71 +602,71 @@ const PaymentIn = () => {
                   )}
                   {(pm.method === "bank_transfer" ||
                     pm.method === "cheque") && (
-                    <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-secondary mb-2">
-                          Bank Account
-                        </label>
-                        <select
-                          value={pm.bankAccount}
-                          onChange={(e) =>
-                            updatePaymentMethod(
-                              index,
-                              "bankAccount",
-                              e.target.value
-                            )
-                          }
-                          className="w-full px-3 py-2 border border-default rounded-lg"
-                        >
-                          <option value="">Select Bank Account</option>
-                          {bankAccounts.map((acc) => (
-                            <option key={acc._id} value={acc._id}>
-                              {acc.bankName} - {acc.accountNumber.slice(-4)}
-                            </option>
-                          ))}
-                        </select>
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-secondary mb-2">
+                            Bank Account
+                          </label>
+                          <select
+                            value={pm.bankAccount}
+                            onChange={(e) =>
+                              updatePaymentMethod(
+                                index,
+                                "bankAccount",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 border border-default rounded-lg"
+                          >
+                            <option value="">Select Bank Account</option>
+                            {bankAccounts.map((acc) => (
+                              <option key={acc._id} value={acc._id}>
+                                {acc.bankName} - {acc.accountNumber.slice(-4)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {pm.method === "cheque" && (
+                          <>
+                            <div>
+                              <label className="block text-sm font-medium text-secondary mb-2">
+                                Cheque Number
+                              </label>
+                              <input
+                                type="text"
+                                value={pm.chequeNumber}
+                                onChange={(e) =>
+                                  updatePaymentMethod(
+                                    index,
+                                    "chequeNumber",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-3 py-2 border border-default rounded-lg"
+                                placeholder="Cheque No"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-secondary mb-2">
+                                Cheque Date
+                              </label>
+                              <input
+                                type="date"
+                                value={pm.chequeDate}
+                                onChange={(e) =>
+                                  updatePaymentMethod(
+                                    index,
+                                    "chequeDate",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-3 py-2 border border-default rounded-lg"
+                              />
+                            </div>
+                          </>
+                        )}
                       </div>
-                      {pm.method === "cheque" && (
-                        <>
-                          <div>
-                            <label className="block text-sm font-medium text-secondary mb-2">
-                              Cheque Number
-                            </label>
-                            <input
-                              type="text"
-                              value={pm.chequeNumber}
-                              onChange={(e) =>
-                                updatePaymentMethod(
-                                  index,
-                                  "chequeNumber",
-                                  e.target.value
-                                )
-                              }
-                              className="w-full px-3 py-2 border border-default rounded-lg"
-                              placeholder="Cheque No"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-secondary mb-2">
-                              Cheque Date
-                            </label>
-                            <input
-                              type="date"
-                              value={pm.chequeDate}
-                              onChange={(e) =>
-                                updatePaymentMethod(
-                                  index,
-                                  "chequeDate",
-                                  e.target.value
-                                )
-                              }
-                              className="w-full px-3 py-2 border border-default rounded-lg"
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
+                    )}
                 </div>
               ))}
             </div>
@@ -835,9 +835,8 @@ const PaymentIn = () => {
                 <div className="flex justify-between">
                   <span className="font-medium">Remaining:</span>
                   <span
-                    className={`text-lg font-bold ${
-                      remainingAmount >= 0 ? "text-gray-900" : "text-red-600"
-                    }`}
+                    className={`text-lg font-bold ${remainingAmount >= 0 ? "text-gray-900" : "text-red-600"
+                      }`}
                   >
                     ₹{remainingAmount.toFixed(2)}
                   </span>

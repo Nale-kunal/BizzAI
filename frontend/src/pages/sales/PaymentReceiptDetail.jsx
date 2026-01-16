@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Layout from "../../components/Layout";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 const PaymentReceiptDetail = () => {
   const { id } = useParams();
