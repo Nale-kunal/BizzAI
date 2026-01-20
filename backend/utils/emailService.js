@@ -75,7 +75,7 @@ export const sendEmail = async (to, subject, text, attachmentPath = null) => {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"BizzAI" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+      from: `"BizzAI" <${process.env.EMAIL_FROM || process.env.EMAIL_USER || "noreply@bizzai.com"}>`,
       to,
       subject,
       text,
@@ -110,7 +110,7 @@ export const sendHtmlEmail = async (to, subject, html, text = null) => {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"BizzAI" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+      from: `"BizzAI" <${process.env.EMAIL_FROM || process.env.EMAIL_USER || "noreply@bizzai.com"}>`,
       to,
       subject,
       html,
