@@ -46,6 +46,26 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // Device session tracking for single device login enforcement
+    // deviceId is a cryptographically secure random identifier stored in HttpOnly cookie
+    activeDeviceId: {
+      type: String,
+      default: null,
+      index: true,
+    },
+    activeSessionCreatedAt: {
+      type: Date,
+      default: null,
+    },
+    // IP and UA stored as audit metadata only, NOT used for device identification
+    lastLoginIp: {
+      type: String,
+      default: null,
+    },
+    lastLoginUserAgent: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

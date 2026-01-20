@@ -3,6 +3,7 @@ import RefreshToken from "../models/RefreshToken.js";
 import { generateToken, generateRefreshToken, generateRandomToken } from "../config/jwt.js";
 import crypto from "crypto";
 import { sendHtmlEmail, generatePasswordResetEmail } from "../utils/emailService.js";
+import { generateDeviceId, setDeviceIdCookie, getDeviceIdFromCookie } from "../utils/deviceUtils.js";
 
 // Simple password strength check for registration
 const isStrongPassword = (password) => {
@@ -56,6 +57,23 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
+      // Generate cryptographically secure deviceId for initial session
+      const deviceId = generateDeviceId();
+
+      // Store audit metadata (IP and UA for logging only, NOT for device identification)
+      const userAgent = req.headers["user-agent"] || "unknown";
+      const ipAddress = req.ip || req.connection.remoteAddress || "unknown";
+
+      // Set initial device session
+      user.activeDeviceId = deviceId;
+      user.activeSessionCreatedAt = new Date();
+      user.lastLoginIp = ipAddress;
+      user.lastLoginUserAgent = userAgent;
+      await user.save();
+
+      // Issue deviceId as secure HttpOnly signed cookie
+      setDeviceIdCookie(res, deviceId);
+
       // Generate tokens
       const accessToken = generateToken(user._id);
       const refreshToken = generateRandomToken();
@@ -107,6 +125,47 @@ export const loginUser = async (req, res) => {
     // Match password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+    // Get deviceId from signed cookie (if exists)
+    const existingDeviceId = getDeviceIdFromCookie(req);
+
+    // Store audit metadata (IP and UA for logging only, NOT for device identification)
+    const userAgent = req.headers["user-agent"] || "unknown";
+    const ipAddress = req.ip || req.connection.remoteAddress || "unknown";
+
+    // Check for active session on different device
+    // Device conflict occurs when:
+    // 1. User has an active deviceId stored
+    // 2. AND the deviceId from cookie doesn't match (or doesn't exist)
+    if (user.activeDeviceId && user.activeDeviceId !== existingDeviceId) {
+      return res.status(409).json({
+        message: "This account is currently active on another device.",
+        deviceConflict: true,
+      });
+    }
+
+    // Determine deviceId to use:
+    // - If existingDeviceId matches user.activeDeviceId, reuse it (same device)
+    // - If no activeDeviceId (first login or after force logout), generate new one
+    // - If existingDeviceId exists and matches, reuse it
+    let deviceIdToUse;
+    if (existingDeviceId && user.activeDeviceId === existingDeviceId) {
+      // Same device, same session - reuse existing deviceId
+      deviceIdToUse = existingDeviceId;
+    } else {
+      // New device or first login - generate new deviceId
+      deviceIdToUse = generateDeviceId();
+    }
+
+    // Update device session tracking
+    user.activeDeviceId = deviceIdToUse;
+    user.activeSessionCreatedAt = new Date();
+    user.lastLoginIp = ipAddress;
+    user.lastLoginUserAgent = userAgent;
+    await user.save();
+
+    // Issue deviceId as secure HttpOnly signed cookie
+    setDeviceIdCookie(res, deviceIdToUse);
 
     // Generate tokens
     const accessToken = generateToken(user._id);
@@ -202,6 +261,67 @@ export const forgotPassword = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+/**
+ * @desc Force logout from previous device and allow new login
+ * @route POST /api/auth/force-logout
+ * @security HIGH RISK - Strict rate limiting and audit logging required
+ */
+export const forceLogout = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Generic error message to prevent information leakage
+    const genericError = "Invalid credentials";
+
+    if (!email || !password) {
+      return res.status(400).json({ message: genericError });
+    }
+
+    // Find and verify user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: genericError });
+    }
+
+    // Verify password
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: genericError });
+    }
+
+    // Audit logging (CRITICAL for security monitoring)
+    const auditData = {
+      userId: user._id,
+      email: user.email,
+      action: "FORCE_LOGOUT",
+      ip: req.ip || req.connection.remoteAddress,
+      userAgent: req.headers["user-agent"],
+      timestamp: new Date(),
+    };
+    console.warn("SECURITY AUDIT - Force Logout:", JSON.stringify(auditData));
+
+    // Revoke all refresh tokens for this user
+    await RefreshToken.updateMany(
+      { user: user._id, isRevoked: false },
+      { isRevoked: true, revokedAt: new Date() }
+    );
+
+    // Clear device session fields
+    user.activeDeviceId = null;
+    user.activeSessionCreatedAt = null;
+    await user.save();
+
+    res.status(200).json({
+      message: "All sessions revoked successfully. You can now log in from this device."
+    });
+  } catch (error) {
+    console.error("Force Logout Error:", error);
+    // Generic error message to prevent information leakage
+    res.status(500).json({ message: "Unable to process request" });
+  }
+};
+
 
 /**
  * @desc Reset password using token
