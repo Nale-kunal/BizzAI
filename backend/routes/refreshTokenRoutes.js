@@ -3,6 +3,7 @@ import { protect } from "../middlewares/authMiddleware.js";
 import RefreshToken from "../models/RefreshToken.js";
 import { generateToken, generateRefreshToken, verifyRefreshToken, generateRandomToken } from "../config/jwt.js";
 import User from "../models/User.js";
+import { clearDeviceIdCookie, getDeviceIdFromCookie } from "../utils/deviceUtils.js";
 
 const router = express.Router();
 
@@ -43,6 +44,22 @@ router.post("/refresh", async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
+        // CRITICAL: Validate deviceId from cookie matches user's active deviceId
+        const deviceIdFromCookie = getDeviceIdFromCookie(req);
+
+        if (!deviceIdFromCookie || user.activeDeviceId !== deviceIdFromCookie) {
+            // Device mismatch - this device was logged out
+            // Revoke this refresh token
+            storedToken.isRevoked = true;
+            storedToken.revokedAt = new Date();
+            await storedToken.save();
+
+            return res.status(401).json({
+                message: "Session expired. Please log in again.",
+                sessionExpired: true
+            });
+        }
+
         // Generate new tokens
         const newAccessToken = generateToken(user._id);
         const newRefreshToken = generateRandomToken();
@@ -50,7 +67,6 @@ router.post("/refresh", async (req, res) => {
         // Revoke old refresh token and create new one
         storedToken.isRevoked = true;
         storedToken.revokedAt = new Date();
-        storedToken.replacedByToken = newRefreshToken;
         await storedToken.save();
 
         // Create new refresh token
@@ -101,6 +117,17 @@ router.post("/revoke", protect, async (req, res) => {
         storedToken.revokedAt = new Date();
         await storedToken.save();
 
+        // Clear device session on logout
+        const user = await User.findById(req.user._id);
+        if (user) {
+            user.activeDeviceId = null;
+            user.activeSessionCreatedAt = null;
+            await user.save();
+        }
+
+        // Clear deviceId cookie
+        clearDeviceIdCookie(res);
+
         res.json({ message: "Refresh token revoked successfully" });
     } catch (error) {
         console.error("Revoke token error:", error);
@@ -119,6 +146,17 @@ router.post("/revoke-all", protect, async (req, res) => {
             { user: req.user._id, isRevoked: false },
             { isRevoked: true, revokedAt: new Date() }
         );
+
+        // Clear device session on logout all
+        const user = await User.findById(req.user._id);
+        if (user) {
+            user.activeDeviceId = null;
+            user.activeSessionCreatedAt = null;
+            await user.save();
+        }
+
+        // Clear deviceId cookie
+        clearDeviceIdCookie(res);
 
         res.json({ message: "All refresh tokens revoked successfully" });
     } catch (error) {

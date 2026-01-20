@@ -57,9 +57,25 @@ export const passwordResetLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+/**
+ * CRITICAL: Strictest limiter for force logout
+ * Prevents brute force attacks on device session takeover
+ */
+export const forceLogoutLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 3, // 3 attempts per 15 minutes - production security
+    message: {
+        message: "Too many force logout attempts. Please try again in 15 minutes.",
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false, // Count all requests for security
+});
+
 export default {
     authLimiter,
     apiLimiter,
     moderateLimiter,
     passwordResetLimiter,
+    forceLogoutLimiter,
 };

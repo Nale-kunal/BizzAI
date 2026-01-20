@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import compression from "compression";
+import cookieParser from "cookie-parser";
 
 // Routes imports
 import authRoutes from "./routes/authRoutes.js";
@@ -92,6 +93,9 @@ app.use(requestTimeout(30000));
 // Body parsing
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Cookie parsing with signed cookie support
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // =======================
 // CORS Configuration
