@@ -1,9 +1,31 @@
 import nodemailer from "nodemailer";
 
 /**
+ * Check if email is configured
+ */
+export const isEmailConfigured = () => {
+  return global.EMAIL_ENABLED === true;
+};
+
+/**
  * Creates a reusable nodemailer transporter
+ * Supports both Gmail and custom SMTP
  */
 const createTransporter = () => {
+  // Custom SMTP configuration (recommended for production)
+  if (process.env.SMTP_HOST) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587", 10),
+      secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
+
+  // Gmail configuration (fallback for development)
   return nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -14,6 +36,29 @@ const createTransporter = () => {
 };
 
 /**
+ * Verify email transport on server startup
+ * Logs results server-side only
+ */
+export const verifyEmailTransport = async () => {
+  if (!isEmailConfigured()) {
+    console.warn('⚠️  Email transport verification skipped (not configured)');
+    return false;
+  }
+
+  try {
+    const transporter = createTransporter();
+    await transporter.verify();
+    console.log('✅ Email transport verified successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Email transport verification failed:', error.message);
+    console.error('   Email features will be disabled');
+    global.EMAIL_ENABLED = false;
+    return false;
+  }
+};
+
+/**
  * Sends an email with optional attachment (invoice PDF, etc.)
  * @param {String} to
  * @param {String} subject
@@ -21,11 +66,16 @@ const createTransporter = () => {
  * @param {String} attachmentPath (optional)
  */
 export const sendEmail = async (to, subject, text, attachmentPath = null) => {
+  if (!isEmailConfigured()) {
+    console.warn('Email not sent - email service not configured');
+    return false;
+  }
+
   try {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"BizzAI" <${process.env.EMAIL_USER}>`,
+      from: `"BizzAI" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
       to,
       subject,
       text,
@@ -38,7 +88,7 @@ export const sendEmail = async (to, subject, text, attachmentPath = null) => {
     console.log("📨 Email sent:", info.response);
     return true;
   } catch (error) {
-    console.error("Email Error:", error);
+    console.error("Email Error:", error.message);
     return false;
   }
 };
@@ -51,11 +101,16 @@ export const sendEmail = async (to, subject, text, attachmentPath = null) => {
  * @param {String} text - Plain text fallback (optional)
  */
 export const sendHtmlEmail = async (to, subject, html, text = null) => {
+  if (!isEmailConfigured()) {
+    console.warn('Email not sent - email service not configured');
+    return false;
+  }
+
   try {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"BizzAI" <${process.env.EMAIL_USER}>`,
+      from: `"BizzAI" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
@@ -66,7 +121,7 @@ export const sendHtmlEmail = async (to, subject, html, text = null) => {
     console.log("📨 HTML Email sent:", info.response);
     return true;
   } catch (error) {
-    console.error("HTML Email Error:", error);
+    console.error("HTML Email Error:", error.message);
     return false;
   }
 };

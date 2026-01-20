@@ -252,13 +252,18 @@ export const forgotPassword = async (req, res) => {
     );
 
     if (!mailSent) {
-      return res.status(500).json({ message: "Failed to send reset email" });
+      // Log detailed error server-side only
+      console.error("Failed to send password reset email to:", email);
+      // CRITICAL: Always return success to prevent information leakage
+      // User enumeration protection + email configuration privacy
     }
 
-    res.status(200).json({ message: "Reset link sent if the email exists" });
+    // Always return generic success message (security best practice)
+    res.status(200).json({ message: "If this email exists, a reset link has been sent" });
   } catch (error) {
     console.error("Forgot Password Error:", error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    // CRITICAL: Never expose error details to client
+    res.status(500).json({ message: "Unable to process request. Please try again later." });
   }
 };
 
