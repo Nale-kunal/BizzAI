@@ -12,6 +12,8 @@ const initialState = {
   isSuccess: false,
   isError: false,
   message: '',
+  deviceConflict: false,
+  conflictMessage: '',
 };
 
 // Register user
@@ -95,6 +97,23 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   localStorage.removeItem('returnDraft');
 });
 
+// Force logout from previous device
+export const forceLogout = createAsyncThunk(
+  'auth/forceLogout',
+  async (credentials, thunkAPI) => {
+    try {
+      const response = await api.post(`${API_URL}/force-logout`, credentials);
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Get user profile
 export const getProfile = createAsyncThunk(
   'auth/profile',
@@ -159,6 +178,8 @@ export const authSlice = createSlice({
       state.isSuccess = false;
       state.isError = false;
       state.message = '';
+      state.deviceConflict = false;
+      state.conflictMessage = '';
     },
   },
   extraReducers: (builder) => {
@@ -189,8 +210,15 @@ export const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
-        state.isError = true;
-        state.message = action.payload;
+        // Check if this is a device conflict (409 status) - axios stores status in error.response
+        const errorData = action.payload;
+        if (typeof errorData === 'string' && errorData.includes('currently active on another device')) {
+          state.deviceConflict = true;
+          state.conflictMessage = errorData;
+        } else {
+          state.isError = true;
+          state.message = action.payload;
+        }
         state.user = null;
       })
       // Forgot Password
@@ -230,6 +258,20 @@ export const authSlice = createSlice({
       // Logout
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+      })
+      // Force Logout
+      .addCase(forceLogout.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(forceLogout.fulfilled, (state) => {
+        state.isLoading = false;
+        state.deviceConflict = false;
+        state.conflictMessage = '';
+      })
+      .addCase(forceLogout.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       })
       // Get Profile
       .addCase(getProfile.pending, (state) => {

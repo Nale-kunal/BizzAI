@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 // Create axios instance
 const api = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL,
+    withCredentials: true, // CRITICAL: Send cookies with every request
 });
 
 // Response interceptor to handle token expiration
