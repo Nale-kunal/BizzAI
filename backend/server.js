@@ -3,6 +3,7 @@ import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import { validateEnv } from "./config/validateEnv.js";
 import { info, error } from "./utils/logger.js";
+import { verifyEmailTransport } from "./utils/emailService.js";
 
 dotenv.config();
 
@@ -11,6 +12,13 @@ dotenv.config();
 // =======================
 info("Validating environment variables...");
 validateEnv();
+
+// =======================
+// Email Transport Verification
+// =======================
+verifyEmailTransport().catch(err => {
+  error("Email transport verification error:", err);
+});
 
 // =======================
 // DB
