@@ -76,7 +76,7 @@ const LIMITS = {
         keyPrefix: 'rl:device:',
     },
     GLOBAL: {
-        max: 100,
+        max: process.env.NODE_ENV === 'test' ? 1000 : 100, // Higher limit in tests to prevent interference
         windowMs: 60 * 1000, // 1 minute (spike detection)
         keyPrefix: 'rl:global:',
     },
@@ -460,6 +460,14 @@ export const clearRateLimitKeys = async (pattern = 'rl:*') => {
     } catch (err) {
         // Ignore errors - Redis may be unavailable in tests
     }
+};
+
+/**
+ * Test helper: Clear in-memory rate limit counters
+ * Use this in tests to reset the in-memory fallback store
+ */
+export const clearInMemoryCounters = () => {
+    memoryStore.clear();
 };
 
 // Graceful shutdown
