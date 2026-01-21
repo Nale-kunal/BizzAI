@@ -14,10 +14,12 @@ export const generateDeviceId = () => {
  * @param {string} deviceId - Device identifier
  */
 export const setDeviceIdCookie = (res, deviceId) => {
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("deviceId", deviceId, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "strict", // 'none' for cross-origin in production
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         signed: true,
     });
@@ -28,10 +30,12 @@ export const setDeviceIdCookie = (res, deviceId) => {
  * @param {object} res - Express response object
  */
 export const clearDeviceIdCookie = (res) => {
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.clearCookie("deviceId", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "strict",
         signed: true,
     });
 };
