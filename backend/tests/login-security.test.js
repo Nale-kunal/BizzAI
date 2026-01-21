@@ -7,7 +7,7 @@
 
 import request from 'supertest';
 import app from '../app.js';
-import { redisClient, handleLoginAttempt } from '../middlewares/rateLimiter.js';
+import { redisClient, handleLoginAttempt, clearRateLimitKeys } from '../middlewares/rateLimiter.js';
 import User from '../models/User.js';
 
 describe('Enterprise Login Security', () => {
@@ -25,15 +25,21 @@ describe('Enterprise Login Security', () => {
     afterAll(async () => {
         // Cleanup
         await User.deleteOne({ email: 'test@example.com' });
-        await redisClient.quit();
+
+        // Safe Redis shutdown - ignore errors if Redis unavailable
+        try {
+            if (redisClient && typeof redisClient.quit === 'function') {
+                await redisClient.quit();
+            }
+        } catch (err) {
+            // Ignore Redis shutdown errors in CI
+        }
     });
 
     beforeEach(async () => {
-        // Clear Redis rate limit keys before each test
-        const keys = await redisClient.keys('rl:*');
-        if (keys.length > 0) {
-            await redisClient.del(...keys);
-        }
+        // Clear Redis rate limit keys before each test (safe - won't throw)
+        await clearRateLimitKeys('rl:*');
+        await clearRateLimitKeys('attack:*');
     });
 
     describe('1. IP-Based Rate Limiting', () => {
@@ -198,10 +204,7 @@ describe('Enterprise Login Security', () => {
             expect(res.status).toBe(429);
 
             // Fast-forward time by clearing Redis keys (simulates expiry)
-            const keys = await redisClient.keys('rl:account:*');
-            if (keys.length > 0) {
-                await redisClient.del(...keys);
-            }
+            await clearRateLimitKeys('rl:account:*');
 
             // Should be allowed now
             res = await request(app)
@@ -214,8 +217,14 @@ describe('Enterprise Login Security', () => {
 
     describe('8. Redis Outage Behavior', () => {
         it('should fail-safe when Redis is unavailable', async () => {
-            // Disconnect Redis
-            await redisClient.disconnect();
+            // Safe disconnect - ignore errors
+            try {
+                if (redisClient && typeof redisClient.disconnect === 'function') {
+                    await redisClient.disconnect();
+                }
+            } catch (err) {
+                // Ignore disconnect errors
+            }
 
             // Login should still work (in-memory fallback)
             const res = await request(app)
@@ -224,13 +233,25 @@ describe('Enterprise Login Security', () => {
 
             expect(res.status).toBe(200);
 
-            // Reconnect Redis
-            await redisClient.connect();
+            // Safe reconnect - ignore errors
+            try {
+                if (redisClient && typeof redisClient.connect === 'function') {
+                    await redisClient.connect();
+                }
+            } catch (err) {
+                // Ignore connect errors
+            }
         });
 
         it('should use in-memory fallback when Redis fails', async () => {
-            // Simulate Redis error by disconnecting
-            await redisClient.disconnect();
+            // Safe disconnect - ignore errors
+            try {
+                if (redisClient && typeof redisClient.disconnect === 'function') {
+                    await redisClient.disconnect();
+                }
+            } catch (err) {
+                // Ignore disconnect errors
+            }
 
             // Make 5 failed attempts (should use in-memory store)
             for (let i = 0; i < 5; i++) {
@@ -246,8 +267,14 @@ describe('Enterprise Login Security', () => {
 
             expect(res.status).toBe(429);
 
-            // Reconnect Redis
-            await redisClient.connect();
+            // Safe reconnect - ignore errors
+            try {
+                if (redisClient && typeof redisClient.connect === 'function') {
+                    await redisClient.connect();
+                }
+            } catch (err) {
+                // Ignore connect errors
+            }
         });
     });
 

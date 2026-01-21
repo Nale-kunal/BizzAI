@@ -28,6 +28,7 @@ const redisClient = new Redis({
     },
     maxRetriesPerRequest: 3,
     lazyConnect: true,
+    enableOfflineQueue: false, // Don't queue commands when offline
 });
 
 let isRedisAvailable = false;
@@ -38,13 +39,18 @@ redisClient.on('connect', () => {
 });
 
 redisClient.on('error', (err) => {
-    logError('Redis error (rate limiting):', err.message);
+    // Suppress noisy Redis errors in logs - expected in CI/test environments
+    if (process.env.NODE_ENV !== 'test') {
+        logError('Redis error (rate limiting):', err.message);
+    }
     isRedisAvailable = false;
 });
 
-// Attempt connection
+// Attempt connection (non-blocking)
 redisClient.connect().catch((err) => {
-    warn('Redis unavailable - rate limiting will use in-memory fallback');
+    if (process.env.NODE_ENV !== 'test') {
+        warn('Redis unavailable - rate limiting will use in-memory fallback');
+    }
 });
 
 // In-memory fallback store (per-instance only)
@@ -441,6 +447,21 @@ export const forceLogoutLimiter = async (req, res, next) => {
     next();
 };
 
+/**
+ * Test helper: Clear rate limit keys safely
+ * @param {string} pattern - Key pattern to clear (default: 'rl:*')
+ */
+export const clearRateLimitKeys = async (pattern = 'rl:*') => {
+    try {
+        const keys = await redisClient.keys(pattern);
+        if (Array.isArray(keys) && keys.length > 0) {
+            await redisClient.del(...keys);
+        }
+    } catch (err) {
+        // Ignore errors - Redis may be unavailable in tests
+    }
+};
+
 // Graceful shutdown
 process.on('SIGTERM', async () => {
     console.log('📦 Closing Redis connection (rate limiter)...');
@@ -455,5 +476,6 @@ export default {
     passwordResetLimiter,
     forceLogoutLimiter,
     redisClient,
+    clearRateLimitKeys,
     isRedisAvailable: () => isRedisAvailable,
 };
