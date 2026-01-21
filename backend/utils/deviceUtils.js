@@ -11,17 +11,22 @@ export const generateDeviceId = () => {
 /**
  * Determine sameSite cookie setting based on environment
  * - If COOKIE_SAME_SITE env var is set, use that value ("none", "lax", or "strict")
- * - Otherwise, default to "lax" for production (works for same-domain deployments)
- * - Use "strict" for development
+ * - Production default: "none" (required for cross-domain deployments like Render)
+ * - Development default: "strict" (most secure for localhost)
  * 
- * Note: Use "none" only for cross-origin deployments (requires HTTPS)
+ * IMPORTANT: 
+ * - Use "none" for cross-domain (frontend and backend on different domains)
+ * - Use "lax" for same-domain (frontend and backend on same domain)
+ * - "none" requires secure: true (HTTPS)
  */
 const getSameSiteSetting = () => {
     if (process.env.COOKIE_SAME_SITE) {
         return process.env.COOKIE_SAME_SITE;
     }
     const isProduction = process.env.NODE_ENV === "production";
-    return isProduction ? "lax" : "strict";
+    // Default to "none" for production (cross-domain deployments)
+    // Override with COOKIE_SAME_SITE=lax if using same-domain deployment
+    return isProduction ? "none" : "strict";
 };
 
 /**
