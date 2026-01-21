@@ -9,17 +9,34 @@ export const generateDeviceId = () => {
 };
 
 /**
+ * Determine sameSite cookie setting based on environment
+ * - If COOKIE_SAME_SITE env var is set, use that value ("none", "lax", or "strict")
+ * - Otherwise, default to "lax" for production (works for same-domain deployments)
+ * - Use "strict" for development
+ * 
+ * Note: Use "none" only for cross-origin deployments (requires HTTPS)
+ */
+const getSameSiteSetting = () => {
+    if (process.env.COOKIE_SAME_SITE) {
+        return process.env.COOKIE_SAME_SITE;
+    }
+    const isProduction = process.env.NODE_ENV === "production";
+    return isProduction ? "lax" : "strict";
+};
+
+/**
  * Set secure deviceId cookie
  * @param {object} res - Express response object
  * @param {string} deviceId - Device identifier
  */
 export const setDeviceIdCookie = (res, deviceId) => {
     const isProduction = process.env.NODE_ENV === "production";
+    const sameSite = getSameSiteSetting();
 
     res.cookie("deviceId", deviceId, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? "none" : "strict", // 'none' for cross-origin in production
+        sameSite, // Flexible: "lax" (default), "none" (cross-origin), or "strict"
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         signed: true,
     });
@@ -31,11 +48,12 @@ export const setDeviceIdCookie = (res, deviceId) => {
  */
 export const clearDeviceIdCookie = (res) => {
     const isProduction = process.env.NODE_ENV === "production";
+    const sameSite = getSameSiteSetting();
 
     res.clearCookie("deviceId", {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? "none" : "strict",
+        sameSite, // Must match the setting used when cookie was set
         signed: true,
     });
 };
