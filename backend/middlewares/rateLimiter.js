@@ -468,6 +468,9 @@ process.on('SIGTERM', async () => {
     await redisClient.quit();
 });
 
+// Named export for redisClient (required by tests)
+export { redisClient };
+
 // Default export for backward compatibility
 export default {
     loginRateLimiter,
