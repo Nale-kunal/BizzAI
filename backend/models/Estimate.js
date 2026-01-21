@@ -68,7 +68,7 @@ const estimateSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-estimateSchema.index({ estimateNo: 1 });
+// Note: estimateNo already has unique: true, which creates an index automatically
 estimateSchema.index({ customer: 1 });
 estimateSchema.index({ createdAt: -1 });
 
