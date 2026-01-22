@@ -4,6 +4,7 @@ import { generateToken, generateRefreshToken, generateRandomToken } from "../con
 import crypto from "crypto";
 import { sendHtmlEmail, generatePasswordResetEmail } from "../utils/emailService.js";
 import { generateDeviceId, setDeviceIdCookie, getDeviceIdFromCookie } from "../utils/deviceUtils.js";
+import { info } from "../utils/logger.js";
 
 // Simple password strength check for registration
 const isStrongPassword = (password) => {
@@ -193,6 +194,17 @@ export const loginUser = async (req, res) => {
     // Reset rate limit counters on successful login
     await handleLoginAttempt(req, true);
 
+    // Production logging for diagnostics
+    if (process.env.NODE_ENV === 'production') {
+      info('✅ [LOGIN] User logged in successfully', {
+        userId: user._id,
+        email: user.email,
+        deviceIdPrefix: deviceIdToUse.substring(0, 8) + '...',
+        isNewDevice: deviceIdToUse !== existingDeviceId,
+        ip: ipAddress
+      });
+    }
+
     // Send response
     res.status(200).json({
       _id: user._id,
@@ -329,6 +341,15 @@ export const forceLogout = async (req, res) => {
     user.activeDeviceId = null;
     user.activeSessionCreatedAt = null;
     await user.save();
+
+    // Production logging for diagnostics
+    if (process.env.NODE_ENV === 'production') {
+      info('✅ [FORCE-LOGOUT] Device sessions cleared', {
+        userId: user._id,
+        email: user.email,
+        ip: req.ip || req.connection.remoteAddress
+      });
+    }
 
     res.status(200).json({
       message: "All sessions revoked successfully. You can now log in from this device."

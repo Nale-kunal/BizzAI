@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { getDeviceIdFromCookie } from "../utils/deviceUtils.js";
+import { warn } from "../utils/logger.js";
 
 /**
  * Middleware to protect routes
@@ -26,11 +27,34 @@ export const protect = async (req, res, next) => {
       // CRITICAL: Validate deviceId from cookie matches user's active deviceId
       const deviceIdFromCookie = getDeviceIdFromCookie(req);
 
+      // Enhanced logging for production diagnostics
+      if (process.env.NODE_ENV === 'production') {
+        if (!deviceIdFromCookie) {
+          warn('⚠️  [AUTH] Device validation failed - No cookie', {
+            userId: req.user._id,
+            hasActiveDevice: !!req.user.activeDeviceId,
+            activeDevicePrefix: req.user.activeDeviceId ? req.user.activeDeviceId.substring(0, 8) + '...' : 'none'
+          });
+        } else if (req.user.activeDeviceId !== deviceIdFromCookie) {
+          warn('⚠️  [AUTH] Device validation failed - Mismatch', {
+            userId: req.user._id,
+            cookieDevicePrefix: deviceIdFromCookie.substring(0, 8) + '...',
+            activeDevicePrefix: req.user.activeDeviceId ? req.user.activeDeviceId.substring(0, 8) + '...' : 'none'
+          });
+        }
+      }
+
       if (!deviceIdFromCookie || req.user.activeDeviceId !== deviceIdFromCookie) {
         // Device mismatch - this device was logged out from another location
+        // Provide more specific error message based on the scenario
+        const errorMessage = !deviceIdFromCookie
+          ? "Session expired. Please log in again."
+          : "This account is currently active on another device. Please log in again.";
+
         return res.status(401).json({
-          message: "Session expired. Please log in again.",
-          sessionExpired: true
+          message: errorMessage,
+          sessionExpired: true,
+          reason: !deviceIdFromCookie ? 'missing_cookie' : 'device_mismatch'
         });
       }
 

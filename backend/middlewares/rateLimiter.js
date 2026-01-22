@@ -32,25 +32,27 @@ const redisClient = new Redis({
 });
 
 let isRedisAvailable = false;
+let redisErrorLogged = false; // Track if we've already logged the Redis error
 
 redisClient.on('connect', () => {
     console.log('✅ Redis connected (rate limiting)');
     isRedisAvailable = true;
+    redisErrorLogged = false; // Reset error flag on successful connection
 });
 
 redisClient.on('error', (err) => {
-    // Suppress noisy Redis errors in logs - expected in CI/test environments
-    if (process.env.NODE_ENV !== 'test') {
+    // Only log the first Redis error to prevent log spam
+    if (!redisErrorLogged && process.env.NODE_ENV !== 'test') {
         logError('Redis error (rate limiting):', err.message);
+        warn('Redis unavailable - rate limiting will use in-memory fallback');
+        redisErrorLogged = true;
     }
     isRedisAvailable = false;
 });
 
 // Attempt connection (non-blocking)
 redisClient.connect().catch((err) => {
-    if (process.env.NODE_ENV !== 'test') {
-        warn('Redis unavailable - rate limiting will use in-memory fallback');
-    }
+    // Error will be logged by the 'error' event handler
 });
 
 // In-memory fallback store (per-instance only)
