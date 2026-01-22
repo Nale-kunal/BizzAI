@@ -38,6 +38,12 @@ export const setDeviceIdCookie = (res, deviceId) => {
     const isProduction = process.env.NODE_ENV === "production";
     const sameSite = getSameSiteSetting();
 
+    // CRITICAL: Validate COOKIE_SECRET is set
+    if (!process.env.COOKIE_SECRET) {
+        console.error('❌ CRITICAL: COOKIE_SECRET environment variable is not set!');
+        throw new Error('COOKIE_SECRET must be configured for signed cookies');
+    }
+
     const cookieOptions = {
         httpOnly: true,
         secure: isProduction,
@@ -52,8 +58,18 @@ export const setDeviceIdCookie = (res, deviceId) => {
 
     res.cookie("deviceId", deviceId, cookieOptions);
 
-    // Debug log in development
-    if (!isProduction) {
+    // Production logging for diagnostics (protect sensitive data)
+    if (isProduction) {
+        console.log('🍪 [PRODUCTION] Set deviceId cookie:', {
+            deviceIdPrefix: deviceId.substring(0, 8) + '...',
+            sameSite,
+            secure: isProduction,
+            httpOnly: true,
+            maxAge: '7 days',
+            hasCookieSecret: !!process.env.COOKIE_SECRET
+        });
+    } else {
+        // Debug log in development
         console.log('🍪 Set deviceId cookie:', {
             deviceId: deviceId.substring(0, 8) + '...',
             sameSite,
@@ -85,5 +101,19 @@ export const clearDeviceIdCookie = (res) => {
  * @returns {string|null} Device ID or null if not present/invalid
  */
 export const getDeviceIdFromCookie = (req) => {
-    return req.signedCookies?.deviceId || null;
+    const deviceId = req.signedCookies?.deviceId || null;
+    const isProduction = process.env.NODE_ENV === "production";
+
+    // Production logging for diagnostics
+    if (isProduction && !deviceId) {
+        console.warn('⚠️  [PRODUCTION] deviceId cookie not found:', {
+            hasSignedCookies: !!req.signedCookies,
+            signedCookiesKeys: req.signedCookies ? Object.keys(req.signedCookies) : [],
+            hasCookies: !!req.cookies,
+            cookiesKeys: req.cookies ? Object.keys(req.cookies) : [],
+            hasCookieSecret: !!process.env.COOKIE_SECRET
+        });
+    }
+
+    return deviceId;
 };
