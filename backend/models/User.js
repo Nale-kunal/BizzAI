@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["owner", "admin"],
+      enum: ["owner"],
       default: "owner",
     },
     resetPasswordToken: {
@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    // Admin tracking fields
+    // Security tracking fields
     status: {
       type: String,
       enum: ["active", "inactive", "suspended"],
