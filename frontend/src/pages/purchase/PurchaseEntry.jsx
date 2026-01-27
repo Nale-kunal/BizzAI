@@ -22,10 +22,17 @@ const PurchaseEntry = () => {
     const { user } = useSelector((state) => state.auth);
 
     // Use draft save hook to preserve form data
+    const getDefaultDueDate = () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 30); // Default 30 days from today
+        return date.toISOString().split('T')[0];
+    };
+
     const initialFormData = {
         purchaseDate: new Date().toISOString().split('T')[0],
         supplierInvoiceNo: '',
         supplierInvoiceDate: new Date().toISOString().split('T')[0],
+        dueDate: getDefaultDueDate(),
         supplier: null,
         purchaseType: 'cash',
         referenceNo: '',
@@ -310,6 +317,7 @@ const PurchaseEntry = () => {
             purchaseDate: formData.purchaseDate,
             supplierInvoiceNo: formData.supplierInvoiceNo,
             supplierInvoiceDate: formData.supplierInvoiceDate,
+            dueDate: formData.dueDate,
             supplierId: formData.supplier._id,
             purchaseType: formData.purchaseType,
             referenceNo: formData.referenceNo,
@@ -415,6 +423,15 @@ const PurchaseEntry = () => {
                                     />
                                 </div>
                                 <div>
+                                    <label className="block text-sm font-medium text-secondary mb-1">Due Date</label>
+                                    <input
+                                        type="date"
+                                        value={formData.dueDate}
+                                        onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                                    />
+                                </div>
+                                <div>
                                     <label className="block text-sm font-medium text-secondary mb-1">Purchase Type</label>
                                     <select
                                         value={formData.purchaseType}
@@ -444,15 +461,27 @@ const PurchaseEntry = () => {
                             {formData.supplier ? (
                                 <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                                     <div className="flex items-center justify-between">
-                                        <div>
+                                        <div className="flex-1">
                                             <p className="font-medium text-main">{formData.supplier.businessName}</p>
                                             <p className="text-sm text-secondary">{formData.supplier.contactPersonName}</p>
                                             <p className="text-sm text-secondary">{formData.supplier.contactNo}</p>
                                             <p className="text-sm text-secondary">GSTIN: {formData.supplier.gstNo}</p>
+                                            {/* Outstanding Balance Display */}
+                                            {formData.supplier.outstandingBalance !== undefined && formData.supplier.outstandingBalance !== 0 && (
+                                                <div className="mt-2 pt-2 border-t border-indigo-200 dark:border-indigo-700">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm font-medium text-secondary">Previous Outstanding:</span>
+                                                        <span className={`text-sm font-bold ${formData.supplier.outstandingBalance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                            ₹{Math.abs(formData.supplier.outstandingBalance).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            {formData.supplier.outstandingBalance > 0 ? ' (You Owe)' : ' (They Owe)'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                         <button
                                             onClick={() => setFormData({ ...formData, supplier: null })}
-                                            className="text-red-600 hover:text-red-800"
+                                            className="text-red-600 hover:text-red-800 ml-4"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -757,8 +786,18 @@ const PurchaseEntry = () => {
                                     />
                                 </div>
 
+                                {/* Supplier Previous Outstanding */}
+                                {formData.supplier && formData.supplier.outstandingBalance !== undefined && formData.supplier.outstandingBalance !== 0 && (
+                                    <div className="flex justify-between text-sm pb-2 mb-2 border-b border-default">
+                                        <span className="text-secondary">Supplier Previous Dues:</span>
+                                        <span className={`font-bold ${formData.supplier.outstandingBalance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                            ₹{Math.abs(formData.supplier.outstandingBalance).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
+                                    </div>
+                                )}
+
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-secondary">Outstanding:</span>
+                                    <span className="text-secondary">This Purchase Outstanding:</span>
                                     <span className="font-medium text-red-600">₹{totals.outstandingAmount.toFixed(2)}</span>
                                 </div>
                             </div>

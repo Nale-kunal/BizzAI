@@ -699,3 +699,21 @@ export const exportStatement = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: err.message });
   }
 };
+
+/**
+ * @desc Get current cash balance for the user
+ * @route GET /api/cashbank/cash-balance
+ */
+export const getCashBalance = async (req, res) => {
+  try {
+    const balance = await CashbankTransaction.getCashBalance(req.user._id);
+
+    res.status(200).json({
+      balance,
+      formatted: `₹${balance.toFixed(2)}`
+    });
+  } catch (err) {
+    error(`Get cash balance failed: ${err.message}`);
+    res.status(500).json({ message: 'Server Error', error: err.message });
+  }
+};

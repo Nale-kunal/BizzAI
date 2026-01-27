@@ -13,6 +13,7 @@ import {
   getCashBankPosition,
   exportStatement,
   createCashTransaction,
+  getCashBalance,
 } from "../controllers/cashbankController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
@@ -37,6 +38,7 @@ router.put("/transactions/bulk-reconcile", protect, bulkReconcile);
 // Reporting
 router.get("/summary", protect, getBankSummary);
 router.get("/position", protect, getCashBankPosition);
+router.get("/cash-balance", protect, getCashBalance);
 router.get("/export", protect, exportStatement);
 
 export default router;

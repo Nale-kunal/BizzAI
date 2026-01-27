@@ -50,6 +50,8 @@ import PurchaseEntry from './pages/purchase/PurchaseEntry';
 import PurchaseList from './pages/purchase/PurchaseList';
 import PurchaseDetail from './pages/purchase/PurchaseDetail';
 import Bills from './pages/purchase/Bills';
+import BillDetail from './pages/purchase/BillDetail';
+import BillAging from './pages/purchase/BillAging';
 import PaymentOut from './pages/purchase/PaymentOut';
 import Expenses from './pages/purchase/Expenses';
 import PurchaseOrder from './pages/purchase/PurchaseOrder';
@@ -344,6 +346,8 @@ function App() {
               <Route path="list" element={<ProtectedRoute><PurchaseList /></ProtectedRoute>} />
               <Route path=":id" element={<ProtectedRoute><PurchaseDetail /></ProtectedRoute>} />
               <Route path="bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />
+              <Route path="bills/:id" element={<ProtectedRoute><BillDetail /></ProtectedRoute>} />
+              <Route path="bills/aging" element={<ProtectedRoute><BillAging /></ProtectedRoute>} />
               <Route path="payment-out" element={<ProtectedRoute><PaymentOut /></ProtectedRoute>} />
               <Route path="expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
               <Route path="order" element={<ProtectedRoute><PurchaseOrder /></ProtectedRoute>} />

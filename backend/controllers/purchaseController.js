@@ -8,6 +8,7 @@ import BankAccount from "../models/BankAccount.js";
 import { info, error } from "../utils/logger.js";
 import { logStockMovement } from "../utils/stockMovementLogger.js";
 import { validateStockLevels } from "../utils/inventoryValidator.js";
+import { createBillFromPurchase } from "../utils/billUtils.js";
 import {
     calculatePurchaseItemTotal,
     calculateRoundOff,
@@ -25,6 +26,7 @@ export const createPurchase = async (req, res) => {
             purchaseDate,
             supplierInvoiceNo,
             supplierInvoiceDate,
+            dueDate,
             supplierId,
             purchaseType,
             referenceNo,
@@ -170,6 +172,7 @@ export const createPurchase = async (req, res) => {
                     purchaseDate: purchaseDate || Date.now(),
                     supplierInvoiceNo,
                     supplierInvoiceDate: supplierInvoiceDate || Date.now(),
+                    dueDate: dueDate || null,
                     supplier: supplierId,
                     purchaseType,
                     referenceNo: referenceNo || "",
@@ -324,6 +327,17 @@ export const createPurchase = async (req, res) => {
             }
         }
         info(`Purchase created by ${req.user.name}: ${purchaseNo}`);
+
+        // AUTO-CREATE BILL if purchase is finalized
+        if (status === "finalized") {
+            try {
+                const bill = await createBillFromPurchase(purchase[0], req.user._id);
+                info(`Bill ${bill.billNo} auto-created from Purchase ${purchaseNo}`);
+            } catch (billError) {
+                // Log error but don't fail the purchase creation
+                error(`Failed to auto-create bill for Purchase ${purchaseNo}: ${billError.message}`);
+            }
+        }
 
         // Populate and return
         const populatedPurchase = await Purchase.findById(purchase[0]._id)
@@ -729,6 +743,16 @@ export const finalizePurchase = async (req, res) => {
         purchase.finalizedAt = Date.now();
         await purchase.save({});
         info(`Purchase finalized: ${purchase.purchaseNo}`);
+
+        // AUTO-CREATE BILL from finalized purchase
+        try {
+            const bill = await createBillFromPurchase(purchase, req.user._id);
+            info(`Bill ${bill.billNo} auto-created from Purchase ${purchase.purchaseNo}`);
+        } catch (billError) {
+            // Log error but don't fail the purchase finalization
+            error(`Failed to auto-create bill for Purchase ${purchase.purchaseNo}: ${billError.message}`);
+            // Continue with purchase response
+        }
 
         const finalizedPurchase = await Purchase.findById(purchase._id)
             .populate("supplier")

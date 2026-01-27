@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Supplier from "../models/Supplier.js";
+import Bill from "../models/Bill.js";
 import { info, error } from "../utils/logger.js";
 
 /**
@@ -15,21 +16,21 @@ export const addSupplier = async (req, res) => {
     }
 
     // Check for duplicate contactNo within this owner's suppliers
-    const existingContact = await Supplier.findOne({ 
-      contactNo, 
-      owner: req.user._id 
+    const existingContact = await Supplier.findOne({
+      contactNo,
+      owner: req.user._id
     });
-    
+
     if (existingContact) {
       return res.status(400).json({ message: "Contact number already exists in your supplier list" });
     }
 
     // Check for duplicate email within this owner's suppliers
-    const existingEmail = await Supplier.findOne({ 
-      email, 
-      owner: req.user._id 
+    const existingEmail = await Supplier.findOne({
+      email,
+      owner: req.user._id
     });
-    
+
     if (existingEmail) {
       return res.status(400).json({ message: "Email already exists in your supplier list" });
     }
@@ -44,7 +45,7 @@ export const addSupplier = async (req, res) => {
     const supplierId = `SUP-${nextId.toString().padStart(5, '0')}`;
 
     // Create supplier with owner reference
-    const supplier = await Supplier.create({ 
+    const supplier = await Supplier.create({
       supplierId,
       businessName,
       contactPersonName,
@@ -59,7 +60,7 @@ export const addSupplier = async (req, res) => {
       status,
       owner: req.user._id
     });
-    
+
     info(`New supplier added by ${req.user.name}: ${businessName} (${supplierId})`);
     res.status(201).json(supplier);
   } catch (err) {
@@ -80,23 +81,23 @@ export const updateSupplier = async (req, res) => {
     }
 
     // First check if supplier belongs to this owner
-    const supplier = await Supplier.findOne({ 
-      _id: req.params.id, 
-      owner: req.user._id 
+    const supplier = await Supplier.findOne({
+      _id: req.params.id,
+      owner: req.user._id
     });
-    
+
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found or unauthorized" });
     }
 
     // Check for duplicate contactNo if contactNo is being updated
     if (req.body.contactNo && req.body.contactNo !== supplier.contactNo) {
-      const existingContact = await Supplier.findOne({ 
-        contactNo: req.body.contactNo, 
+      const existingContact = await Supplier.findOne({
+        contactNo: req.body.contactNo,
         owner: req.user._id,
         _id: { $ne: req.params.id }
       });
-      
+
       if (existingContact) {
         return res.status(400).json({ message: "Contact number already exists" });
       }
@@ -104,20 +105,20 @@ export const updateSupplier = async (req, res) => {
 
     // Check for duplicate email if email is being updated
     if (req.body.email && req.body.email !== supplier.email) {
-      const existingEmail = await Supplier.findOne({ 
-        email: req.body.email, 
+      const existingEmail = await Supplier.findOne({
+        email: req.body.email,
         owner: req.user._id,
         _id: { $ne: req.params.id }
       });
-      
+
       if (existingEmail) {
         return res.status(400).json({ message: "Email already exists" });
       }
     }
 
     const updated = await Supplier.findByIdAndUpdate(
-      req.params.id, 
-      req.body, 
+      req.params.id,
+      req.body,
       { new: true }
     );
 
@@ -156,15 +157,15 @@ export const getSupplierById = async (req, res) => {
     }
 
     // Only get supplier if it belongs to current user
-    const supplier = await Supplier.findOne({ 
-      _id: req.params.id, 
-      owner: req.user._id 
+    const supplier = await Supplier.findOne({
+      _id: req.params.id,
+      owner: req.user._id
     });
-    
+
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found or unauthorized" });
     }
-    
+
     res.status(200).json(supplier);
   } catch (err) {
     error(`Get Supplier By Id Error: ${err.message}`);
@@ -184,13 +185,59 @@ export const deleteSupplier = async (req, res) => {
     }
 
     // First check if supplier belongs to this owner
-    const supplier = await Supplier.findOne({ 
-      _id: req.params.id, 
-      owner: req.user._id 
+    const supplier = await Supplier.findOne({
+      _id: req.params.id,
+      owner: req.user._id
     });
-    
+
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found or unauthorized" });
+    }
+
+    // Check if supplier has outstanding balance
+    if (supplier.outstandingBalance !== 0) {
+      return res.status(400).json({
+        message: "Cannot delete supplier with outstanding balance",
+        error: "SUPPLIER_HAS_OUTSTANDING_BALANCE",
+        details: {
+          supplierName: supplier.businessName,
+          outstandingBalance: supplier.outstandingBalance,
+          balanceType: supplier.balanceType,
+          reason: "Supplier has outstanding balance that must be cleared before deletion",
+        },
+      });
+    }
+
+    // Check for unpaid, partially paid, or overdue bills
+    const unpaidBills = await Bill.find({
+      supplier: req.params.id,
+      paymentStatus: { $in: ["unpaid", "partial", "overdue"] },
+      isDeleted: false,
+    }).select("billNo totalAmount paidAmount outstandingAmount paymentStatus");
+
+    if (unpaidBills.length > 0) {
+      const totalOutstanding = unpaidBills.reduce((sum, bill) => {
+        return sum + bill.outstandingAmount;
+      }, 0);
+
+      return res.status(400).json({
+        message: "Cannot delete supplier with unpaid bills",
+        error: "SUPPLIER_HAS_UNPAID_BILLS",
+        details: {
+          supplierName: supplier.businessName,
+          unpaidBillCount: unpaidBills.length,
+          totalOutstandingAmount: totalOutstanding,
+          unpaidBills: unpaidBills.map((bill) => ({
+            billNo: bill.billNo,
+            totalAmount: bill.totalAmount,
+            paidAmount: bill.paidAmount,
+            outstandingAmount: bill.outstandingAmount,
+            status: bill.paymentStatus,
+          })),
+          reason:
+            "Supplier has unpaid, partially paid, or overdue bills. Please clear all bills before deletion.",
+        },
+      });
     }
 
     await Supplier.findByIdAndDelete(req.params.id);

@@ -88,6 +88,9 @@ const purchaseSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
+        dueDate: {
+            type: Date,
+        },
         supplier: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Supplier",

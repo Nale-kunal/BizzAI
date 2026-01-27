@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Customer from "../models/Customer.js";
 import Transaction from "../models/Transaction.js";
+import Invoice from "../models/Invoice.js";
 import { info, error } from "../utils/logger.js";
 
 /**
@@ -203,6 +204,51 @@ export const deleteCustomer = async (req, res) => {
       return res
         .status(404)
         .json({ message: "Customer not found or unauthorized" });
+    }
+
+    // Check if customer has pending dues
+    if (customer.dues !== 0) {
+      return res.status(400).json({
+        message: "Cannot delete customer with pending dues",
+        error: "CUSTOMER_HAS_DUES",
+        details: {
+          customerName: customer.name,
+          pendingDues: customer.dues,
+          reason: "Customer has outstanding dues that must be cleared before deletion",
+        },
+      });
+    }
+
+    // Check for unpaid or partially paid invoices
+    const unpaidInvoices = await Invoice.find({
+      customer: req.params.id,
+      paymentStatus: { $in: ["unpaid", "partial"] },
+      isDeleted: false,
+    }).select("invoiceNo totalAmount paidAmount paymentStatus");
+
+    if (unpaidInvoices.length > 0) {
+      const totalOutstanding = unpaidInvoices.reduce((sum, invoice) => {
+        return sum + (invoice.totalAmount - invoice.paidAmount);
+      }, 0);
+
+      return res.status(400).json({
+        message: "Cannot delete customer with unpaid invoices",
+        error: "CUSTOMER_HAS_UNPAID_INVOICES",
+        details: {
+          customerName: customer.name,
+          unpaidInvoiceCount: unpaidInvoices.length,
+          totalOutstandingAmount: totalOutstanding,
+          unpaidInvoices: unpaidInvoices.map((inv) => ({
+            invoiceNo: inv.invoiceNo,
+            totalAmount: inv.totalAmount,
+            paidAmount: inv.paidAmount,
+            outstandingAmount: inv.totalAmount - inv.paidAmount,
+            status: inv.paymentStatus,
+          })),
+          reason:
+            "Customer has unpaid or partially paid invoices. Please clear all invoices before deletion.",
+        },
+      });
     }
 
     // Attach for audit middleware (before deletion)
