@@ -20,6 +20,8 @@ const PurchaseList = () => {
     });
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         dispatch(getAllPurchases(filters));
@@ -30,12 +32,14 @@ const PurchaseList = () => {
         const newFilters = { ...filters, [field]: value };
         setFilters(newFilters);
         dispatch(getAllPurchases(newFilters));
+        setCurrentPage(1); // Reset to first page on filter change
     };
 
     const handleClearFilters = () => {
         const emptyFilters = { status: '', supplier: '', startDate: '', endDate: '' };
         setFilters(emptyFilters);
         dispatch(getAllPurchases(emptyFilters));
+        setCurrentPage(1);
     };
 
     const filteredPurchases = purchases.filter((purchase) => {
@@ -45,6 +49,12 @@ const PurchaseList = () => {
             purchase.supplierInvoiceNo.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesSearch;
     });
+
+    // Pagination logic
+    const totalPages = Math.ceil(filteredPurchases.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentPurchases = filteredPurchases.slice(startIndex, endIndex);
 
     const getStatusBadge = (status) => {
         const badges = {
@@ -212,7 +222,10 @@ const PurchaseList = () => {
                             <input
                                 type="text"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 placeholder="Search by purchase number, supplier, or invoice number..."
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                             />
@@ -226,7 +239,7 @@ const PurchaseList = () => {
                     </div>
                 </div>
 
-                {/* Purchase Table */}
+                {/* Purchase Table - Compact Version */}
                 <div className="bg-card rounded-xl shadow-sm overflow-hidden">
                     {isLoading ? (
                         <div className="p-8 text-center">
@@ -238,92 +251,112 @@ const PurchaseList = () => {
                             <p className="text-secondary">No purchases found</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-surface border-b">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Purchase No
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Date
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Supplier
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Invoice No
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Total
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Paid
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Outstanding
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Payment
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                    {filteredPurchases.map((purchase) => (
-                                        <tr key={purchase._id} className="hover:bg-surface">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="font-medium text-main">{purchase.purchaseNo}</span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary">
-                                                {new Date(purchase.purchaseDate).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm">
-                                                    <div className="font-medium text-main">{purchase.supplier?.businessName}</div>
-                                                    <div className="text-secondary">{purchase.supplier?.contactPersonName}</div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary">
-                                                {purchase.supplierInvoiceNo}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-main">
-                                                ₹{purchase.totalAmount.toFixed(2)}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
-                                                ₹{purchase.paidAmount.toFixed(2)}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
-                                                ₹{purchase.outstandingAmount.toFixed(2)}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(purchase.status)}`}>
-                                                    {purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPaymentStatusBadge(purchase.paymentStatus)}`}>
-                                                    {purchase.paymentStatus.charAt(0).toUpperCase() + purchase.paymentStatus.slice(1)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                <button
-                                                    onClick={() => navigate(`/purchase/${purchase._id}`)}
-                                                    className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400 font-medium"
-                                                >
-                                                    View
-                                                </button>
-                                            </td>
+                        <>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-surface border-b">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                                                Purchase No
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                                                Date
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                                                Supplier
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                                                Total
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                                                Outstanding
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                                                Status
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                                                Actions
+                                            </th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                        {currentPurchases.map((purchase) => (
+                                            <tr key={purchase._id} className="hover:bg-surface">
+                                                <td className="px-4 py-3 whitespace-nowrap">
+                                                    <span className="font-medium text-main">{purchase.purchaseNo}</span>
+                                                </td>
+                                                <td className="px-4 py-3 whitespace-nowrap text-sm text-secondary">
+                                                    {new Date(purchase.purchaseDate).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="text-sm">
+                                                        <div className="font-medium text-main">{purchase.supplier?.businessName}</div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-main">
+                                                    ₹{purchase.totalAmount.toFixed(2)}
+                                                </td>
+                                                <td className="px-4 py-3 whitespace-nowrap text-sm text-red-600">
+                                                    ₹{purchase.outstandingAmount.toFixed(2)}
+                                                </td>
+                                                <td className="px-4 py-3 whitespace-nowrap">
+                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(purchase.status)}`}>
+                                                        {purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                                    <button
+                                                        onClick={() => navigate(`/purchase/${purchase._id}`)}
+                                                        className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400 font-medium"
+                                                    >
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="px-6 py-4 border-t flex items-center justify-between">
+                                    <div className="text-sm text-secondary">
+                                        Showing {startIndex + 1} to {Math.min(endIndex, filteredPurchases.length)} of {filteredPurchases.length} purchases
+                                    </div>
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                            disabled={currentPage === 1}
+                                            className="px-3 py-1 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        >
+                                            Previous
+                                        </button>
+                                        <div className="flex space-x-1">
+                                            {[...Array(totalPages)].map((_, i) => (
+                                                <button
+                                                    key={i + 1}
+                                                    onClick={() => setCurrentPage(i + 1)}
+                                                    className={`px-3 py-1 rounded-lg ${currentPage === i + 1
+                                                            ? 'bg-indigo-600 text-white'
+                                                            : 'border hover:bg-gray-50 dark:hover:bg-gray-800'
+                                                        }`}
+                                                >
+                                                    {i + 1}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                            disabled={currentPage === totalPages}
+                                            className="px-3 py-1 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

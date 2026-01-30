@@ -244,6 +244,7 @@ const PurchaseOrderForm = () => {
     // Handle barcode scan
     const handleScanKeyDown = async (e) => {
         if (e.key === "Enter" && scanInput.trim()) {
+            e.preventDefault(); // CRITICAL: Prevent form submission when scanning
             setScanError("");
 
             try {

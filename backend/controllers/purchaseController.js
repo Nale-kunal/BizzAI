@@ -479,6 +479,7 @@ export const updatePurchase = async (req, res) => {
             purchaseDate,
             supplierInvoiceNo,
             supplierInvoiceDate,
+            dueDate,
             purchaseType,
             referenceNo,
             notes,
@@ -489,6 +490,7 @@ export const updatePurchase = async (req, res) => {
             paymentMethod,
             bankAccount,
             paymentReference,
+            status, // NEW: Accept status field
         } = req.body;
 
         // If items are updated, recalculate everything
@@ -576,6 +578,7 @@ export const updatePurchase = async (req, res) => {
         if (purchaseDate) purchase.purchaseDate = purchaseDate;
         if (supplierInvoiceNo) purchase.supplierInvoiceNo = supplierInvoiceNo;
         if (supplierInvoiceDate) purchase.supplierInvoiceDate = supplierInvoiceDate;
+        if (dueDate !== undefined) purchase.dueDate = dueDate;
         if (purchaseType) purchase.purchaseType = purchaseType;
         if (referenceNo !== undefined) purchase.referenceNo = referenceNo;
         if (notes !== undefined) purchase.notes = notes;
@@ -599,12 +602,143 @@ export const updatePurchase = async (req, res) => {
 
         await purchase.save({});
 
+        // NEW: If status is changing from draft to finalized, trigger finalization
+        if (status === "finalized") {
+            // Update inventory
+            for (const itemData of purchase.items) {
+                const item = await Item.findById(itemData.item);
+
+                const previousState = {
+                    stockQty: item.stockQty,
+                    reservedStock: item.reservedStock || 0,
+                    inTransitStock: item.inTransitStock || 0,
+                };
+
+                item.stockQty += itemData.quantity;
+
+                // Update cost price (weighted average)
+                const totalCost = item.costPrice * previousState.stockQty + itemData.purchaseRate * itemData.quantity;
+                const totalQty = previousState.stockQty + itemData.quantity;
+                item.costPrice = totalQty > 0 ? totalCost / totalQty : itemData.purchaseRate;
+
+                if (itemData.sellingPrice > 0) {
+                    item.sellingPrice = itemData.sellingPrice;
+                }
+
+                // Update barcode if provided
+                if (itemData.barcode) {
+                    item.barcode = itemData.barcode;
+                }
+
+                if (item.trackBatch && itemData.batchNo) {
+                    item.batches.push({
+                        batchNo: itemData.batchNo,
+                        quantity: itemData.quantity,
+                        expiryDate: itemData.expiryDate || null,
+                        purchaseRate: itemData.purchaseRate,
+                        purchaseDate: purchase.purchaseDate,
+                    });
+                }
+
+                validateStockLevels(item);
+                await item.save({});
+
+                const newState = {
+                    stockQty: item.stockQty,
+                    reservedStock: item.reservedStock || 0,
+                    inTransitStock: item.inTransitStock || 0,
+                };
+
+                await logStockMovement(
+                    item,
+                    "PURCHASE",
+                    itemData.quantity,
+                    purchase._id,
+                    "Purchase",
+                    req.user._id,
+                    previousState,
+                    newState);
+            }
+
+            // Update supplier balance
+            const supplier = await Supplier.findById(purchase.supplier);
+            supplier.outstandingBalance += purchase.outstandingAmount;
+            supplier.totalPurchases += purchase.totalAmount;
+            await supplier.save({});
+
+            // Record payment if any
+            if (purchase.paidAmount > 0) {
+                if (purchase.paymentMethod === "bank" && purchase.bankAccount) {
+                    const bankAcc = await BankAccount.findOne({
+                        _id: purchase.bankAccount,
+                        userId: req.user._id,
+                    });
+
+                    if (!bankAcc) {
+                        return res.status(400).json({ message: "Bank account not found" });
+                    }
+
+                    const cashbankTxn = await CashbankTransaction.create(
+                        [
+                            {
+                                type: "out",
+                                amount: purchase.paidAmount,
+                                fromAccount: purchase.bankAccount,
+                                toAccount: "purchase",
+                                description: `Purchase payment for ${purchase.purchaseNo}`,
+                                userId: req.user._id,
+                            },
+                        ],
+                        {}
+                    );
+
+                    await BankAccount.updateOne(
+                        { _id: purchase.bankAccount, userId: req.user._id },
+                        {
+                            $inc: { currentBalance: -purchase.paidAmount },
+                            $push: { transactions: cashbankTxn[0]._id },
+                        },
+                        {}
+                    );
+                } else if (purchase.paymentMethod === "cash") {
+                    await CashbankTransaction.create(
+                        [
+                            {
+                                type: "out",
+                                amount: purchase.paidAmount,
+                                fromAccount: "cash",
+                                toAccount: "purchase",
+                                description: `Cash payment for purchase ${purchase.purchaseNo}`,
+                                userId: req.user._id,
+                            },
+                        ],
+                        {}
+                    );
+                }
+            }
+
+            // Mark as finalized
+            purchase.status = "finalized";
+            purchase.finalizedAt = Date.now();
+            await purchase.save({});
+            info(`Purchase finalized: ${purchase.purchaseNo}`);
+
+            // AUTO-CREATE BILL from finalized purchase
+            try {
+                const bill = await createBillFromPurchase(purchase, req.user._id);
+                info(`Bill ${bill.billNo} auto-created from Purchase ${purchase.purchaseNo}`);
+            } catch (billError) {
+                // Log error but don't fail the purchase finalization
+                error(`Failed to auto-create bill for Purchase ${purchase.purchaseNo}: ${billError.message}`);
+            }
+        }
+
         const updatedPurchase = await Purchase.findById(purchase._id)
             .populate("supplier")
             .populate("items.item", "name sku");
 
         res.status(200).json({
-            message: "Purchase updated successfully",
+            message: status === "finalized" ? "Purchase finalized successfully" : "Purchase updated successfully",
             purchase: updatedPurchase,
         });
     } catch (err) {

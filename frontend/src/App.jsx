@@ -360,6 +360,7 @@ function App() {
             {/* Purchase Routes */}
             <Route path="/purchase">
               <Route path="entry" element={<ProtectedRoute><PurchaseEntry /></ProtectedRoute>} />
+              <Route path="edit/:id" element={<ProtectedRoute><PurchaseEntry /></ProtectedRoute>} />
               <Route path="list" element={<ProtectedRoute><PurchaseList /></ProtectedRoute>} />
               <Route path=":id" element={<ProtectedRoute><PurchaseDetail /></ProtectedRoute>} />
               <Route path="bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />

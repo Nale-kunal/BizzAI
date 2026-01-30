@@ -808,32 +808,25 @@ export const cancelPurchaseOrder = async (req, res) => {
  * @access  Private
  */
 export const convertToPurchase = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
         const purchaseOrder = await PurchaseOrder.findOne({
             _id: req.params.id,
             createdBy: req.user._id,
             isDeleted: false,
         })
-            .populate("supplier")
-            .session(session);
+            .populate("supplier");
 
         if (!purchaseOrder) {
-            await session.abortTransaction();
             return res.status(404).json({ message: "Purchase Order not found" });
         }
 
         if (purchaseOrder.status !== "Approved") {
-            await session.abortTransaction();
             return res.status(400).json({
                 message: "Only approved purchase orders can be converted",
             });
         }
 
         if (purchaseOrder.convertedToPurchase) {
-            await session.abortTransaction();
             return res.status(400).json({
                 message: "Purchase Order already converted to Purchase",
             });
@@ -861,7 +854,7 @@ export const convertToPurchase = async (req, res) => {
 
         // Generate purchase number
         const Counter = (await import("../models/Counter.js")).default;
-        const purchaseNumber = await Counter.getNextSequence("purchase", req.user._id, session);
+        const purchaseNumber = await Counter.getNextSequence("purchase", req.user._id);
         const purchaseNo = `PUR-${String(purchaseNumber).padStart(6, "0")}`;
 
         const purchase = new Purchase({
@@ -888,7 +881,7 @@ export const convertToPurchase = async (req, res) => {
             createdBy: req.user._id,
         });
 
-        await purchase.save({ session });
+        await purchase.save();
 
         // Update PO
         purchaseOrder.convertedToPurchase = true;
@@ -903,8 +896,7 @@ export const convertToPurchase = async (req, res) => {
             details: `Converted to Purchase: ${purchaseNo}`,
         });
 
-        await purchaseOrder.save({ session });
-        await session.commitTransaction();
+        await purchaseOrder.save();
 
         res.status(201).json({
             message: "Purchase Order converted to Purchase successfully",
@@ -912,13 +904,11 @@ export const convertToPurchase = async (req, res) => {
             purchaseOrder,
         });
     } catch (error) {
-        await session.abortTransaction();
+        error(`Convert to purchase error: ${error.message}`);
         res.status(500).json({
             message: "Failed to convert purchase order",
             error: error.message,
         });
-    } finally {
-        session.endSession();
     }
 };
 

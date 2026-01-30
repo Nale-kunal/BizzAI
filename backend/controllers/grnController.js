@@ -81,8 +81,8 @@ export const createGRN = async (req, res) => {
                 acceptedQty: grnItem.receivedQty - (grnItem.rejectedQty || 0),
                 batchNo: grnItem.batchNo || "",
                 expiryDate: grnItem.expiryDate || null,
-                qualityCheckNotes: grnItem.qualityCheckNotes || "",
-                qualityStatus: grnItem.qualityStatus || "pending",
+                qualityCheckNotes: grnItem.qualityCheckNotes || grnItem.remarks || "",
+                qualityStatus: grnItem.qualityStatus || grnItem.qualityCheck || "pending",
             });
         }
 

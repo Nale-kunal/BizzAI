@@ -75,7 +75,7 @@ const PaymentOut = () => {
     const fetchCashBalance = async () => {
         try {
             const { data } = await api.get(`${API_URL}/api/cashbank/balance`);
-            setCashBalance(data.cashBalance || 0);
+            setCashBalance(data.balance || 0); // Fixed: backend returns 'balance', not 'cashBalance'
             setHasBalanceData(true);
         } catch (err) {
             console.error('Error fetching cash balance:', err);
