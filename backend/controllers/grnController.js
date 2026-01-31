@@ -11,28 +11,26 @@ import { generateGRNNumber } from "../utils/poNumberGenerator.js";
  * @access  Private
  */
 export const createGRN = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
         const { purchaseOrder: poId, grnDate, items, notes } = req.body;
+
+        console.log('📦 Creating GRN:', { poId, itemCount: items?.length, userId: req.user._id });
 
         // Validate PO
         const purchaseOrder = await PurchaseOrder.findOne({
             _id: poId,
-            createdBy: req.user._id,
             isDeleted: false,
-        })
-            .populate("supplier")
-            .session(session);
+        }).populate("supplier");
 
         if (!purchaseOrder) {
-            await session.abortTransaction();
+            console.error('❌ Purchase Order not found:', poId);
             return res.status(404).json({ message: "Purchase Order not found" });
         }
 
+        console.log('✅ PO found:', { poNumber: purchaseOrder.poNumber, status: purchaseOrder.status });
+
         if (purchaseOrder.status !== "Approved" && purchaseOrder.status !== "Partially Received") {
-            await session.abortTransaction();
+            console.error('❌ Invalid PO status:', purchaseOrder.status);
             return res.status(400).json({
                 message: "Only approved or partially received POs can have GRNs created",
             });
@@ -40,7 +38,7 @@ export const createGRN = async (req, res) => {
 
         // Validate items
         if (!items || items.length === 0) {
-            await session.abortTransaction();
+            console.error('❌ No items provided');
             return res.status(400).json({ message: "At least one item is required" });
         }
 
@@ -54,7 +52,7 @@ export const createGRN = async (req, res) => {
             );
 
             if (!poItem) {
-                await session.abortTransaction();
+                console.error('❌ Item not found in PO:', grnItem.item);
                 return res.status(400).json({
                     message: `Item ${grnItem.item} not found in Purchase Order`,
                 });
@@ -63,7 +61,7 @@ export const createGRN = async (req, res) => {
             // Validate received quantity
             const pendingQty = poItem.orderedQty - poItem.receivedQty;
             if (grnItem.receivedQty > pendingQty) {
-                await session.abortTransaction();
+                console.error('❌ Received qty exceeds pending:', { received: grnItem.receivedQty, pending: pendingQty });
                 return res.status(400).json({
                     message: `Received quantity for item ${poItem.itemName} exceeds pending quantity`,
                     pendingQty,
@@ -87,7 +85,8 @@ export const createGRN = async (req, res) => {
         }
 
         // Generate GRN number
-        const grnNumber = await generateGRNNumber(req.user._id, session);
+        const grnNumber = await generateGRNNumber(req.user._id);
+        console.log('✅ Generated GRN number:', grnNumber);
 
         // Create GRN
         const grn = new GoodsReceivedNote({
@@ -102,8 +101,9 @@ export const createGRN = async (req, res) => {
             createdBy: req.user._id,
         });
 
-        await grn.save({ session });
-        await session.commitTransaction();
+        await grn.save();
+
+        console.log('✅ GRN created successfully:', grnNumber);
 
         await grn.populate("supplier", "businessName contactPersonName");
         await grn.populate("items.item", "name unit");
@@ -113,13 +113,12 @@ export const createGRN = async (req, res) => {
             grn,
         });
     } catch (error) {
-        await session.abortTransaction();
+        console.error('❌ GRN creation failed:', error.message);
+        console.error('❌ Full error:', error);
         res.status(500).json({
             message: "Failed to create GRN",
             error: error.message,
         });
-    } finally {
-        session.endSession();
     }
 };
 
@@ -231,38 +230,52 @@ export const getGRNById = async (req, res) => {
  * @access  Private
  */
 export const finalizeGRN = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
+        console.log('🔄 Finalizing GRN:', req.params.id);
+
         const grn = await GoodsReceivedNote.findOne({
             _id: req.params.id,
             createdBy: req.user._id,
             isDeleted: false,
-        }).session(session);
+        });
 
         if (!grn) {
-            await session.abortTransaction();
+            console.error('❌ GRN not found');
             return res.status(404).json({ message: "GRN not found" });
         }
 
+        console.log('✅ GRN found:', grn.grnNumber, 'Status:', grn.status);
+
         if (grn.status === "Finalized") {
-            await session.abortTransaction();
+            console.error('❌ GRN already finalized');
             return res.status(400).json({ message: "GRN already finalized" });
         }
 
         // Get PO
-        const purchaseOrder = await PurchaseOrder.findById(grn.purchaseOrder).session(session);
+        console.log('📦 Fetching PO:', grn.purchaseOrder);
+        const purchaseOrder = await PurchaseOrder.findById(grn.purchaseOrder);
         if (!purchaseOrder) {
-            await session.abortTransaction();
+            console.error('❌ Purchase Order not found');
             return res.status(404).json({ message: "Purchase Order not found" });
         }
 
+        console.log('✅ PO found:', purchaseOrder.poNumber);
+
         // Update inventory and PO for each item
+        console.log('📝 Processing', grn.items.length, 'items');
         for (const grnItem of grn.items) {
+            console.log('  - Processing item:', grnItem.item);
+
             // Update item stock
-            const item = await Item.findById(grnItem.item).session(session);
+            const item = await Item.findById(grnItem.item);
             if (item) {
+                console.log('    Current stock:', item.stockQty, 'Reserved:', item.reservedStock);
+
+                // Store previous state for stock movement
+                const previousStock = item.stockQty;
+                const previousReserved = item.reservedStock || 0;
+                const previousInTransit = item.inTransit || 0;
+
                 // Increase stock by accepted quantity
                 item.stockQty += grnItem.acceptedQty;
 
@@ -270,8 +283,11 @@ export const finalizeGRN = async (req, res) => {
                 const reservedQtyToRelease = grnItem.receivedQty;
                 item.reservedStock = Math.max((item.reservedStock || 0) - reservedQtyToRelease, 0);
 
+                console.log('    New stock:', item.stockQty, 'New reserved:', item.reservedStock);
+
                 // Add batch if tracked
                 if (item.trackBatch && grnItem.batchNo) {
+                    console.log('    Adding batch:', grnItem.batchNo);
                     item.batches.push({
                         batchNo: grnItem.batchNo,
                         quantity: grnItem.acceptedQty,
@@ -281,21 +297,33 @@ export const finalizeGRN = async (req, res) => {
                     });
                 }
 
-                await item.save({ session });
+                await item.save();
+                console.log('    ✅ Item saved');
 
-                // Create stock movement record
+                // Create stock movement record with all required fields
                 const stockMovement = new StockMovement({
                     item: grnItem.item,
-                    movementType: "in",
+                    type: "PURCHASE",
                     quantity: grnItem.acceptedQty,
-                    reason: "GRN",
-                    referenceNo: grn.grnNumber,
-                    referenceModel: "GoodsReceivedNote",
-                    referenceId: grn._id,
-                    performedBy: req.user._id,
-                    notes: `GRN ${grn.grnNumber} - PO ${purchaseOrder.poNumber}`,
+                    sourceId: grn._id,
+                    sourceType: "GoodsReceivedNote",
+                    // Previous state
+                    previousStock: previousStock,
+                    previousReserved: previousReserved,
+                    previousInTransit: previousInTransit,
+                    // New state
+                    newStock: item.stockQty,
+                    newReserved: item.reservedStock,
+                    newInTransit: item.inTransit || 0,
+                    // Quality and disposition
+                    qualityStatus: grnItem.qualityStatus || "none",
+                    disposition: "restock",
+                    createdBy: req.user._id,
                 });
-                await stockMovement.save({ session });
+                await stockMovement.save();
+                console.log('    ✅ Stock movement created');
+            } else {
+                console.warn('    ⚠️ Item not found:', grnItem.item);
             }
 
             // Update PO item received quantity
@@ -303,11 +331,13 @@ export const finalizeGRN = async (req, res) => {
                 (item) => item.item.toString() === grnItem.item.toString()
             );
             if (poItem) {
+                console.log('    Updating PO item received qty from', poItem.receivedQty, 'to', poItem.receivedQty + grnItem.receivedQty);
                 poItem.receivedQty += grnItem.receivedQty;
             }
         }
 
         // Update PO status (will be handled by pre-save middleware)
+        console.log('📦 Updating PO with GRN reference');
         purchaseOrder.grns.push(grn._id);
         purchaseOrder.auditLog.push({
             action: "grn_created",
@@ -315,15 +345,16 @@ export const finalizeGRN = async (req, res) => {
             performedByName: req.user.name || req.user.email,
             details: `GRN ${grn.grnNumber} finalized`,
         });
-        await purchaseOrder.save({ session });
+        await purchaseOrder.save();
+        console.log('✅ PO updated');
 
         // Finalize GRN
+        console.log('✅ Finalizing GRN status');
         grn.status = "Finalized";
         grn.finalizedAt = new Date();
         grn.finalizedBy = req.user._id;
-        await grn.save({ session });
-
-        await session.commitTransaction();
+        await grn.save();
+        console.log('✅ GRN finalized successfully');
 
         await grn.populate("supplier");
         await grn.populate("purchaseOrder");
@@ -335,12 +366,11 @@ export const finalizeGRN = async (req, res) => {
             purchaseOrder,
         });
     } catch (error) {
-        await session.abortTransaction();
+        console.error('❌ Finalize GRN failed:', error.message);
+        console.error('❌ Full error:', error);
         res.status(500).json({
             message: "Failed to finalize GRN",
             error: error.message,
         });
-    } finally {
-        session.endSession();
     }
 };

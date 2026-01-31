@@ -125,6 +125,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
         { name: 'Payment Out', path: '/purchase/payment-out' },
         { name: 'Expenses', path: '/purchase/expenses' },
         { name: 'Purchase Order', path: '/purchase-orders/new' },
+        { name: 'GRN', path: '/grns' },
         { name: 'Purchase Return', path: '/purchase/return' }
       ]
     },
