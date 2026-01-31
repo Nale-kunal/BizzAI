@@ -13,13 +13,16 @@ import {
   getCashBankPosition,
   exportStatement,
   createCashTransaction,
+  getCashBalance,
 } from "../controllers/cashbankController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+
 // Account Management
 router.get("/accounts", protect, getAccounts);
+router.get("/bank-accounts", protect, getAccounts); // Alias for backward compatibility
 router.post("/accounts", protect, createAccount);
 router.put("/accounts/:id", protect, updateAccount);
 router.delete("/accounts/:id", protect, deleteAccount);
@@ -37,6 +40,8 @@ router.put("/transactions/bulk-reconcile", protect, bulkReconcile);
 // Reporting
 router.get("/summary", protect, getBankSummary);
 router.get("/position", protect, getCashBankPosition);
+router.get("/cash-balance", protect, getCashBalance);
+router.get("/balance", protect, getCashBalance); // Alias for backward compatibility
 router.get("/export", protect, exportStatement);
 
 export default router;

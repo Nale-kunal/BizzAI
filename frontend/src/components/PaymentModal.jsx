@@ -5,9 +5,11 @@ import Modal from './Modal';
 const PaymentModal = ({ isOpen, onClose, onSubmit, documentType, totalAmount, paidAmount }) => {
     const [bankAccounts, setBankAccounts] = useState([]);
     const [formData, setFormData] = useState({
-        paidAmount: totalAmount - paidAmount,
+        amount: totalAmount - paidAmount,
         paymentMethod: 'cash',
-        bankAccount: ''
+        bankAccount: '',
+        reference: '',
+        notes: ''
     });
     const [loading, setLoading] = useState(false);
 
@@ -16,55 +18,64 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, documentType, totalAmount, pa
             try {
                 const userData = JSON.parse(localStorage.getItem('user'));
                 const token = userData?.token;
-                console.log('PaymentModal: Fetching bank accounts...');
-                console.log('API URL:', `/api/cashbank/accounts`);
 
                 const response = await api.get(
                     `/api/cashbank/accounts`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 
-                console.log('Payment modal - bank accounts response:', response.data);
-                console.log('Number of accounts:', response.data?.length);
-
-                if (!response.data || response.data.length === 0) {
-                    console.warn('No bank accounts found!');
-                    alert('No bank accounts found. Please create a bank account first.');
-                }
-
                 setBankAccounts(response.data || []);
             } catch (error) {
                 console.error('Error fetching bank accounts:', error);
-                console.error('Error details:', error.response?.data);
-                alert(`Failed to load bank accounts: ${error.response?.data?.message || error.message}`);
+                // Only show error if user is trying to use bank payment
+                if (formData.paymentMethod !== 'cash') {
+                    alert(`Failed to load bank accounts: ${error.response?.data?.message || error.message}`);
+                }
             }
         };
 
         if (isOpen) {
-            fetchBankAccounts();
+            // Reset form data
             setFormData({
-                paidAmount: totalAmount - paidAmount,
-                paymentMethod: 'cash',
-                bankAccount: ''
+                amount: totalAmount - paidAmount,
+                paymentMethod: 'cash', // Default to cash
+                bankAccount: '',
+                reference: '',
+                notes: ''
             });
+
+            // Only fetch bank accounts if needed (will be fetched when user selects bank method)
+            // This prevents unnecessary API calls and alerts for cash payments
         }
     }, [isOpen, totalAmount, paidAmount]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (formData.paymentMethod === 'bank_transfer' && !formData.bankAccount) {
+        // Only validate bank account for bank-related payment methods
+        const bankMethods = ['bank', 'upi', 'card', 'cheque'];
+        if (bankMethods.includes(formData.paymentMethod) && !formData.bankAccount) {
             alert('Please select a bank account');
             return;
         }
 
         setLoading(true);
-        onSubmit(formData);
+
+        // Send data with 'amount' field name (backend expects 'amount', not 'paidAmount')
+        const paymentData = {
+            amount: formData.amount,
+            paymentMethod: formData.paymentMethod,
+            bankAccount: formData.bankAccount || null,
+            reference: formData.reference || '',
+            notes: formData.notes || ''
+        };
+
+        onSubmit(paymentData);
     };
 
     const remainingAmount = totalAmount - paidAmount;
     const selectedAccount = bankAccounts.find(a => a._id === formData.bankAccount);
-    const hasInsufficientBalance = selectedAccount && selectedAccount.currentBalance < formData.paidAmount;
+    const hasInsufficientBalance = selectedAccount && selectedAccount.currentBalance < formData.amount;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={`Record Payment - ${documentType}`}>
@@ -95,8 +106,8 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, documentType, totalAmount, pa
                         step="0.01"
                         min="0.01"
                         max={remainingAmount}
-                        value={formData.paidAmount}
-                        onChange={(e) => setFormData({ ...formData, paidAmount: parseFloat(e.target.value) || 0 })}
+                        value={formData.amount}
+                        onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         required
                     />
@@ -110,20 +121,45 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, documentType, totalAmount, pa
                     </label>
                     <select
                         value={formData.paymentMethod}
-                        onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value, bankAccount: '' })}
+                        onChange={(e) => {
+                            setFormData({ ...formData, paymentMethod: e.target.value, bankAccount: '' });
+                            // Fetch bank accounts when bank-related method is selected
+                            const bankMethods = ['bank', 'upi', 'card', 'cheque'];
+                            if (bankMethods.includes(e.target.value) && bankAccounts.length === 0) {
+                                const fetchBankAccounts = async () => {
+                                    try {
+                                        const userData = JSON.parse(localStorage.getItem('user'));
+                                        const token = userData?.token;
+                                        const response = await api.get(
+                                            `/api/cashbank/accounts`,
+                                            { headers: { Authorization: `Bearer ${token}` } }
+                                        );
+                                        if (!response.data || response.data.length === 0) {
+                                            alert('No bank accounts found. Please create a bank account first.');
+                                        }
+                                        setBankAccounts(response.data || []);
+                                    } catch (error) {
+                                        console.error('Error fetching bank accounts:', error);
+                                        alert(`Failed to load bank accounts: ${error.response?.data?.message || error.message}`);
+                                    }
+                                };
+                                fetchBankAccounts();
+                            }
+                        }}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         required
                     >
-                        <option value="cash">Cash</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="upi">UPI</option>
-                        <option value="card">Card</option>
-                        <option value="cheque">Cheque</option>
+                        <option value="cash">Cash (from Shop Safe)</option>
+                        <option value="bank">Bank Transfer (from Business Account)</option>
+                        <option value="upi">UPI (from Business Account)</option>
+                        <option value="card">Card (from Business Account)</option>
+                        <option value="cheque">Cheque (from Business Account)</option>
+                        <option value="owner">Owner's Personal Funds</option>
                     </select>
                 </div>
 
-                {/* Bank Account Selection */}
-                {formData.paymentMethod === 'bank_transfer' && (
+                {/* Bank Account Selection - Show for bank-related methods */}
+                {['bank', 'upi', 'card', 'cheque'].includes(formData.paymentMethod) && (
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Select Bank Account <span className="text-red-500">*</span>
@@ -153,7 +189,7 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, documentType, totalAmount, pa
                                     <p className="text-red-800 font-medium text-sm">Insufficient Balance!</p>
                                     <p className="text-red-700 text-sm">
                                         Available: ₹{selectedAccount.currentBalance.toFixed(2)} |
-                                        Required: ₹{formData.paidAmount.toFixed(2)}
+                                        Required: ₹{formData.amount.toFixed(2)}
                                     </p>
                                 </div>
                             </div>

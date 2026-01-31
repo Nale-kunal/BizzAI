@@ -36,6 +36,10 @@ const supplierSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    state: {
+      type: String,
+      default: "",
+    },
     supplierType: {
       type: String,
       enum: ["manufacturer", "wholesaler", "distributor"],
@@ -49,6 +53,26 @@ const supplierSchema = new mongoose.Schema(
       type: String,
       enum: ["payable", "receivable"],
       default: "payable",
+    },
+    outstandingBalance: {
+      type: Number,
+      default: 0,
+    },
+    advanceBalance: {
+      type: Number,
+      default: 0,
+    },
+    totalAdvanceGiven: {
+      type: Number,
+      default: 0,
+    },
+    totalAdvanceUsed: {
+      type: Number,
+      default: 0,
+    },
+    totalPurchases: {
+      type: Number,
+      default: 0,
     },
     creditPeriod: {
       type: Number,

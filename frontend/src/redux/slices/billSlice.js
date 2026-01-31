@@ -13,19 +13,24 @@ const getConfig = (token) => ({
 const initialState = {
   bills: [],
   bill: null,
+  aging: null,
+  analytics: null,
+  overdueBills: [],
   isLoading: false,
   isSuccess: false,
   isError: false,
   message: '',
 };
 
-// Get all bills
+// Get all bills (with optional filters)
 export const getAllBills = createAsyncThunk(
   'bill/getAll',
-  async (_, thunkAPI) => {
+  async (filters = {}, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await api.get(API_URL, getConfig(token));
+      const queryParams = new URLSearchParams(filters).toString();
+      const url = queryParams ? `${API_URL}?${queryParams}` : API_URL;
+      const response = await api.get(url, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -109,6 +114,150 @@ export const deleteBill = createAsyncThunk(
   }
 );
 
+// Record payment
+export const recordPayment = createAsyncThunk(
+  'bill/recordPayment',
+  async ({ id, paymentData }, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.post(`${API_URL}/${id}/payment`, paymentData, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Apply credit note
+export const applyCreditNote = createAsyncThunk(
+  'bill/applyCreditNote',
+  async ({ id, creditData }, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.post(`${API_URL}/${id}/apply-credit`, creditData, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Get bill aging
+export const getBillAging = createAsyncThunk(
+  'bill/getAging',
+  async (_, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.get(`${API_URL}/aging`, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Get bill analytics
+export const getBillAnalytics = createAsyncThunk(
+  'bill/getAnalytics',
+  async (_, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.get(`${API_URL}/analytics`, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Approve bill
+export const approveBill = createAsyncThunk(
+  'bill/approve',
+  async (id, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.post(`${API_URL}/${id}/approve`, {}, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Reject bill
+export const rejectBill = createAsyncThunk(
+  'bill/reject',
+  async ({ id, reason }, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.post(`${API_URL}/${id}/reject`, { reason }, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Get overdue bills
+export const getOverdueBills = createAsyncThunk(
+  'bill/getOverdue',
+  async (_, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.get(`${API_URL}/overdue`, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Bulk payment
+export const bulkPayment = createAsyncThunk(
+  'bill/bulkPayment',
+  async (paymentData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await api.post(`${API_URL}/bulk-payment`, paymentData, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const billSlice = createSlice({
   name: 'bill',
   initialState,
@@ -147,7 +296,7 @@ export const billSlice = createSlice({
       .addCase(createBill.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.bills.unshift(action.payload);
+        state.bills.unshift(action.payload.bill || action.payload);
       })
       .addCase(createBill.rejected, (state, action) => {
         state.isLoading = false;
@@ -175,9 +324,10 @@ export const billSlice = createSlice({
       .addCase(updateBill.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        const index = state.bills.findIndex(bill => bill._id === action.payload._id);
+        const bill = action.payload.bill || action.payload;
+        const index = state.bills.findIndex(b => b._id === bill._id);
         if (index !== -1) {
-          state.bills[index] = action.payload;
+          state.bills[index] = bill;
         }
       })
       .addCase(updateBill.rejected, (state, action) => {
@@ -195,6 +345,146 @@ export const billSlice = createSlice({
         state.bills = state.bills.filter((bill) => bill._id !== action.payload);
       })
       .addCase(deleteBill.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Record payment
+      .addCase(recordPayment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(recordPayment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const bill = action.payload.bill || action.payload;
+        const index = state.bills.findIndex(b => b._id === bill._id);
+        if (index !== -1) {
+          state.bills[index] = bill;
+        }
+        if (state.bill && state.bill._id === bill._id) {
+          state.bill = bill;
+        }
+      })
+      .addCase(recordPayment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Apply credit note
+      .addCase(applyCreditNote.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(applyCreditNote.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const bill = action.payload.bill || action.payload;
+        const index = state.bills.findIndex(b => b._id === bill._id);
+        if (index !== -1) {
+          state.bills[index] = bill;
+        }
+        if (state.bill && state.bill._id === bill._id) {
+          state.bill = bill;
+        }
+      })
+      .addCase(applyCreditNote.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Get bill aging
+      .addCase(getBillAging.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getBillAging.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.aging = action.payload;
+      })
+      .addCase(getBillAging.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Get bill analytics
+      .addCase(getBillAnalytics.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getBillAnalytics.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.analytics = action.payload;
+      })
+      .addCase(getBillAnalytics.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Approve bill
+      .addCase(approveBill.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(approveBill.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const bill = action.payload.bill || action.payload;
+        const index = state.bills.findIndex(b => b._id === bill._id);
+        if (index !== -1) {
+          state.bills[index] = bill;
+        }
+        if (state.bill && state.bill._id === bill._id) {
+          state.bill = bill;
+        }
+      })
+      .addCase(approveBill.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Reject bill
+      .addCase(rejectBill.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(rejectBill.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const bill = action.payload.bill || action.payload;
+        const index = state.bills.findIndex(b => b._id === bill._id);
+        if (index !== -1) {
+          state.bills[index] = bill;
+        }
+        if (state.bill && state.bill._id === bill._id) {
+          state.bill = bill;
+        }
+      })
+      .addCase(rejectBill.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Get overdue bills
+      .addCase(getOverdueBills.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getOverdueBills.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.overdueBills = action.payload;
+      })
+      .addCase(getOverdueBills.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Bulk payment
+      .addCase(bulkPayment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(bulkPayment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        // Refresh bills list after bulk payment
+      })
+      .addCase(bulkPayment.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

@@ -40,16 +40,19 @@ const gracefulShutdown = (signal) => {
   info(`${signal} received. Starting graceful shutdown...`);
 
   // Stop accepting new connections
-  server.close(() => {
+  server.close(async () => {
     info("HTTP server closed");
 
     // Close database connections
-    import("mongoose").then((mongoose) => {
-      mongoose.default.connection.close(false, () => {
-        info("MongoDB connection closed");
-        process.exit(0);
-      });
-    });
+    try {
+      const mongoose = await import("mongoose");
+      await mongoose.default.connection.close();
+      info("MongoDB connection closed");
+      process.exit(0);
+    } catch (err) {
+      error("Error closing MongoDB connection:", err);
+      process.exit(1);
+    }
   });
 
   // Force shutdown after 30 seconds

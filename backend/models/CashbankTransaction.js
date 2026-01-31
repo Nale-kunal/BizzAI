@@ -60,5 +60,54 @@ cashbankTransactionSchema.pre("validate", function (next) {
   next();
 });
 
+/**
+ * Get current cash balance for a user
+ * @param {ObjectId} userId - User ID
+ * @returns {Promise<number>} Current cash balance
+ */
+cashbankTransactionSchema.statics.getCashBalance = async function (userId) {
+  const result = await this.aggregate([
+    {
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+        $or: [
+          { fromAccount: 'cash' },
+          { toAccount: 'cash' }
+        ]
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalIn: {
+          $sum: {
+            $cond: [
+              { $eq: ['$toAccount', 'cash'] },
+              '$amount',
+              0
+            ]
+          }
+        },
+        totalOut: {
+          $sum: {
+            $cond: [
+              { $eq: ['$fromAccount', 'cash'] },
+              '$amount',
+              0
+            ]
+          }
+        }
+      }
+    }
+  ]);
+
+  if (!result || result.length === 0) {
+    return 0;
+  }
+
+  const balance = result[0].totalIn - result[0].totalOut;
+  return balance;
+};
+
 const CashbankTransaction = mongoose.model("CashbankTransaction", cashbankTransactionSchema);
 export default CashbankTransaction;

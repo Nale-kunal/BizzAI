@@ -26,7 +26,7 @@ const SalesInvoiceDetail = () => {
     const handlePayment = async (paymentData) => {
         const result = await dispatch(markSalesInvoiceAsPaid({
             id: invoice._id,
-            amount: paymentData.paidAmount,
+            amount: paymentData.amount, // Fixed: PaymentModal sends 'amount', not 'paidAmount'
             bankAccount: paymentData.bankAccount,
             paymentMethod: paymentData.paymentMethod
         }));
