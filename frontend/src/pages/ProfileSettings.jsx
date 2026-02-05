@@ -122,15 +122,15 @@ const ProfileSettings = () => {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-2">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center text-secondary hover:text-main mb-4"
+            className="flex items-center text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:text-gray-900 dark:hover:text-[rgb(var(--color-text))] mb-2 text-xs"
           >
             <svg
-              className="w-5 h-5 mr-2"
+              className="w-4 h-4 mr-1"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -144,16 +144,16 @@ const ProfileSettings = () => {
             </svg>
             Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-main mb-2">Profile Settings</h1>
-          <p className="text-secondary">Update your personal and business information</p>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-0.5">Profile Settings</h1>
+          <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Update your personal and business information</p>
         </div>
 
         {/* Success Message */}
         {showSuccess && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mb-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
             <div className="flex items-center">
               <svg
-                className="w-5 h-5 text-green-600 mr-3"
+                className="w-4 h-4 text-green-600 dark:text-green-400 mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -165,163 +165,175 @@ const ProfileSettings = () => {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <p className="text-green-600 font-medium">Profile updated successfully!</p>
+              <p className="text-green-600 dark:text-green-400 font-medium text-xs">Profile updated successfully!</p>
             </div>
           </div>
         )}
 
         {/* Form Card */}
-        <div className="bg-card rounded-xl shadow-sm p-8">
-          <form onSubmit={onSubmit} className="space-y-6">
-            {/* Full Name Input */}
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+          <form onSubmit={onSubmit} className="space-y-2">
+            {/* Personal Information Section */}
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-secondary mb-2"
-              >
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={name}
-                onChange={onChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition ${errors.name
-                  ? 'border-red-500 bg-red-50'
-                  : ' border-default'
-                  }`}
-                placeholder="Enter your full name"
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-              )}
-            </div>
-
-            {/* Email Input */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-secondary mb-2"
-              >
-                Email Address <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={email}
-                onChange={onChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition ${errors.email
-                  ? 'border-red-500 bg-red-50'
-                  : ' border-default'
-                  }`}
-                placeholder="Enter your email address"
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Phone Input */}
-            <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-medium text-secondary mb-2"
-              >
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={phone}
-                onChange={onChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition ${errors.phone
-                  ? 'border-red-500 bg-red-50'
-                  : ' border-default'
-                  }`}
-                placeholder="Enter your phone number"
-              />
-              {errors.phone && (
-                <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-              )}
-            </div>
-
-            {/* Shop Name Input */}
-            <div>
-              <label
-                htmlFor="shopName"
-                className="block text-sm font-medium text-secondary mb-2"
-              >
-                Shop Name
-              </label>
-              <input
-                type="text"
-                id="shopName"
-                name="shopName"
-                value={shopName}
-                onChange={onChange}
-                className="w-full px-4 py-3 border  border-default rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition"
-                placeholder="Enter your shop/business name"
-              />
-            </div>
-
-            {/* GST Number Input */}
-            <div>
-              <label
-                htmlFor="gstNumber"
-                className="block text-sm font-medium text-secondary mb-2"
-              >
-                GST Number (GSTIN)
-              </label>
-              <input
-                type="text"
-                id="gstNumber"
-                name="gstNumber"
-                value={gstNumber}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition"
-                placeholder="e.g., 27AABCU9603R1ZM"
-              />
-            </div>
-
-            {/* Shop Address Input */}
-            <div>
-              <label
-                htmlFor="shopAddress"
-                className="block text-sm font-medium text-secondary mb-2"
-              >
-                Shop Address
-              </label>
-              <textarea
-                id="shopAddress"
-                name="shopAddress"
-                value={shopAddress}
-                onChange={onChange}
-                rows={3}
-                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition resize-none"
-                placeholder="Enter complete shop address (Street, City, State, PIN Code)"
-              />
-            </div>
-
-            {/* Additional Info Section */}
-            <div className="pt-4 border-t  border-default">
-              <h3 className="text-sm font-medium text-main mb-4">Account Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className=" bg-surface p-4 rounded-lg">
-                  <p className="text-xs font-medium text-muted mb-1">User ID</p>
-                  <p className="text-sm text-main break-all">{user._id}</p>
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1.5 pb-1 border-b dark:border-[rgb(var(--color-border))]">Personal Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {/* Full Name Input */}
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1"
+                  >
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={name}
+                    onChange={onChange}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] ${errors.name
+                      ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                      : 'border-gray-300 dark:border-[rgb(var(--color-border))]'
+                      }`}
+                    placeholder="Enter your full name"
+                  />
+                  {errors.name && (
+                    <p className="mt-0.5 text-xs text-red-600 dark:text-red-400">{errors.name}</p>
+                  )}
                 </div>
-                <div className=" bg-surface p-4 rounded-lg">
-                  <p className="text-xs font-medium text-muted mb-1">Role</p>
-                  <p className="text-sm text-main capitalize">{user.role || 'Owner'}</p>
+
+                {/* Email Input */}
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1"
+                  >
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={email}
+                    onChange={onChange}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] ${errors.email
+                      ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                      : 'border-gray-300 dark:border-[rgb(var(--color-border))]'
+                      }`}
+                    placeholder="Enter your email address"
+                  />
+                  {errors.email && (
+                    <p className="mt-0.5 text-xs text-red-600 dark:text-red-400">{errors.email}</p>
+                  )}
+                </div>
+
+                {/* Phone Input */}
+                <div>
+                  <label
+                    htmlFor="phone"
+                    className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1"
+                  >
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={phone}
+                    onChange={onChange}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] ${errors.phone
+                      ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                      : 'border-gray-300 dark:border-[rgb(var(--color-border))]'
+                      }`}
+                    placeholder="Enter your phone number"
+                  />
+                  {errors.phone && (
+                    <p className="mt-0.5 text-xs text-red-600 dark:text-red-400">{errors.phone}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Business Information Section */}
+            <div>
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1.5 pb-1 border-b dark:border-[rgb(var(--color-border))]">Business Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {/* Shop Name Input */}
+                <div>
+                  <label
+                    htmlFor="shopName"
+                    className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1"
+                  >
+                    Shop Name
+                  </label>
+                  <input
+                    type="text"
+                    id="shopName"
+                    name="shopName"
+                    value={shopName}
+                    onChange={onChange}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
+                    placeholder="Enter your shop/business name"
+                  />
+                </div>
+
+                {/* GST Number Input */}
+                <div>
+                  <label
+                    htmlFor="gstNumber"
+                    className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1"
+                  >
+                    GST Number (GSTIN)
+                  </label>
+                  <input
+                    type="text"
+                    id="gstNumber"
+                    name="gstNumber"
+                    value={gstNumber}
+                    onChange={onChange}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
+                    placeholder="e.g., 27AABCU9603R1ZM"
+                  />
+                </div>
+
+                {/* Shop Address Input - Full Width */}
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="shopAddress"
+                    className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1"
+                  >
+                    Shop Address
+                  </label>
+                  <textarea
+                    id="shopAddress"
+                    name="shopAddress"
+                    value={shopAddress}
+                    onChange={onChange}
+                    rows={2}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition resize-none bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
+                    placeholder="Enter complete shop address (Street, City, State, PIN Code)"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Account Information Section */}
+            <div className="pt-2 border-t dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1.5">Account Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="bg-gray-50 dark:bg-[rgb(var(--color-input))] p-2 rounded-lg border dark:border-[rgb(var(--color-border))]">
+                  <p className="text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-0.5">User ID</p>
+                  <p className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))] break-all">{user._id}</p>
+                </div>
+                <div className="bg-gray-50 dark:bg-[rgb(var(--color-input))] p-2 rounded-lg border dark:border-[rgb(var(--color-border))]">
+                  <p className="text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-0.5">Role</p>
+                  <p className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))] capitalize">{user.role || 'Owner'}</p>
                 </div>
               </div>
             </div>
 
             {/* Form Actions */}
-            <div className="flex space-x-4 pt-4">
+            <div className="flex gap-2 pt-2 border-t dark:border-[rgb(var(--color-border))]">
               <button
                 type="button"
                 onClick={() => {
@@ -335,19 +347,19 @@ const ProfileSettings = () => {
                   });
                   setErrors({});
                 }}
-                className="flex-1 px-6 py-3 border  border-default text-secondary rounded-lg hover: bg-surface font-medium transition"
+                className="flex-1 px-4 py-1.5 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] font-medium transition bg-white dark:bg-[rgb(var(--color-card))]"
               >
                 Reset
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="flex-1 px-4 py-1.5 text-xs bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
                     <svg
-                      className="animate-spin h-5 w-5 mr-2"
+                      className="animate-spin h-4 w-4 mr-1"
                       viewBox="0 0 24 24"
                     >
                       <circle
@@ -365,7 +377,7 @@ const ProfileSettings = () => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       />
                     </svg>
-                    Saving Changes...
+                    Saving...
                   </>
                 ) : (
                   'Save Changes'
@@ -376,11 +388,11 @@ const ProfileSettings = () => {
         </div>
 
         {/* Help Section */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+        <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg
-                className="h-5 w-5 text-blue-600"
+                className="h-4 w-4 text-blue-600 dark:text-blue-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -393,8 +405,8 @@ const ProfileSettings = () => {
                 />
               </svg>
             </div>
-            <div className="ml-3">
-              <p className="text-sm text-blue-700">
+            <div className="ml-2">
+              <p className="text-xs text-blue-700 dark:text-blue-300">
                 Keep your profile information up to date to ensure accurate records and effective communication.
               </p>
             </div>

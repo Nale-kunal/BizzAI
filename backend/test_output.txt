@@ -1,0 +1,287 @@
+﻿
+> backend@2.0.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand --passWithNoTests --no-coverage tests/integration/purchase.test.js
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ≡ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    ΓÜá∩╕Å  Sentry not configured (SENTRY_DSN not set)
+
+      at initSentry (config/sentry.js:13:17)
+
+npm : (node:18308) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+At line:1 char:1
++ npm test -- --no-coverage tests/integration/purchase.test.js 2>&1 | O ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:18308) Ex...nge at any time:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18308) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:18308) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:18308) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:18308) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:18308) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+2026-02-01 16:38:11 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"81ae4c6b...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:11 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:11 +0000] "POST /api/purchases HTTP/1.1" 400 81 "-" "-"
+2026-02-01 16:38:12 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"3baf3d39...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:12 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:12 +0000] "POST /api/purchases HTTP/1.1" 400 81 "-" "-"
+2026-02-01 16:38:12 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"261212f5...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:12 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:12 +0000] "POST /api/purchases HTTP/1.1" 400 81 "-" "-"
+2026-02-01 16:38:13 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"f2dc9851...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:13 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:13 +0000] "POST /api/purchases HTTP/1.1" 400 81 "-" "-"
+2026-02-01 16:38:13 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"3f7594ea...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:13 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:13 +0000] "POST /api/purchases HTTP/1.1" 400 81 "-" "-"
+2026-02-01 16:38:13 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"78270ae6...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:13 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+2026-02-01 16:38:14 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"184ae5c2...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:14 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+2026-02-01 16:38:14 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"04660d8d...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:14 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+2026-02-01 16:38:14 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"c395fad3...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [01/Feb/2026:11:08:14 +0000] "POST /api/auth/login HTTP/1.1" 200 558 "-" "-"
+FAIL tests/integration/purchase.test.js (9.878 s)
+  Purchase API Integration Tests
+    POST /api/purchases
+      ├ù should create purchase and update stock (1016 ms)
+      ├ù should handle multiple items in purchase (439 ms)
+      ├ù should apply bill discount correctly (427 ms)
+      ├ù should handle credit purchase (368 ms)
+      ΓêÜ should fail with invalid item (304 ms)
+    GET /api/purchases
+      ├ù should get all purchases for authenticated user (284 ms)
+      ├ù should filter purchases by supplier (327 ms)
+      ├ù should not return other users' purchases (295 ms)
+    PUT /api/purchases/:id/cancel
+      ├ù should cancel purchase and revert stock (344 ms)
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ POST /api/purchases ΓÇ║ should create purchase and update stock
+
+    expected 201 "Created", got 400 "Bad Request"
+
+    [0m [90m 47 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)
+     [90m 48 |[39m                 [33m.[39msend(purchaseData)
+    [31m[1m>[22m[39m[90m 49 |[39m                 [33m.[39mexpect([35m201[39m)[33m;[39m
+     [90m    |[39m                  [31m[1m^[22m[39m
+     [90m 50 |[39m
+     [90m 51 |[39m             
+expect(response[33m.[39mbody[33m.[39msuccess)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 52 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase)[33m.[39mtoHaveProperty([32m'purchaseNo'[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/purchase.test.js:49:18)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ POST /api/purchases ΓÇ║ should handle multiple items in purchase
+
+    expected 201 "Created", got 400 "Bad Request"
+
+    [0m [90m 111 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)
+     [90m 112 |[39m                 [33m.[39msend(purchaseData)
+    [31m[1m>[22m[39m[90m 113 |[39m                 [33m.[39mexpect([35m201[39m)[33m;[39m
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 114 |[39m
+     [90m 115 |[39m             
+expect(response[33m.[39mbody[33m.[39msuccess)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 116 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mitems)[33m.[39mtoHaveLength([35m2[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/purchase.test.js:113:18)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ POST /api/purchases ΓÇ║ should apply bill discount correctly
+
+    expected 201 "Created", got 400 "Bad Request"
+
+    [0m [90m 145 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)
+     [90m 146 |[39m                 [33m.[39msend(purchaseData)
+    [31m[1m>[22m[39m[90m 147 |[39m                 [33m.[39mexpect([35m201[39m)[33m;[39m
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 148 |[39m
+     [90m 149 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mbillDiscount)[33m.[39mtoBe([35m100[39m)[33m;[39m
+     [90m 150 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mtotalAmount)[33m.[39mtoBe([35m1080[39m)[33m;[39m 
+[90m// (1000 + 180 tax) - 100[39m[0m
+
+      at Object.<anonymous> (tests/integration/purchase.test.js:147:18)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ POST /api/purchases ΓÇ║ should handle credit purchase
+
+    expected 201 "Created", got 400 "Bad Request"
+
+    [0m [90m 173 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)
+     [90m 174 |[39m                 [33m.[39msend(purchaseData)
+    [31m[1m>[22m[39m[90m 175 |[39m                 [33m.[39mexpect([35m201[39m)[33m;[39m
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 176 |[39m
+     [90m 177 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mpurchaseType)[33m.[39mtoBe([32m'credit'[39m)[33m;[39m
+     [90m 178 |[39m             expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mpaymentStatus)[33m.[39m
+toBe([32m'unpaid'[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/purchase.test.js:175:18)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:309:14)
+      at node_modules/supertest/lib/test.js:365:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:342:13)
+      at Test.assert (node_modules/supertest/lib/test.js:195:23)
+      at localAssert (node_modules/supertest/lib/test.js:138:14)
+      at Server.<anonymous> (node_modules/supertest/lib/test.js:152:11)
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ GET /api/purchases ΓÇ║ should get all purchases for authenticated user
+
+    ValidationError: Purchase validation failed: supplier: Path `supplier` is required.
+
+      at model.Object.<anonymous>.Document.invalidate (node_modules/mongoose/lib/document.js:3373:32)
+      at node_modules/mongoose/lib/document.js:3134:17
+      at node_modules/mongoose/lib/schemaType.js:1446:9
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ GET /api/purchases ΓÇ║ should filter purchases by supplier
+
+    ValidationError: Purchase validation failed: supplier: Path `supplier` is required.
+
+      at model.Object.<anonymous>.Document.invalidate (node_modules/mongoose/lib/document.js:3373:32)
+      at node_modules/mongoose/lib/document.js:3134:17
+      at node_modules/mongoose/lib/schemaType.js:1446:9
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ GET /api/purchases ΓÇ║ should not return other users' purchases
+
+    ValidationError: Purchase validation failed: supplier: Path `supplier` is required.
+
+      at model.Object.<anonymous>.Document.invalidate (node_modules/mongoose/lib/document.js:3373:32)
+      at node_modules/mongoose/lib/document.js:3134:17
+      at node_modules/mongoose/lib/schemaType.js:1446:9
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ PUT /api/purchases/:id/cancel ΓÇ║ should cancel purchase and revert stock
+
+    ValidationError: Purchase validation failed: supplier: Path `supplier` is required.
+
+      at model.Object.<anonymous>.Document.invalidate (node_modules/mongoose/lib/document.js:3373:32)
+      at node_modules/mongoose/lib/document.js:3134:17
+      at node_modules/mongoose/lib/schemaType.js:1446:9
+
+Test Suites: 1 failed, 1 total
+Tests:       8 failed, 1 passed, 9 total
+Snapshots:   0 total
+Time:        10.05 s
+Ran all test suites matching /tests\\integration\\purchase.test.js/i.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after 
+all tests finished?

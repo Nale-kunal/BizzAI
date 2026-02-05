@@ -8,7 +8,7 @@ import Modal from '../components/Modal';
 const Suppliers = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { suppliers, isLoading, isError, message } = useSelector(
+  const { suppliers = [], isLoading, isError, message } = useSelector(
     (state) => state.suppliers
   );
 
@@ -36,13 +36,13 @@ const Suppliers = () => {
     navigate('/suppliers/add');
   };
 
-  const filteredSuppliers = suppliers.filter(
+  const filteredSuppliers = Array.isArray(suppliers) ? suppliers.filter(
     (supplier) =>
       supplier.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       supplier.contactPersonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       supplier.contactNo.includes(searchTerm) ||
       (supplier.email && supplier.email.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  ) : [];
 
   return (
     <Layout>

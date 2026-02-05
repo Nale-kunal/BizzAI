@@ -9,6 +9,8 @@ import {
     cancelPurchase,
 } from "../controllers/purchaseController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { validatePeriodLock, validatePeriodLockForUpdate } from "../middlewares/periodLockingMiddleware.js";
+import Purchase from "../models/Purchase.js";
 
 const router = express.Router();
 
@@ -16,14 +18,14 @@ const router = express.Router();
 router.use(protect);
 
 // Purchase CRUD
-router.post("/", createPurchase);
+router.post("/", validatePeriodLock, createPurchase);
 router.get("/", getAllPurchases);
 router.get("/drafts", getDraftPurchases);
 router.get("/:id", getPurchaseById);
-router.put("/:id", updatePurchase);
+router.put("/:id", validatePeriodLockForUpdate(Purchase), updatePurchase);
 
 // Purchase actions
-router.post("/:id/finalize", finalizePurchase);
+router.post("/:id/finalize", validatePeriodLock, finalizePurchase);
 router.post("/:id/cancel", cancelPurchase);
 
 export default router;

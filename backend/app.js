@@ -34,11 +34,17 @@ import grnRoutes from "./routes/grnRoutes.js";
 import approvalRoutes from "./routes/approvalRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import refreshTokenRoutes from "./routes/refreshTokenRoutes.js";
+import financialPeriodRoutes from "./routes/financialPeriodRoutes.js";
+import gdprRoutes from "./routes/gdprRoutes.js";
+import ledgerRoutes from "./routes/ledgerRoutes.js";
+import accountingRoutes from "./routes/accountingRoutes.js";
+import complianceRoutes from "./routes/complianceRoutes.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import { initSentry, sentryRequestHandler, sentryTracingHandler, sentryErrorHandler } from "./config/sentry.js";
 import requestId from "./middlewares/requestId.js";
 import { corsOptions } from "./config/cors.config.js";
 import { requestTimeout } from "./middlewares/timeout.js";
+import { tenantContext } from "./middlewares/tenantContext.js";
 
 dotenv.config();
 
@@ -138,6 +144,10 @@ app.use("/api/health", healthRoutes);
 // API routes (with auth where needed)
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", refreshTokenRoutes);
+
+// Tenant context middleware (must be after auth routes to have req.user available)
+app.use(tenantContext);
+
 app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/pos", posRoutes);
@@ -161,6 +171,11 @@ app.use("/api/purchases", purchaseRoutes);
 app.use("/api/purchase-orders", purchaseOrderRoutes);
 app.use("/api/grns", grnRoutes);
 app.use("/api/approvals", approvalRoutes);
+app.use("/api/ledger", ledgerRoutes);
+app.use("/api/accounting", accountingRoutes);
+app.use("/api/financial-periods", financialPeriodRoutes);
+app.use("/api/gdpr", gdprRoutes);
+app.use("/api/compliance", complianceRoutes);
 
 // =======================
 // Error Handler (must be last)

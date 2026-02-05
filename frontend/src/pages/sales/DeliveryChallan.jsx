@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
-import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
 import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 import ItemSelectionModal from '../../components/ItemSelectionModal';
 import SalesOrderSelectionModal from '../../components/SalesOrderSelectionModal';
 import { createDeliveryChallan, reset } from '../../redux/slices/deliveryChallanSlice';
+import useDraftSave from '../../hooks/useDraftSave';
 
 const DeliveryChallan = () => {
     const navigate = useNavigate();
@@ -18,7 +18,8 @@ const DeliveryChallan = () => {
     const [showCustomerModal, setShowCustomerModal] = useState(false);
     const [showItemModal, setShowItemModal] = useState(false);
     const [showSalesOrderModal, setShowSalesOrderModal] = useState(false);
-    const [formData, setFormData] = useState({
+
+    const initialFormData = {
         challanNo: 'DC-' + Date.now(),
         challanDate: new Date().toISOString().split('T')[0],
         deliveryDate: '',
@@ -29,7 +30,9 @@ const DeliveryChallan = () => {
         driverName: '',
         transportMode: 'road',
         notes: ''
-    });
+    };
+
+    const [formData, setFormData, clearDraft, hasDraft] = useDraftSave('deliveryChallanDraft', initialFormData);
 
     useEffect(() => {
         if (isError) {
@@ -56,6 +59,9 @@ const DeliveryChallan = () => {
                 transportMode: 'road',
                 notes: ''
             });
+
+            // Clear auto-saved draft
+            clearDraft();
 
             // Navigate to detail page
             navigate(`/sales/delivery-challan/${challan._id}`);
@@ -173,33 +179,40 @@ const DeliveryChallan = () => {
 
     return (
         <Layout>
-            <PageHeader
-                title="Delivery Challan"
-                description="Create delivery notes for goods dispatch"
-                actions={[
-                    <button
-                        key="list"
-                        onClick={() => navigate('/sales/delivery-challan-list')}
-                        className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                    >
-                        View All Delivery Challans
-                    </button>,
-                    <button
-                        key="save"
-                        onClick={handleSave}
-                        disabled={isLoading}
-                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                    >
-                        {isLoading ? 'Saving...' : 'Save Challan'}
-                    </button>
-                ]}
-            />
+            {/* Custom Header */}
+            <div className="mb-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
+                            Delivery Challan
+                        </h1>
+                        <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                            Create delivery notes for goods dispatch
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate('/sales/delivery-challan-list')}
+                            className="px-4 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium"
+                        >
+                            View All Challans
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={isLoading}
+                            className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
+                        >
+                            {isLoading ? 'Saving...' : 'Save Challan'}
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-main mb-4">Challan Details</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2 space-y-4">
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                        <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Challan Details</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <FormInput
                                 label="Challan Number"
                                 value={formData.challanNo}
@@ -223,29 +236,29 @@ const DeliveryChallan = () => {
                         </div>
                     </div>
 
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-main">Customer</h2>
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                        <div className="flex items-center justify-between mb-3">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Customer</h2>
                             {!formData.customer && (
                                 <button
                                     onClick={() => setShowSalesOrderModal(true)}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2"
+                                    className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
-                                    Select from Sales Order
+                                    From Sales Order
                                 </button>
                             )}
                         </div>
                         {formData.customer ? (
-                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-main">{formData.customer.name}</p>
-                                        <p className="text-sm text-secondary">{formData.customer.phone}</p>
+                                        <p className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{formData.customer.name}</p>
+                                        <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{formData.customer.phone}</p>
                                         {formData.customer.email && (
-                                            <p className="text-sm text-secondary">{formData.customer.email}</p>
+                                            <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{formData.customer.email}</p>
                                         )}
                                     </div>
                                     <button
@@ -259,75 +272,74 @@ const DeliveryChallan = () => {
                         ) : (
                             <button
                                 onClick={() => setShowCustomerModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-default rounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
+                                className="w-full px-4 py-3 text-sm border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 hover:text-indigo-600 transition"
                             >
-                                <span className="font-medium">Click to select customer</span>
-                                <span className="text-sm text-muted">Search by name, phone or email</span>
+                                Click to select customer
                             </button>
                         )}
                     </div>
 
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-main">Items</h2>
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                        <div className="flex items-center justify-between mb-3">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Items</h2>
                             <button
                                 onClick={() => setShowItemModal(true)}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                className="px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700"
                             >
                                 + Add Item
                             </button>
                         </div>
                         {formData.items.length === 0 ? (
-                            <div className="text-center py-8 text-secondary">
+                            <div className="text-center py-8 text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
                                 No items added. Click "Add Item" to select from inventory.
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-surface border-b">
+                                <table className="w-full text-xs">
+                                    <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
                                         <tr>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Available</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Delivered Qty</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Unit</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Description</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Action</th>
+                                            <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase">Item</th>
+                                            <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase">Available</th>
+                                            <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase">Delivered Qty</th>
+                                            <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase">Unit</th>
+                                            <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase">Description</th>
+                                            <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y">
+                                    <tbody className="divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                                         {formData.items.map((item, index) => (
                                             <tr key={index}>
-                                                <td className="px-4 py-3">
+                                                <td className="px-2 py-2">
                                                     <div>
-                                                        <div className="font-medium text-main">{item.name}</div>
-                                                        {item.sku && <div className="text-xs text-muted">{item.sku}</div>}
+                                                        <div className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{item.name}</div>
+                                                        {item.sku && <div className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{item.sku}</div>}
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-3 text-secondary">{item.availableStock}</td>
-                                                <td className="px-4 py-3">
+                                                <td className="px-2 py-2 text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{item.availableStock}</td>
+                                                <td className="px-2 py-2">
                                                     <input
                                                         type="number"
                                                         value={item.deliveredQty}
                                                         onChange={(e) => updateItem(index, 'deliveredQty', parseFloat(e.target.value) || 0)}
-                                                        className="w-24 px-2 py-1 border rounded"
+                                                        className="w-20 px-2 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
                                                         min="0"
                                                         max={item.availableStock}
                                                     />
                                                 </td>
-                                                <td className="px-4 py-3 text-secondary">{item.unit}</td>
-                                                <td className="px-4 py-3">
+                                                <td className="px-2 py-2 text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{item.unit}</td>
+                                                <td className="px-2 py-2">
                                                     <input
                                                         type="text"
                                                         value={item.description}
                                                         onChange={(e) => updateItem(index, 'description', e.target.value)}
-                                                        className="w-full px-2 py-1 border rounded"
+                                                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
                                                         placeholder="Optional"
                                                     />
                                                 </td>
-                                                <td className="px-4 py-3">
+                                                <td className="px-2 py-2">
                                                     <button
                                                         onClick={() => removeItem(index)}
-                                                        className="text-red-600 hover:text-red-700"
+                                                        className="text-red-600 hover:text-red-700 text-xs"
                                                     >
                                                         Remove
                                                     </button>
@@ -340,15 +352,15 @@ const DeliveryChallan = () => {
                         )}
                     </div>
 
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-main mb-4">Transport Details</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                        <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Transport Details</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-secondary mb-2">Transport Mode</label>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-2">Transport Mode</label>
                                 <select
                                     value={formData.transportMode}
                                     onChange={(e) => setFormData({ ...formData, transportMode: e.target.value })}
-                                    className="w-full px-4 py-2 border rounded-lg"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
                                 >
                                     <option value="road">Road</option>
                                     <option value="rail">Rail</option>
@@ -371,46 +383,46 @@ const DeliveryChallan = () => {
                         </div>
                     </div>
 
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-main mb-4">Notes</h2>
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                        <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Notes</h2>
                         <textarea
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows="3"
-                            className="w-full px-4 py-2 border rounded-lg"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
                             placeholder="Add delivery notes..."
                         />
                     </div>
                 </div>
 
                 <div className="lg:col-span-1">
-                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-main mb-4">Delivery Summary</h2>
-                        <div className="space-y-4 mb-6">
-                            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3 sticky top-4">
+                        <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Delivery Summary</h2>
+                        <div className="space-y-3 mb-4">
+                            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                     </svg>
-                                    <span className="font-medium text-blue-900 dark:text-blue-300">Total Items</span>
+                                    <span className="font-medium text-blue-900 dark:text-blue-200 text-sm">Total Items</span>
                                 </div>
-                                <p className="text-2xl font-bold text-blue-600">{totalItems}</p>
+                                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{totalItems}</p>
                             </div>
-                            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span className="font-medium text-green-900 dark:text-green-300">Total Quantity</span>
+                                    <span className="font-medium text-green-900 dark:text-green-200 text-sm">Total Quantity</span>
                                 </div>
-                                <p className="text-2xl font-bold text-green-600">{totalQuantity}</p>
+                                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{totalQuantity}</p>
                             </div>
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             <button
                                 onClick={handleSave}
                                 disabled={isLoading}
-                                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
+                                className="w-full px-3 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
                             >
                                 {isLoading ? 'Saving...' : 'Save Challan'}
                             </button>

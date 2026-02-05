@@ -98,6 +98,12 @@ const expenseSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    // Multi-tenancy
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      index: true
+    },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

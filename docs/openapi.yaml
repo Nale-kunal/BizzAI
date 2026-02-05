@@ -1,0 +1,666 @@
+openapi: 3.0.3
+info:
+  title: BizzAI Inventory Management API
+  description: |
+    Enterprise-grade Inventory Management System API with multi-tenancy, financial period locking, 
+    GDPR compliance, and comprehensive business operations support.
+    
+    ## Features
+    - Multi-tenant architecture with automatic data isolation
+    - Financial period locking for compliance
+    - Auto-posting to general ledger
+    - GDPR compliance (DSAR, legal holds, retention)
+    - Real-time inventory tracking
+    - Purchase and sales order management
+    - Payment processing
+    - Comprehensive reporting
+    
+  version: 2.0.0
+  contact:
+    name: BizzAI Support
+    email: support@bizzai.com
+  license:
+    name: Proprietary
+    
+servers:
+  - url: https://api.bizzai.com/v1
+    description: Production server
+  - url: https://staging-api.bizzai.com/v1
+    description: Staging server
+  - url: http://localhost:5000/api
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Items
+    description: Inventory item management
+  - name: Customers
+    description: Customer management
+  - name: Suppliers
+    description: Supplier management
+  - name: Invoices
+    description: Sales invoice management
+  - name: Purchases
+    description: Purchase order and bill management
+  - name: Payments
+    description: Payment processing (in/out)
+  - name: Financial Periods
+    description: Financial period locking and management
+  - name: GDPR
+    description: GDPR compliance (DSAR, legal holds, retention)
+  - name: Accounting
+    description: General ledger and journal entries
+  - name: Reports
+    description: Business reports and analytics
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/login endpoint
+      
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Error message"
+        errors:
+          type: array
+          items:
+            type: object
+            
+    FinancialPeriod:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: objectid
+        name:
+          type: string
+          example: "Q1 FY 2026-2027"
+        fiscalYear:
+          type: integer
+          example: 2026
+        startDate:
+          type: string
+          format: date
+          example: "2026-04-01"
+        endDate:
+          type: string
+          format: date
+          example: "2026-06-30"
+        status:
+          type: string
+          enum: [open, locked, closed]
+          example: "open"
+        organization:
+          type: string
+          format: objectid
+        lockedAt:
+          type: string
+          format: date-time
+        lockedBy:
+          type: string
+          format: objectid
+        closedAt:
+          type: string
+          format: date-time
+        closedBy:
+          type: string
+          format: objectid
+          
+    Item:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: objectid
+        name:
+          type: string
+          example: "Laptop Dell XPS 15"
+        sku:
+          type: string
+          example: "DELL-XPS-15-001"
+        barcode:
+          type: string
+        category:
+          type: string
+          example: "Electronics"
+        costPrice:
+          type: number
+          example: 75000
+        sellingPrice:
+          type: number
+          example: 95000
+        stockQty:
+          type: number
+          example: 50
+        reservedStock:
+          type: number
+          example: 5
+        lowStockLimit:
+          type: number
+          example: 10
+        unit:
+          type: string
+          example: "pcs"
+        hsnCode:
+          type: string
+          example: "8471"
+        taxRate:
+          type: number
+          example: 18
+        organizationId:
+          type: string
+          format: objectid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          
+    Invoice:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: objectid
+        invoiceNo:
+          type: string
+          example: "INV-2026-001"
+        customer:
+          type: string
+          format: objectid
+        customerName:
+          type: string
+          example: "ABC Corporation"
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              item:
+                type: string
+                format: objectid
+              itemName:
+                type: string
+              quantity:
+                type: number
+              rate:
+                type: number
+              amount:
+                type: number
+        subtotal:
+          type: number
+        taxAmount:
+          type: number
+        totalAmount:
+          type: number
+        paymentStatus:
+          type: string
+          enum: [paid, unpaid, partial]
+        paymentMethod:
+          type: string
+          enum: [cash, bank, upi, card, credit]
+        organizationId:
+          type: string
+          format: objectid
+        createdAt:
+          type: string
+          format: date-time
+          
+    DSAR:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: objectid
+        requestId:
+          type: string
+          example: "DSAR-1706745600000-abc123"
+        userId:
+          type: string
+          format: objectid
+        organizationId:
+          type: string
+          format: objectid
+        requestType:
+          type: string
+          enum: [access, erasure, portability, rectification]
+        status:
+          type: string
+          enum: [pending, processing, completed, rejected]
+        requestedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        dataExportPath:
+          type: string
+        notes:
+          type: string
+
+security:
+  - BearerAuth: []
+
+paths:
+  # Authentication
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and receive JWT token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "SecurePass123!"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      organization:
+                        type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Financial Periods
+  /financial-periods:
+    get:
+      tags:
+        - Financial Periods
+      summary: Get all financial periods
+      description: Retrieve all financial periods for the organization
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, locked, closed]
+        - name: fiscalYear
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FinancialPeriod'
+    post:
+      tags:
+        - Financial Periods
+      summary: Create financial period
+      description: Create a new financial period (Admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - fiscalYear
+                - startDate
+                - endDate
+              properties:
+                name:
+                  type: string
+                  example: "Q1 FY 2026-2027"
+                fiscalYear:
+                  type: integer
+                  example: 2026
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Period created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FinancialPeriod'
+
+  /financial-periods/{id}/lock:
+    post:
+      tags:
+        - Financial Periods
+      summary: Lock financial period
+      description: Lock a period to prevent further transactions (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Period locked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FinancialPeriod'
+
+  # GDPR
+  /gdpr/dsar:
+    post:
+      tags:
+        - GDPR
+      summary: Create DSAR request
+      description: Create a Data Subject Access Request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - requestType
+              properties:
+                requestType:
+                  type: string
+                  enum: [access, erasure, portability, rectification]
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: DSAR created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/DSAR'
+    get:
+      tags:
+        - GDPR
+      summary: Get all DSARs
+      description: Get all DSAR requests for organization (Admin only)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, processing, completed, rejected]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DSAR'
+
+  /gdpr/dsar/{id}/process:
+    post:
+      tags:
+        - GDPR
+      summary: Process DSAR
+      description: Process a DSAR request and export data (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: DSAR processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      exportPath:
+                        type: string
+                      data:
+                        type: object
+
+  # Items
+  /items:
+    get:
+      tags:
+        - Items
+      summary: Get all items
+      description: Retrieve all inventory items for the organization
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: lowStock
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Item'
+    post:
+      tags:
+        - Items
+      summary: Create item
+      description: Create a new inventory item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - costPrice
+                - sellingPrice
+              properties:
+                name:
+                  type: string
+                sku:
+                  type: string
+                category:
+                  type: string
+                costPrice:
+                  type: number
+                sellingPrice:
+                  type: number
+                stockQty:
+                  type: number
+                lowStockLimit:
+                  type: number
+      responses:
+        '201':
+          description: Item created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Item'
+
+  # Invoices
+  /invoices:
+    get:
+      tags:
+        - Invoices
+      summary: Get all invoices
+      description: Retrieve all invoices for the organization
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [paid, unpaid, partial]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+    post:
+      tags:
+        - Invoices
+      summary: Create invoice
+      description: Create a new sales invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customerName
+                - items
+                - totalAmount
+              properties:
+                customerName:
+                  type: string
+                customer:
+                  type: string
+                  format: objectid
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      item:
+                        type: string
+                      quantity:
+                        type: number
+                      rate:
+                        type: number
+                paymentMethod:
+                  type: string
+                  enum: [cash, bank, upi, card, credit]
+      responses:
+        '201':
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Invoice'

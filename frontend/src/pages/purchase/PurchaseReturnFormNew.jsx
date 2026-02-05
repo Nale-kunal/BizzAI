@@ -441,21 +441,21 @@ const PurchaseReturnFormNew = () => {
     return (
         <>
             {/* Tab Navigation */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] border-b mb-6">
-                <div className="flex space-x-8 px-6">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] border-b dark:border-[rgb(var(--color-border))] mb-1.5">
+                <div className="flex space-x-2 px-2">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors relative ${activeTab === tab.id
+                            className={`py-1.5 px-1 border-b-2 font-medium text-xs transition-colors relative ${activeTab === tab.id
                                 ? 'border-indigo-500 text-indigo-600 dark:border-[rgb(var(--color-primary))] dark:text-[rgb(var(--color-primary))]'
-                                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
+                                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                                 }`}
                         >
                             <span className="mr-2">{tab.icon}</span>
                             {tab.label}
                             {tab.badge !== undefined && tab.badge > 0 && (
-                                <span className="ml-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 py-0.5 px-2 rounded-full text-xs">
+                                <span className="ml-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 py-0.5 px-1.5 rounded-full text-xs">
                                     {tab.badge}
                                 </span>
                             )}
@@ -465,11 +465,11 @@ const PurchaseReturnFormNew = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-2">
                 {/* Return Details Tab */}
                 {activeTab === 'details' && (
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             <FormInput
                                 label="Return Date"
                                 type="date"
@@ -479,28 +479,28 @@ const PurchaseReturnFormNew = () => {
                                 required
                             />
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                                     Source Type
                                 </label>
                                 <select
                                     name="sourceType"
                                     value={formData.sourceType}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                 >
                                     <option value="purchase">Purchase</option>
                                     <option value="grn">GRN</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                                     Return Type
                                 </label>
                                 <select
                                     name="returnType"
                                     value={formData.returnType}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                 >
                                     <option value="partial">Partial Return</option>
                                     <option value="full">Full Return</option>
@@ -510,13 +510,13 @@ const PurchaseReturnFormNew = () => {
 
                         {/* Purchase/GRN Selection */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-2">
                                 Select {formData.sourceType === 'purchase' ? 'Purchase' : 'GRN'}
                             </label>
                             <button
                                 type="button"
                                 onClick={() => setShowPurchaseModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors"
+                                className="w-full px-4 py-2 text-sm border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 dark:hover:border-[rgb(var(--color-primary))] hover:text-indigo-600 dark:hover:text-[rgb(var(--color-primary))] transition-colors bg-white dark:bg-[rgb(var(--color-card))]"
                             >
                                 {formData.originalPurchase || formData.originalGRN
                                     ? '✓ Purchase Selected - Click to change'
@@ -526,12 +526,12 @@ const PurchaseReturnFormNew = () => {
 
                         {/* Supplier (read-only after selection) */}
                         {formData.supplier && (
-                            <div className="bg-blue-50 p-4 rounded-lg">
-                                <h3 className="text-sm font-medium text-gray-700 mb-2">Supplier</h3>
-                                <p className="text-lg font-semibold text-gray-900">
+                            <div className="bg-indigo-50 dark:bg-indigo-900/20 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                                <h3 className="text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Supplier</h3>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))]">
                                     {formData.supplier.businessName}
                                 </p>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                                     {formData.supplier.contactPersonName} • {formData.supplier.contactNo}
                                 </p>
                             </div>
@@ -539,16 +539,16 @@ const PurchaseReturnFormNew = () => {
 
                         {/* Return Reason */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                                 Return Reason <span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 name="returnReason"
                                 value={formData.returnReason}
                                 onChange={handleInputChange}
-                                rows={3}
+                                rows={2}
                                 placeholder="Explain why items are being returned..."
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                 required
                             />
                         </div>
@@ -563,16 +563,16 @@ const PurchaseReturnFormNew = () => {
                         />
 
                         {/* Refund Mode */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                                     Refund Mode
                                 </label>
                                 <select
                                     name="refundMode"
                                     value={formData.refundMode}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                 >
                                     <option value="adjust_payable">Adjust Payable</option>
                                     <option value="cash">Cash</option>
@@ -583,14 +583,14 @@ const PurchaseReturnFormNew = () => {
 
                             {formData.refundMode === 'bank_transfer' && (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                                         Bank Account <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         name="bankAccount"
                                         value={formData.bankAccount}
                                         onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                         required
                                     >
                                         <option value="">Select Bank Account</option>
@@ -605,31 +605,31 @@ const PurchaseReturnFormNew = () => {
                         </div>
 
                         {/* Notes */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                                     Notes (Visible to Supplier)
                                 </label>
                                 <textarea
                                     name="notes"
                                     value={formData.notes}
                                     onChange={handleInputChange}
-                                    rows={3}
+                                    rows={2}
                                     placeholder="Add any notes for the supplier..."
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                                     Internal Notes
                                 </label>
                                 <textarea
                                     name="internalNotes"
                                     value={formData.internalNotes}
                                     onChange={handleInputChange}
-                                    rows={3}
+                                    rows={2}
                                     placeholder="Internal notes (not visible to supplier)..."
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -661,28 +661,27 @@ const PurchaseReturnFormNew = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-6 flex justify-between items-center">
+            <div className="mt-2 flex justify-between items-center">
                 <button
                     type="button"
                     onClick={handleClearDraft}
-                    className="px-4 py-2 text-sm text-gray-600 hover:text-red-600 transition-colors"
+                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-red-600 transition-colors"
                     disabled={loading}
                 >
                     🗑️ Clear Saved Draft
                 </button>
-                <div className="flex space-x-4">
+                <div className="flex gap-2 justify-end">
                     <button
                         type="button"
-                        onClick={() => navigate('/purchase/returns/list')}
-                        className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        disabled={loading}
+                        onClick={() => window.history.back()}
+                        className="px-4 py-1.5 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] font-medium"
                     >
                         Cancel
                     </button>
                     <button
                         type="button"
                         onClick={handleSaveDraft}
-                        className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+                        className="px-4 py-1.5 text-xs bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 font-medium"
                         disabled={loading}
                     >
                         {loading ? 'Saving...' : 'Save as Draft'}
@@ -690,7 +689,7 @@ const PurchaseReturnFormNew = () => {
                     <button
                         type="button"
                         onClick={handleSubmitForApproval}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        className="px-4 py-1.5 text-xs bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50 font-medium"
                         disabled={loading}
                     >
                         {loading ? 'Submitting...' : 'Submit for Approval'}

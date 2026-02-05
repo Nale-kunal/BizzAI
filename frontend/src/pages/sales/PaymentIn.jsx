@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import api from '../../services/api';
 import { toast } from "react-toastify";
 import Layout from "../../components/Layout";
-import PageHeader from "../../components/PageHeader";
 import FormInput from "../../components/FormInput";
 import CustomerSelectionModal from "../../components/CustomerSelectionModal";
 
@@ -406,303 +405,300 @@ const PaymentIn = () => {
 
   return (
     <Layout>
-      <PageHeader
-        title="Payment In"
-        description="Record customer payments and receipts"
-        actions={[
-          <button
-            key="list"
-            onClick={() => navigate("/sales/payment-in-list")}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-          >
-            View All Payments
-          </button>,
-          <button
-            key="save"
-            onClick={handleSave}
-            disabled={loading}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-          >
-            {loading ? "Saving..." : "Save Payment"}
-          </button>,
-          <button
-            key="print"
-            onClick={handlePrint}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-          >
-            Print Receipt
-          </button>,
-        ]}
-      />
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
+            Payment In
+          </h1>
+          <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+            Record customer payments and receipts
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Payment Details */}
-          <div className="bg-card rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-main mb-4">
-              Payment Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInput
-                label="Receipt Number"
-                value={formData.receiptNo}
-                onChange={(e) =>
-                  setFormData({ ...formData, receiptNo: e.target.value })
-                }
-                required
-                disabled
-              />
-              <FormInput
-                label="Receipt Date"
-                type="date"
-                value={formData.receiptDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, receiptDate: e.target.value })
-                }
-                required
-              />
-            </div>
-          </div>
-
-          {/* Customer Selection */}
-          <div className="bg-card rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-main">Customer</h2>
-            </div>
-            {formData.customer ? (
-              <div className="p-4 bg-primary-soft rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-main">
-                      {formData.customer.name}
-                    </p>
-                    <p className="text-sm text-secondary">
-                      {formData.customer.phone}
-                    </p>
-                    <div className="flex gap-4 mt-2">
-                      <p className="text-sm text-orange-600 font-medium">
-                        Outstanding: ₹{customerInfo.outstandingDue.toFixed(2)}
-                      </p>
-                      {customerInfo.availableCredit > 0 && (
-                        <p className="text-sm text-green-600 font-medium">
-                          Credit: ₹{customerInfo.availableCredit.toFixed(2)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setFormData({ ...formData, customer: null })}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    Remove
-                  </button>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
+            {/* Payment Details */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
+                Payment Details
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <FormInput
+                  label="Receipt Number"
+                  value={formData.receiptNo}
+                  onChange={(e) =>
+                    setFormData({ ...formData, receiptNo: e.target.value })
+                  }
+                  required
+                  disabled
+                />
+                <FormInput
+                  label="Receipt Date"
+                  type="date"
+                  value={formData.receiptDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, receiptDate: e.target.value })
+                  }
+                  required
+                />
               </div>
-            ) : (
-              <button
-                onClick={() => setShowCustomerModal(true)}
-                className="w-full px-4 py-3 border-2 border-dashed border-default rounded-lg text-secondary hover:border-primary hover:text-primary transition flex flex-col items-center justify-center gap-2"
-              >
-                <span className="font-medium">Click to select customer</span>
-                <span className="text-sm text-muted">
-                  Search by name, phone or email
-                </span>
-              </button>
-            )}
-          </div>
-
-          {/* Payment Methods */}
-          <div className="bg-card rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-main">Payment Methods</h2>
-              <button
-                onClick={addPaymentMethod}
-                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-              >
-                + Add Method
-              </button>
             </div>
-            <div className="space-y-4">
-              {formData.paymentMethods.map((pm, index) => (
-                <div
-                  key={index}
-                  className="p-4 border border-default rounded-lg"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-secondary mb-2">
-                        Method
-                      </label>
-                      <select
-                        value={pm.method}
-                        onChange={(e) =>
-                          updatePaymentMethod(index, "method", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-default rounded-lg"
-                      >
-                        {paymentMethodOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.icon} {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-secondary mb-2">
-                        Amount
-                      </label>
-                      <input
-                        type="number"
-                        value={pm.amount}
-                        onChange={(e) =>
-                          updatePaymentMethod(
-                            index,
-                            "amount",
-                            parseFloat(e.target.value) || 0
-                          )
-                        }
-                        className="w-full px-3 py-2 border border-default rounded-lg"
-                        placeholder="0.00"
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
-                    <div className="flex items-end">
-                      {formData.paymentMethods.length > 1 && (
-                        <button
-                          onClick={() => removePaymentMethod(index)}
-                          className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Method-specific fields */}
-                  {pm.method === "upi" && (
-                    <div className="mt-3">
-                      <label className="block text-sm font-medium text-secondary mb-2">
-                        Transaction Reference
-                      </label>
-                      <input
-                        type="text"
-                        value={pm.reference}
-                        onChange={(e) =>
-                          updatePaymentMethod(
-                            index,
-                            "reference",
-                            e.target.value
-                          )
-                        }
-                        className="w-full px-3 py-2 border border-default rounded-lg"
-                        placeholder="UPI Transaction ID"
-                      />
-                    </div>
-                  )}
-                  {pm.method === "card" && (
-                    <div className="mt-3">
-                      <label className="block text-sm font-medium text-secondary mb-2">
-                        Card Type
-                      </label>
-                      <select
-                        value={pm.cardType}
-                        onChange={(e) =>
-                          updatePaymentMethod(index, "cardType", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-default rounded-lg"
-                      >
-                        <option value="">Select Card Type</option>
-                        <option value="visa">Visa</option>
-                        <option value="mastercard">Mastercard</option>
-                        <option value="rupay">RuPay</option>
-                        <option value="amex">American Express</option>
-                      </select>
-                    </div>
-                  )}
-                  {(pm.method === "bank_transfer" ||
-                    pm.method === "cheque") && (
-                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-secondary mb-2">
-                            Bank Account
-                          </label>
-                          <select
-                            value={pm.bankAccount}
-                            onChange={(e) =>
-                              updatePaymentMethod(
-                                index,
-                                "bankAccount",
-                                e.target.value
-                              )
-                            }
-                            className="w-full px-3 py-2 border border-default rounded-lg"
-                          >
-                            <option value="">Select Bank Account</option>
-                            {bankAccounts.map((acc) => (
-                              <option key={acc._id} value={acc._id}>
-                                {acc.bankName} - {acc.accountNumber.slice(-4)}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {pm.method === "cheque" && (
-                          <>
-                            <div>
-                              <label className="block text-sm font-medium text-secondary mb-2">
-                                Cheque Number
-                              </label>
-                              <input
-                                type="text"
-                                value={pm.chequeNumber}
-                                onChange={(e) =>
-                                  updatePaymentMethod(
-                                    index,
-                                    "chequeNumber",
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full px-3 py-2 border border-default rounded-lg"
-                                placeholder="Cheque No"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-secondary mb-2">
-                                Cheque Date
-                              </label>
-                              <input
-                                type="date"
-                                value={pm.chequeDate}
-                                onChange={(e) =>
-                                  updatePaymentMethod(
-                                    index,
-                                    "chequeDate",
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full px-3 py-2 border border-default rounded-lg"
-                              />
-                            </div>
-                          </>
+            {/* Customer Selection */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Customer</h2>
+              {formData.customer ? (
+                <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                        {formData.customer.name}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                        {formData.customer.phone}
+                      </p>
+                      <div className="flex gap-3 mt-1">
+                        <p className="text-xs text-orange-600 font-medium">
+                          Outstanding: ₹{customerInfo.outstandingDue.toFixed(2)}
+                        </p>
+                        {customerInfo.availableCredit > 0 && (
+                          <p className="text-xs text-green-600 font-medium">
+                            Credit: ₹{customerInfo.availableCredit.toFixed(2)}
+                          </p>
                         )}
                       </div>
-                    )}
+                    </div>
+                    <button
+                      onClick={() => setFormData({ ...formData, customer: null })}
+                      className="text-red-600 hover:text-red-700 text-xs"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-              ))}
+              ) : (
+                <button
+                  onClick={() => setShowCustomerModal(true)}
+                  className="w-full px-3 py-2 border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 hover:text-indigo-600 transition text-xs"
+                >
+                  Click to select customer
+                </button>
+              )}
             </div>
-          </div>
 
-          {/* Deposit To */}
-          <div className="bg-card rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-main mb-4">Deposit To</h2>
-            {(() => {
-              // Check if any payment method is not cash
-              const hasNonCashMethod = formData.paymentMethods.some(
-                (pm) => pm.method !== "cash"
-              );
+            {/* Payment Methods */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Payment Methods</h2>
+                <button
+                  onClick={addPaymentMethod}
+                  className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                >
+                  + Add Method
+                </button>
+              </div>
+              <div className="space-y-3">
+                {formData.paymentMethods.map((pm, index) => (
+                  <div
+                    key={index}
+                    className="p-2 border border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                          Method
+                        </label>
+                        <select
+                          value={pm.method}
+                          onChange={(e) =>
+                            updatePaymentMethod(index, "method", e.target.value)
+                          }
+                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg"
+                        >
+                          {paymentMethodOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.icon} {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                          Amount
+                        </label>
+                        <input
+                          type="number"
+                          value={pm.amount}
+                          onChange={(e) =>
+                            updatePaymentMethod(
+                              index,
+                              "amount",
+                              parseFloat(e.target.value) || 0
+                            )
+                          }
+                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg"
+                          placeholder="0.00"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        {formData.paymentMethods.length > 1 && (
+                          <button
+                            onClick={() => removePaymentMethod(index)}
+                            className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded-lg"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-              // If there's a non-cash payment method, show only bank accounts
-              if (hasNonCashMethod) {
+                    {/* Method-specific fields */}
+                    {pm.method === "upi" && (
+                      <div className="mt-3">
+                        <label className="block text-sm font-medium text-secondary mb-2">
+                          Transaction Reference
+                        </label>
+                        <input
+                          type="text"
+                          value={pm.reference}
+                          onChange={(e) =>
+                            updatePaymentMethod(
+                              index,
+                              "reference",
+                              e.target.value
+                            )
+                          }
+                          className="w-full px-3 py-2 border border-default rounded-lg"
+                          placeholder="UPI Transaction ID"
+                        />
+                      </div>
+                    )}
+                    {pm.method === "card" && (
+                      <div className="mt-3">
+                        <label className="block text-sm font-medium text-secondary mb-2">
+                          Card Type
+                        </label>
+                        <select
+                          value={pm.cardType}
+                          onChange={(e) =>
+                            updatePaymentMethod(index, "cardType", e.target.value)
+                          }
+                          className="w-full px-3 py-2 border border-default rounded-lg"
+                        >
+                          <option value="">Select Card Type</option>
+                          <option value="visa">Visa</option>
+                          <option value="mastercard">Mastercard</option>
+                          <option value="rupay">RuPay</option>
+                          <option value="amex">American Express</option>
+                        </select>
+                      </div>
+                    )}
+                    {(pm.method === "bank_transfer" ||
+                      pm.method === "cheque") && (
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-secondary mb-2">
+                              Bank Account
+                            </label>
+                            <select
+                              value={pm.bankAccount}
+                              onChange={(e) =>
+                                updatePaymentMethod(
+                                  index,
+                                  "bankAccount",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-default rounded-lg"
+                            >
+                              <option value="">Select Bank Account</option>
+                              {bankAccounts.map((acc) => (
+                                <option key={acc._id} value={acc._id}>
+                                  {acc.bankName} - {acc.accountNumber.slice(-4)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {pm.method === "cheque" && (
+                            <>
+                              <div>
+                                <label className="block text-sm font-medium text-secondary mb-2">
+                                  Cheque Number
+                                </label>
+                                <input
+                                  type="text"
+                                  value={pm.chequeNumber}
+                                  onChange={(e) =>
+                                    updatePaymentMethod(
+                                      index,
+                                      "chequeNumber",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-default rounded-lg"
+                                  placeholder="Cheque No"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-secondary mb-2">
+                                  Cheque Date
+                                </label>
+                                <input
+                                  type="date"
+                                  value={pm.chequeDate}
+                                  onChange={(e) =>
+                                    updatePaymentMethod(
+                                      index,
+                                      "chequeDate",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 border border-default rounded-lg"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Deposit To */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Deposit To</h2>
+              {(() => {
+                // Check if any payment method is not cash
+                const hasNonCashMethod = formData.paymentMethods.some(
+                  (pm) => pm.method !== "cash"
+                );
+
+                // If there's a non-cash payment method, show only bank accounts
+                if (hasNonCashMethod) {
+                  return (
+                    <select
+                      value={formData.depositAccount}
+                      onChange={(e) =>
+                        setFormData({ ...formData, depositAccount: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-default rounded-lg"
+                      required
+                    >
+                      <option value="">Select Bank Account</option>
+                      {bankAccounts.map((acc) => (
+                        <option key={acc._id} value={acc._id}>
+                          🏦 {acc.bankName} - {acc.accountNumber.slice(-4)}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                }
+
+                // Otherwise, show both cash and bank accounts
                 return (
                   <select
                     value={formData.depositAccount}
@@ -712,7 +708,7 @@ const PaymentIn = () => {
                     className="w-full px-4 py-2 border border-default rounded-lg"
                     required
                   >
-                    <option value="">Select Bank Account</option>
+                    <option value="cash">💵 Cash in Hand</option>
                     {bankAccounts.map((acc) => (
                       <option key={acc._id} value={acc._id}>
                         🏦 {acc.bankName} - {acc.accountNumber.slice(-4)}
@@ -720,205 +716,186 @@ const PaymentIn = () => {
                     ))}
                   </select>
                 );
-              }
-
-              // Otherwise, show both cash and bank accounts
-              return (
-                <select
-                  value={formData.depositAccount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, depositAccount: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-default rounded-lg"
-                  required
-                >
-                  <option value="cash">💵 Cash in Hand</option>
-                  {bankAccounts.map((acc) => (
-                    <option key={acc._id} value={acc._id}>
-                      🏦 {acc.bankName} - {acc.accountNumber.slice(-4)}
-                    </option>
-                  ))}
-                </select>
-              );
-            })()}
-          </div>
-
-          {/* Outstanding Invoices */}
-          {formData.customer && customerInfo.outstandingInvoices.length > 0 && (
-            <div className="bg-card rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-bold text-main mb-4">
-                Outstanding Invoices
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
-                        Invoice No
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
-                        Date
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
-                        Total
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
-                        Balance
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
-                        Pay Amount
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {customerInfo.outstandingInvoices.map((invoice) => (
-                      <tr key={invoice._id}>
-                        <td className="px-4 py-3 font-medium text-indigo-600">
-                          {invoice.invoiceNo}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-secondary">
-                          {new Date(invoice.date).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 font-medium">
-                          ₹{invoice.total.toFixed(2)}
-                        </td>
-                        <td className="px-4 py-3 font-medium text-orange-600">
-                          ₹{invoice.balance.toFixed(2)}
-                        </td>
-                        <td className="px-4 py-3">
-                          <input
-                            type="number"
-                            value={invoiceAllocations[invoice._id] || 0}
-                            onChange={(e) =>
-                              handleInvoiceAllocation(
-                                invoice._id,
-                                e.target.value
-                              )
-                            }
-                            className="w-32 px-3 py-1 border border-default rounded-lg"
-                            placeholder="0.00"
-                            max={invoice.balance}
-                            min="0"
-                            step="0.01"
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              })()}
             </div>
-          )}
 
-          {/* Notes */}
-          <div className="bg-card rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-main mb-4">Notes</h2>
-            <textarea
-              value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
-              rows="3"
-              className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
-              placeholder="Add any notes about this payment..."
-            />
-          </div>
-        </div>
-
-        {/* Summary Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
-            <h2 className="text-lg font-bold text-main mb-4">
-              Payment Summary
-            </h2>
-
-            <div className="space-y-3 mb-6 p-4 bg-surface rounded-lg">
-              <div className="flex justify-between text-sm">
-                <span className="text-secondary">Total Payment:</span>
-                <span className="font-medium text-green-600">
-                  ₹{totalPayment.toFixed(2)}
-                </span>
-              </div>
-
-              {customerInfo.availableCredit > 0 && (
-                <div className="border-t pt-3">
-                  <label className="block text-sm text-secondary mb-2">
-                    Use Customer Credit:
-                  </label>
-                  <input
-                    type="number"
-                    value={creditApplied}
-                    onChange={(e) =>
-                      setCreditApplied(
-                        Math.min(
-                          parseFloat(e.target.value) || 0,
-                          customerInfo.availableCredit
-                        )
-                      )
-                    }
-                    className="w-full px-3 py-2 border border-default rounded-lg"
-                    placeholder="0.00"
-                    max={customerInfo.availableCredit}
-                    min="0"
-                    step="0.01"
-                  />
-                  <p className="text-xs text-muted mt-1">
-                    Available: ₹{customerInfo.availableCredit.toFixed(2)}
-                  </p>
+            {/* Outstanding Invoices */}
+            {formData.customer && customerInfo.outstandingInvoices.length > 0 && (
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
+                  Outstanding Invoices
+                </h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                          Invoice No
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                          Date
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                          Total
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                          Balance
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                          Pay Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {customerInfo.outstandingInvoices.map((invoice) => (
+                        <tr key={invoice._id}>
+                          <td className="px-4 py-3 font-medium text-indigo-600">
+                            {invoice.invoiceNo}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-secondary">
+                            {new Date(invoice.date).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 font-medium">
+                            ₹{invoice.total.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-3 font-medium text-orange-600">
+                            ₹{invoice.balance.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-3">
+                            <input
+                              type="number"
+                              value={invoiceAllocations[invoice._id] || 0}
+                              onChange={(e) =>
+                                handleInvoiceAllocation(
+                                  invoice._id,
+                                  e.target.value
+                                )
+                              }
+                              className="w-32 px-3 py-1 border border-default rounded-lg"
+                              placeholder="0.00"
+                              max={invoice.balance}
+                              min="0"
+                              step="0.01"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-
-              <div className="flex justify-between text-sm border-t pt-3">
-                <span className="text-secondary">Effective Payment:</span>
-                <span className="font-medium">
-                  ₹{effectivePayment.toFixed(2)}
-                </span>
               </div>
+            )}
 
-              <div className="flex justify-between text-sm">
-                <span className="text-secondary">Allocated to Invoices:</span>
-                <span className="font-medium">
-                  ₹{totalAllocated.toFixed(2)}
-                </span>
-              </div>
+            {/* Notes */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Notes</h2>
+              <textarea
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+                rows="2"
+                className="w-full px-3 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-indigo-500"
+                placeholder="Add any notes about this payment..."
+              />
+            </div>
+          </div>
 
-              <div className="border-t pt-3">
-                <div className="flex justify-between">
-                  <span className="font-medium">Remaining:</span>
-                  <span
-                    className={`text-lg font-bold ${remainingAmount >= 0 ? "text-gray-900" : "text-red-600"
-                      }`}
-                  >
-                    ₹{remainingAmount.toFixed(2)}
+          {/* Summary Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 sticky top-4">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
+                Payment Summary
+              </h2>
+
+              <div className="space-y-3 mb-6 p-4 bg-surface rounded-lg">
+                <div className="flex justify-between text-sm">
+                  <span className="text-secondary">Total Payment:</span>
+                  <span className="font-medium text-green-600">
+                    ₹{totalPayment.toFixed(2)}
                   </span>
                 </div>
-                {remainingAmount > 0 && (
-                  <p className="text-xs text-green-600 mt-1">
-                    Will be added as customer credit
-                  </p>
-                )}
-                {remainingAmount < 0 && (
-                  <p className="text-xs text-red-600 mt-1">
-                    Payment insufficient!
-                  </p>
-                )}
-              </div>
-            </div>
 
-            <div className="space-y-3">
-              <button
-                onClick={handleSave}
-                disabled={loading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
-              >
-                {loading ? "Saving..." : "Save Payment"}
-              </button>
-              <button
-                onClick={handlePrint}
-                className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-              >
-                Print Receipt
-              </button>
+                {customerInfo.availableCredit > 0 && (
+                  <div className="border-t pt-3">
+                    <label className="block text-sm text-secondary mb-2">
+                      Use Customer Credit:
+                    </label>
+                    <input
+                      type="number"
+                      value={creditApplied}
+                      onChange={(e) =>
+                        setCreditApplied(
+                          Math.min(
+                            parseFloat(e.target.value) || 0,
+                            customerInfo.availableCredit
+                          )
+                        )
+                      }
+                      className="w-full px-3 py-2 border border-default rounded-lg"
+                      placeholder="0.00"
+                      max={customerInfo.availableCredit}
+                      min="0"
+                      step="0.01"
+                    />
+                    <p className="text-xs text-muted mt-1">
+                      Available: ₹{customerInfo.availableCredit.toFixed(2)}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-sm border-t pt-3">
+                  <span className="text-secondary">Effective Payment:</span>
+                  <span className="font-medium">
+                    ₹{effectivePayment.toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span className="text-secondary">Allocated to Invoices:</span>
+                  <span className="font-medium">
+                    ₹{totalAllocated.toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="border-t pt-3">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Remaining:</span>
+                    <span
+                      className={`text-lg font-bold ${remainingAmount >= 0 ? "text-gray-900" : "text-red-600"
+                        }`}
+                    >
+                      ₹{remainingAmount.toFixed(2)}
+                    </span>
+                  </div>
+                  {remainingAmount > 0 && (
+                    <p className="text-xs text-green-600 mt-1">
+                      Will be added as customer credit
+                    </p>
+                  )}
+                  {remainingAmount < 0 && (
+                    <p className="text-xs text-red-600 mt-1">
+                      Payment insufficient!
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <button
+                  onClick={handleSave}
+                  disabled={loading}
+                  className="w-full py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
+                >
+                  {loading ? "Saving..." : "Save Payment"}
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="w-full py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Print Receipt
+                </button>
+              </div>
             </div>
           </div>
         </div>

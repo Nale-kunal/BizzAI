@@ -1,61 +1,73 @@
 /**
- * GST Calculation Utilities
- * Handles CGST/SGST/IGST calculations based on state
+ * GST Calculator Utilities
+ * 
+ * Provides functions for calculating GST on purchases and sales
  */
 
 /**
  * Extract state code from GSTIN
- * GSTIN format: 27AABCU9603R1ZM (first 2 digits are state code)
- * @param {String} gstin - GST Identification Number
- * @returns {String} State code
+ * @param {String} gstin - 15-character GSTIN
+ * @returns {String} 2-digit state code
  */
 export const extractStateFromGSTIN = (gstin) => {
-    if (!gstin || gstin.length < 2) return "";
+    if (!gstin || gstin.length < 2) {
+        return null;
+    }
     return gstin.substring(0, 2);
 };
 
 /**
- * Determine if purchase is inter-state
- * @param {String} businessState - Business state code
- * @param {String} supplierState - Supplier state code
+ * Check if purchase is inter-state
+ * @param {String} supplierGSTIN - Supplier's GSTIN
+ * @param {String} buyerGSTIN - Buyer's GSTIN
  * @returns {Boolean} True if inter-state
  */
-export const isInterStatePurchase = (businessState, supplierState) => {
-    if (!businessState || !supplierState) return false;
-    return businessState !== supplierState;
+export const isInterStatePurchase = (supplierGSTIN, buyerGSTIN) => {
+    const supplierState = extractStateFromGSTIN(supplierGSTIN);
+    const buyerState = extractStateFromGSTIN(buyerGSTIN);
+
+    if (!supplierState || !buyerState) {
+        return false;
+    }
+
+    return supplierState !== buyerState;
 };
 
 /**
  * Calculate GST breakdown
- * @param {Number} taxableAmount - Amount before tax
- * @param {Number} taxRate - Tax rate percentage (e.g., 18 for 18%)
- * @param {Boolean} isInterState - Whether it's inter-state transaction
- * @returns {Object} { cgst, sgst, igst, totalTax, total }
+ * @param {Number} taxableValue - Amount on which GST is calculated
+ * @param {Number} taxRate - GST rate percentage
+ * @param {Boolean} isIntraState - True for CGST+SGST, False for IGST
+ * @param {Number} discount - Discount amount (optional, for backward compatibility)
+ * @returns {Object} GST breakdown with cgst, sgst, igst, totalTax, total
  */
-export const calculateGST = (taxableAmount, taxRate, isInterState) => {
-    const totalTax = (taxableAmount * taxRate) / 100;
+export const calculateGST = (taxableValue, taxRate, isIntraState = true, discount = 0) => {
+    // If discount is provided, subtract it from taxable value
+    const finalTaxableValue = discount > 0 ? taxableValue - discount : taxableValue;
 
-    if (isInterState) {
-        // Inter-state: IGST only
-        return {
-            cgst: 0,
-            sgst: 0,
-            igst: parseFloat(totalTax.toFixed(2)),
-            totalTax: parseFloat(totalTax.toFixed(2)),
-            total: parseFloat((taxableAmount + totalTax).toFixed(2)),
-        };
-    } else {
+    const totalTax = (finalTaxableValue * taxRate) / 100;
+
+    let cgst = 0;
+    let sgst = 0;
+    let igst = 0;
+
+    if (isIntraState) {
         // Intra-state: CGST + SGST (split equally)
-        const cgst = totalTax / 2;
-        const sgst = totalTax / 2;
-        return {
-            cgst: parseFloat(cgst.toFixed(2)),
-            sgst: parseFloat(sgst.toFixed(2)),
-            igst: 0,
-            totalTax: parseFloat(totalTax.toFixed(2)),
-            total: parseFloat((taxableAmount + totalTax).toFixed(2)),
-        };
+        cgst = totalTax / 2;
+        sgst = totalTax / 2;
+    } else {
+        // Inter-state: IGST
+        igst = totalTax;
     }
+
+    return {
+        taxableValue: parseFloat(finalTaxableValue.toFixed(2)),
+        cgst: parseFloat(cgst.toFixed(2)),
+        sgst: parseFloat(sgst.toFixed(2)),
+        igst: parseFloat(igst.toFixed(2)),
+        totalTax: parseFloat(totalTax.toFixed(2)),
+        total: parseFloat((finalTaxableValue + totalTax).toFixed(2))
+    };
 };
 
 /**
@@ -76,7 +88,7 @@ export const calculatePurchaseItemTotal = (
 ) => {
     const baseAmount = quantity * rate;
     const taxableValue = baseAmount - discount;
-    const gst = calculateGST(taxableValue, taxRate, isInterState);
+    const gst = calculateGST(taxableValue, taxRate, !isInterState);
 
     return {
         baseAmount: parseFloat(baseAmount.toFixed(2)),
@@ -91,6 +103,24 @@ export const calculatePurchaseItemTotal = (
 };
 
 /**
+ * Calculate item total (alias for calculatePurchaseItemTotal with object parameter)
+ * @param {Object} item - Item object with quantity, purchaseRate/rate, taxRate, discount
+ * @param {Boolean} isIntraState - Whether it's intra-state (true = CGST+SGST, false = IGST)
+ * @returns {Object} Complete calculation breakdown
+ */
+export const calculateItemTotal = (item, isIntraState = true) => {
+    const rate = item.purchaseRate || item.rate || 0;
+    return calculatePurchaseItemTotal(
+        item.quantity,
+        rate,
+        item.discount || 0,
+        item.taxRate || 0,
+        !isIntraState  // Convert: isIntraState=true means isInterState=false
+    );
+};
+
+
+/**
  * Calculate round off amount
  * @param {Number} amount - Amount to round
  * @returns {Object} { roundedAmount, roundOff }
@@ -98,16 +128,15 @@ export const calculatePurchaseItemTotal = (
 export const calculateRoundOff = (amount) => {
     const rounded = Math.round(amount);
     const roundOff = rounded - amount;
+
     return {
         roundedAmount: rounded,
-        roundOff: parseFloat(roundOff.toFixed(2)),
+        roundOff: parseFloat(roundOff.toFixed(2))
     };
 };
 
-/**
- * State code to name mapping (Indian states)
- */
-export const STATE_CODES = {
+// State code mapping
+const STATE_CODES = {
     "01": "Jammu and Kashmir",
     "02": "Himachal Pradesh",
     "03": "Punjab",
@@ -155,4 +184,40 @@ export const STATE_CODES = {
  */
 export const getStateName = (stateCode) => {
     return STATE_CODES[stateCode] || "Unknown";
+};
+
+/**
+ * Calculate bill total from multiple items
+ * @param {Array} items - Array of items with calculated totals (cgst, sgst, igst, total)
+ * @param {Number} billDiscount - Bill-level discount
+ * @param {Number} shippingCharges - Shipping charges to add
+ * @returns {Object} Complete bill calculation
+ */
+export const calculateBillTotal = (items, billDiscount = 0, shippingCharges = 0) => {
+    let subtotal = 0;
+    let totalCGST = 0;
+    let totalSGST = 0;
+    let totalIGST = 0;
+
+    items.forEach(item => {
+        const baseAmount = (item.quantity || 0) * (item.purchaseRate || item.rate || 0);
+        subtotal += baseAmount;
+        totalCGST += item.cgst || 0;
+        totalSGST += item.sgst || 0;
+        totalIGST += item.igst || 0;
+    });
+
+    const totalTax = totalCGST + totalSGST + totalIGST;
+    const totalAmount = subtotal + totalTax - billDiscount + shippingCharges;
+
+    return {
+        subtotal: parseFloat(subtotal.toFixed(2)),
+        totalCGST: parseFloat(totalCGST.toFixed(2)),
+        totalSGST: parseFloat(totalSGST.toFixed(2)),
+        totalIGST: parseFloat(totalIGST.toFixed(2)),
+        totalTax: parseFloat(totalTax.toFixed(2)),
+        billDiscount: parseFloat(billDiscount.toFixed(2)),
+        shippingCharges: parseFloat(shippingCharges.toFixed(2)),
+        totalAmount: parseFloat(totalAmount.toFixed(2))
+    };
 };

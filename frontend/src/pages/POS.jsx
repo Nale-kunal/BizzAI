@@ -11,9 +11,9 @@ import Layout from '../components/Layout';
 const POS = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { items } = useSelector((state) => state.inventory);
-  const { customers } = useSelector((state) => state.customers);
-  const { accounts } = useSelector((state) => state.cashbank);
+  const { items = [] } = useSelector((state) => state.inventory);
+  const { customers = [] } = useSelector((state) => state.customers);
+  const { accounts = [] } = useSelector((state) => state.cashbank);
   const { invoice, isLoading, isSuccess, isError, message } = useSelector((state) => state.pos);
 
   // Tab system state - Load from localStorage on mount
@@ -143,15 +143,15 @@ const POS = () => {
 
   const activeTab = tabs.find(tab => tab.id === activeTabId);
 
-  const filteredItems = items.filter((item) =>
+  const filteredItems = Array.isArray(items) ? items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  ) : [];
 
-  const filteredCustomers = customers.filter((customer) =>
+  const filteredCustomers = Array.isArray(customers) ? customers.filter((customer) =>
     customer.name.toLowerCase().includes(customerSearchTerm.toLowerCase()) ||
     customer.phone.includes(customerSearchTerm)
-  );
+  ) : [];
 
   // Barcode scanner handler
   const handleBarcodeInput = (e) => {

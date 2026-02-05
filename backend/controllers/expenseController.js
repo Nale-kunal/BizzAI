@@ -722,6 +722,7 @@ export const getExpenseSummary = async (req, res) => {
       {
         $group: {
           _id: '$category',
+          categoryName: { $first: '$category' },
           total: { $sum: '$amount' },
           count: { $sum: 1 }
         }

@@ -43,8 +43,14 @@ redisClient.on('connect', () => {
 redisClient.on('error', (err) => {
     // Only log the first Redis error to prevent log spam
     if (!redisErrorLogged && process.env.NODE_ENV !== 'test') {
-        logError('Redis error (rate limiting):', err.message);
-        warn('Redis unavailable - rate limiting will use in-memory fallback');
+        // In production, log as error since Redis should be available
+        if (process.env.NODE_ENV === 'production') {
+            logError('Redis error (rate limiting):', err.message);
+            warn('Redis unavailable - rate limiting will use in-memory fallback');
+        } else {
+            // In development, just a friendly info message
+            console.log('ℹ️  Redis not available - using in-memory rate limiting (development mode)');
+        }
         redisErrorLogged = true;
     }
     isRedisAvailable = false;

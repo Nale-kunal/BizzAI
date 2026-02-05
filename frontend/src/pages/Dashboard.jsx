@@ -83,22 +83,22 @@ const Dashboard = () => {
           }`}
       >
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-2xl p-8 mb-8 text-white flex items-center justify-between">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-2xl p-4 mb-6 text-white flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold mb-2">
-              Welcome back, {user.name}! 👋
+            <h2 className="text-xl font-bold mb-1">
+              Welcome back, {user?.user?.name || user?.name || "User"}! 👋
             </h2>
-            <p className="text-indigo-100 dark:text-white/80">
+            <p className="text-xs text-indigo-100 dark:text-white/80">
               Here's your account overview and business insights
             </p>
           </div>
           <button
             onClick={() => navigate("/profile-settings")}
-            className="flex items-center space-x-2 px-4 py-2 bg-white hover:bg-gray-100 dark:bg-white/10 dark:hover:bg-white/20 text-indigo-600 dark:text-white rounded-lg transition-colors duration-150 font-medium whitespace-nowrap"
+            className="flex items-center space-x-2 px-2 py-1 text-xs bg-white hover:bg-gray-100 dark:bg-white/10 dark:hover:bg-white/20 text-indigo-600 dark:text-white rounded-lg transition-colors duration-150 font-medium whitespace-nowrap"
             title="Edit your Profile"
           >
             <svg
-              className="w-5 h-5"
+              className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -110,32 +110,32 @@ const Dashboard = () => {
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
               />
             </svg>
-            <span>Edit your Profile</span>
+            <span className="text-xs">Edit your Profile</span>
           </button>
         </div>
 
         {/* Profile Card */}
-        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-md dark:shadow-lg p-5 mb-6 border border-gray-100 dark:border-[rgb(var(--color-border))]">
-          <div className="flex items-center space-x-4 pb-4 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-full flex items-center justify-center shadow-md">
-              <span className="text-2xl font-bold text-white">
-                {user.name.charAt(0).toUpperCase()}
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-md dark:shadow-lg p-2.5 mb-4 border dark:border-[rgb(var(--color-border))]">
+          <div className="flex items-center space-x-3 pb-2 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
+            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-full flex items-center justify-center shadow-md">
+              <span className="text-xl font-bold text-white">
+                {(user?.user?.name || user?.name || "U").charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-                {user.name}
+              <h3 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                {user?.user?.name || user?.name || "User"}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
-                {user.email}
+              <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                {user?.user?.email || user?.email || ""}
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3">
             {/* Email */}
-            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200/50 dark:border-blue-700/50">
-              <div className="p-2 bg-blue-600 dark:bg-blue-500 rounded-lg shadow-sm">
+            <div className="flex items-start space-x-2 p-1.5 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200/50 dark:border-blue-700/50">
+              <div className="p-1 bg-blue-600 dark:bg-blue-500 rounded-full">
                 <svg
                   className="w-5 h-5 text-white"
                   fill="none"
@@ -151,18 +151,18 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                <p className="text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
                   Email
                 </p>
-                <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-medium">
-                  {user.email || "Not provided"}
+                <p className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))] font-medium">
+                  {user?.user?.email || user?.email || "Not provided"}
                 </p>
               </div>
             </div>
 
             {/* Phone */}
-            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200/50 dark:border-purple-700/50">
-              <div className="p-2 bg-purple-600 dark:bg-purple-500 rounded-lg shadow-sm">
+            <div className="flex items-start space-x-2 p-1.5 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200/50 dark:border-purple-700/50">
+              <div className="p-1 bg-purple-600 dark:bg-purple-500 rounded-full">
                 <svg
                   className="w-5 h-5 text-white"
                   fill="none"
@@ -181,15 +181,15 @@ const Dashboard = () => {
                 <p className="text-xs font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wide">
                   Phone
                 </p>
-                <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-semibold text-sm truncate">
-                  {user.phone || "Not provided"}
+                <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-semibold text-xs truncate">
+                  {user?.user?.phone || user?.phone || "Not provided"}
                 </p>
               </div>
             </div>
 
             {/* Role */}
-            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-yellow-50 to-yellow-100/50 dark:from-yellow-900/20 dark:to-yellow-800/20 border border-yellow-200/50 dark:border-yellow-700/50">
-              <div className="p-2 bg-yellow-600 dark:bg-yellow-500 rounded-lg shadow-sm">
+            <div className="flex items-start space-x-2 p-1.5 rounded-lg bg-gradient-to-br from-yellow-50 to-yellow-100/50 dark:from-yellow-900/20 dark:to-yellow-800/20 border border-yellow-200/50 dark:border-yellow-700/50">
+              <div className="p-1 bg-yellow-600 dark:bg-yellow-500 rounded-full">
                 <svg
                   className="w-5 h-5 text-white"
                   fill="none"
@@ -208,15 +208,15 @@ const Dashboard = () => {
                 <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 uppercase tracking-wide">
                   Role
                 </p>
-                <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-semibold text-sm capitalize truncate">
-                  {user.role || "Owner"}
+                <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-semibold text-xs capitalize truncate">
+                  {user?.user?.role || user?.role || "Owner"}
                 </p>
               </div>
             </div>
 
             {/* Shop Name */}
-            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/20 border border-green-200/50 dark:border-green-700/50">
-              <div className="p-2 bg-green-600 dark:bg-green-500 rounded-lg shadow-sm">
+            <div className="flex items-start space-x-2 p-1.5 rounded-lg bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/20 border border-green-200/50 dark:border-green-700/50">
+              <div className="p-1 bg-green-600 dark:bg-green-500 rounded-full">
                 <svg
                   className="w-5 h-5 text-white"
                   fill="none"
@@ -232,11 +232,11 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                <p className="text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
                   Shop Name
                 </p>
-                <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-medium">
-                  {user.shopName || "Not provided"}
+                <p className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))] font-medium">
+                  {user?.user?.shopName || user?.shopName || "Not provided"}
                 </p>
               </div>
             </div>
@@ -244,135 +244,146 @@ const Dashboard = () => {
         </div>
 
         {/* Financial Overview Section */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-            <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3 flex items-center">
+            <svg className="w-4 h-4 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Financial Overview
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Total Revenue */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalRevenue || 0).toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Revenue</p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Revenue</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalRevenue || 0).toLocaleString()}</p>
             </div>
 
             {/* Total Collected */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalCollected || 0).toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Collected</p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Collected</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalCollected || 0).toLocaleString()}</p>
             </div>
 
             {/* Total Outstanding */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-600 dark:to-yellow-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-600 dark:to-yellow-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalCustomerOutstanding || 0).toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Customer Dues <span className="text-gray-400">• To Receive</span></p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Customer Dues</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalCustomerOutstanding || 0).toLocaleString()}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">To Receive</p>
             </div>
 
             {/* Supplier Outstanding */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalSupplierOutstanding || 0).toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Supplier Dues <span className="text-gray-400">• To Pay</span></p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Supplier Dues</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalSupplierOutstanding || 0).toLocaleString()}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">To Pay</p>
             </div>
 
             {/* Total Expenses */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalExpenses || 0).toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Expenses</p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Expenses</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalExpenses || 0).toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         {/* Profit Metrics Section */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-            <svg className="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3 flex items-center">
+            <svg className="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
             Profit & Loss
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Operating Profit */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
+                <div>
+                  <p className={`text-xl font-bold ${(dashboardStats?.operatingProfit || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    ₹{(dashboardStats?.operatingProfit || 0).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Operating Profit <span className="text-gray-400">• Revenue - Expenses</span></p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Operating Profit</p>
-              <p className={`text-3xl font-bold ${(dashboardStats?.operatingProfit || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                ₹{(dashboardStats?.operatingProfit || 0).toLocaleString()}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Revenue - Expenses</p>
             </div>
 
             {/* Profit Margin */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
+                <div>
+                  <p className={`text-xl font-bold ${(dashboardStats?.profitMargin || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {(dashboardStats?.profitMargin || 0).toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Profit Margin <span className="text-gray-400">• Profit / Revenue × 100</span></p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Profit Margin</p>
-              <p className={`text-3xl font-bold ${(dashboardStats?.profitMargin || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {(dashboardStats?.profitMargin || 0).toFixed(1)}%
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Profit / Revenue × 100</p>
             </div>
 
             {/* Total Invoices */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-lg shadow-sm">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-full">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalInvoices || 0}</p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Invoices</p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Invoices</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalInvoices || 0}</p>
             </div>
           </div>
         </div>
@@ -381,18 +392,18 @@ const Dashboard = () => {
         <div className="mb-6 flex justify-center">
           <button
             onClick={() => setShowDetailedMetrics(!showDetailedMetrics)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform  transition-all duration-200"
           >
             {showDetailedMetrics ? (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                 </svg>
                 <span>Hide Detailed Metrics</span>
               </>
             ) : (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
                 <span>Show Detailed Metrics</span>
@@ -406,254 +417,210 @@ const Dashboard = () => {
           <>
 
             {/* Inventory Section */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mb-4">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
                 Inventory Overview
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Total Items */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-cyan-600 dark:from-cyan-600 dark:to-cyan-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gradient-to-br from-cyan-500 to-cyan-600 dark:from-cyan-600 dark:to-cyan-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Items</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalItems || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalItems || 0}</p><p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Items</p></div></div>
                 </div>
 
                 {/* Low Stock Items */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     </div>
+                    <div>
+                      <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{dashboardStats?.lowStockItems || 0}</p>
+                      <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Low Stock</p>
+                    </div>
                   </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Low Stock</p>
-                  <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{dashboardStats?.lowStockItems || 0}</p>
                 </div>
 
                 {/* Out of Stock */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </div>
+                    <div>
+                      <p className="text-xl font-bold text-red-600 dark:text-red-400">{dashboardStats?.outOfStockItems || 0}</p>
+                      <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Out of Stock</p>
+                    </div>
                   </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Out of Stock</p>
-                  <p className="text-3xl font-bold text-red-600 dark:text-red-400">{dashboardStats?.outOfStockItems || 0}</p>
                 </div>
 
                 {/* Inventory Value */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gradient-to-br from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
+                    <div>
+                      <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalInventoryValue || 0).toLocaleString()}</p>
+                      <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Inventory Value</p>
+                    </div>
                   </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Inventory Value</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalInventoryValue || 0).toLocaleString()}</p>
                 </div>
               </div>
             </div>
 
             {/* Cash & Bank Section */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mb-4">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 Cash & Bank
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Cash in Hand */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Cash in Hand</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.cashInHand || 0).toLocaleString()}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.cashInHand || 0).toLocaleString()}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Cash in Hand</p></div></div>
                 </div>
 
                 {/* Bank Balance */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.5m-9.5 0H3m2 0h5.5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Bank Balance</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalBankBalance || 0).toLocaleString()}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalBankBalance || 0).toLocaleString()}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Bank Balance</p></div></div>
                 </div>
 
                 {/* Total Liquidity */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Liquidity</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalLiquidity || 0).toLocaleString()}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalLiquidity || 0).toLocaleString()}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Liquidity</p></div></div>
                 </div>
 
                 {/* Bank Accounts */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Bank Accounts</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.bankAccountCount || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.bankAccountCount || 0}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Bank Accounts</p></div></div>
                 </div>
               </div>
             </div>
 
             {/* Sales, Purchase & Parties Section */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mb-4">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
                 Sales, Purchase & Parties
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Pending Sales Orders */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Pending Orders</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.pendingSalesOrders || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.pendingSalesOrders || 0}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Pending Orders</p></div></div>
                 </div>
 
                 {/* Total Purchases */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-violet-500 to-violet-600 dark:from-violet-600 dark:to-violet-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-violet-500 to-violet-600 dark:from-violet-600 dark:to-violet-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Purchases</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalPurchases || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalPurchases || 0}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Purchases</p></div></div>
                 </div>
 
                 {/* Total Customers */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-pink-500 to-pink-600 dark:from-pink-600 dark:to-pink-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-pink-500 to-pink-600 dark:from-pink-600 dark:to-pink-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Customers</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalCustomers || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalCustomers || 0}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Customers</p></div></div>
                 </div>
 
                 {/* Total Suppliers */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-fuchsia-500 to-fuchsia-600 dark:from-fuchsia-600 dark:to-fuchsia-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-fuchsia-500 to-fuchsia-600 dark:from-fuchsia-600 dark:to-fuchsia-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.5m-9.5 0H3m2 0h5.5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Suppliers</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalSuppliers || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalSuppliers || 0}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Suppliers</p></div></div>
                 </div>
               </div>
             </div>
 
             {/* Payments & Returns Section */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mb-4">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
                 Payments & Returns
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Payments In */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Payments In</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalPaymentsIn || 0).toLocaleString()}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalPaymentsIn || 0).toLocaleString()}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Payments In</p></div></div>
                 </div>
 
                 {/* Payments Out */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Payments Out</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalPaymentsOut || 0).toLocaleString()}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalPaymentsOut || 0).toLocaleString()}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Payments Out</p></div></div>
                 </div>
 
                 {/* Sales Returns */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Sales Returns</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.salesReturnsCount || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.salesReturnsCount || 0}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Sales Returns</p></div></div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">₹{(dashboardStats?.salesReturnsAmount || 0).toLocaleString()}</p>
                 </div>
 
                 {/* Purchase Returns */}
-                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-lg shadow-sm">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-3 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg ">
+                  <div className="flex items-center space-x-3"><div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-full">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                       </svg>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Purchase Returns</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.purchaseReturnsCount || 0}</p>
+                    </div><div><p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.purchaseReturnsCount || 0}</p><p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Purchase Returns</p></div></div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">₹{(dashboardStats?.purchaseReturnsAmount || 0).toLocaleString()}</p>
                 </div>
               </div>
@@ -663,10 +630,10 @@ const Dashboard = () => {
 
         {/* Analytical Graphs */}
         {dashboardStats && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
             {/* Sales Trend */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-4 rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-base font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2 flex items-center">
                 <svg
                   className="w-5 h-5 mr-2 text-indigo-500"
                   fill="none"
@@ -682,7 +649,7 @@ const Dashboard = () => {
                 </svg>
                 Sales Trend (Last 30 Days)
               </h3>
-              <div className="h-64 w-full">
+              <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={dashboardStats.dailySales || []}>
                     <defs>
@@ -743,8 +710,8 @@ const Dashboard = () => {
             </div>
 
             {/* Revenue vs Expenses */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-4 rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-base font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2 flex items-center">
                 <svg
                   className="w-5 h-5 mr-2 text-green-500"
                   fill="none"
@@ -760,7 +727,7 @@ const Dashboard = () => {
                 </svg>
                 Revenue vs Expenses (Monthly)
               </h3>
-              <div className="h-64 w-full">
+              <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={dashboardStats.revenueVsExpenses || []}>
                     <CartesianGrid
@@ -805,8 +772,8 @@ const Dashboard = () => {
             </div>
 
             {/* Payment Methods */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-4 rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-base font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2 flex items-center">
                 <svg
                   className="w-5 h-5 mr-2 text-purple-500"
                   fill="none"
@@ -822,7 +789,7 @@ const Dashboard = () => {
                 </svg>
                 Payment Methods Distribution
               </h3>
-              <div className="h-64 w-full">
+              <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -872,8 +839,8 @@ const Dashboard = () => {
             </div>
 
             {/* Top Customer Dues */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-4 rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-base font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2 flex items-center">
                 <svg
                   className="w-5 h-5 mr-2 text-orange-500"
                   fill="none"
@@ -922,8 +889,8 @@ const Dashboard = () => {
         )}
 
         {/* Coming Soon Section - Now as helpful info */}
-        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-[rgb(var(--color-card))] dark:to-[rgb(var(--color-card))] rounded-xl shadow-md dark:shadow-lg p-6 border border-gray-100 dark:border-[rgb(var(--color-border))]">
-          <div className="flex items-center space-x-4">
+        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-[rgb(var(--color-card))] dark:to-[rgb(var(--color-card))] rounded-xl shadow-md dark:shadow-lg p-6 border dark:border-[rgb(var(--color-border))]">
+          <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
               <svg
                 className="w-6 h-6 text-indigo-600"
@@ -940,7 +907,7 @@ const Dashboard = () => {
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
                 Quick Tips
               </h3>
               <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">

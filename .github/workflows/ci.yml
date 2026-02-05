@@ -23,7 +23,15 @@ jobs:
     - name: Install Dependencies
       run: npm install --prefer-offline --no-audit
     - name: Test
-      run: npm test
+      run: npm run test:coverage
+      env:
+        CI: true
+    - name: Upload Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage/lcov.info
+        flags: backend
+        fail_ci_if_error: true
 
   frontend-check:
     runs-on: ubuntu-latest

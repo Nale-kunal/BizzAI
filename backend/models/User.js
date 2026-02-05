@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      default: null,
+      index: true,
+    },
     role: {
       type: String,
       enum: ["owner"],

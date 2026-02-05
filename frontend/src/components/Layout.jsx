@@ -54,7 +54,7 @@ const Layout = ({ children }) => {
         expandedMenus={expandedMenus}
         setExpandedMenus={setExpandedMenus}
       />
-      <div className={`flex flex-col min-h-screen transition-[margin] duration-300 ease-in-out ${isCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
+      <div className={`flex flex-col min-h-screen transition-[margin] duration-300 ease-in-out ${isCollapsed ? 'lg:ml-12' : 'lg:ml-48'}`}>
         <header className="flex items-center justify-between border-b border-gray-200 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-card))] px-4 py-4 shadow-sm lg:hidden print:hidden sticky top-0 z-30">
           <button
             type="button"
@@ -85,7 +85,7 @@ const Layout = ({ children }) => {
           </button>
         </header>
 
-        <main className="flex-1 w-full px-4 py-6 sm:px-6 lg:px-8">
+        <main className="flex-1 w-full px-3 py-6 sm:px-4 lg:px-6">
           {children}
         </main>
       </div>

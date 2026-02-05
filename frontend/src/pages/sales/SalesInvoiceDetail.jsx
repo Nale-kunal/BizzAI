@@ -52,7 +52,7 @@ const SalesInvoiceDetail = () => {
         return (
             <Layout>
                 <div className="max-w-4xl mx-auto">
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
                         <p className="text-red-600">{message}</p>
                     </div>
                     <button
@@ -88,23 +88,23 @@ const SalesInvoiceDetail = () => {
                         onClick={() => navigate('/sales/invoice')}
                         className="flex items-center  text-secondary hover: text-main mb-4"
                     >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                         Back to Sales Invoices
                     </button>
                     <div className="flex justify-between items-start">
                         <div>
-                            <h1 className="text-3xl font-bold  text-main mb-2">Sales Invoice Details</h1>
+                            <h1 className="text-xs font-bold  text-main mb-2">Sales Invoice Details</h1>
                             <p className=" text-secondary">View and print sales invoice</p>
                         </div>
                         <div className="flex space-x-2">
                             {invoice && invoice.paymentStatus !== 'paid' && (
                                 <button
                                     onClick={() => setShowPaymentModal(true)}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                    className="flex items-center space-x-2 px-2 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
                                 >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
                                     <span>Record Payment</span>
@@ -112,9 +112,9 @@ const SalesInvoiceDetail = () => {
                             )}
                             <button
                                 onClick={handlePrint}
-                                className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                className="flex items-center space-x-2 px-2 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
                                 <span>Print Invoice</span>
@@ -125,9 +125,9 @@ const SalesInvoiceDetail = () => {
                                     dispatch(reset());
                                     navigate('/sales/invoice');
                                 }}
-                                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                                className="flex items-center space-x-2 px-2 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <span>Done - Return to Sales</span>
@@ -142,8 +142,8 @@ const SalesInvoiceDetail = () => {
                     <div className="border-b pb-6 mb-6">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h2 className="text-3xl font-bold text-indigo-600 mb-2">INVOICE</h2>
-                                <div className="text-lg font-semibold  text-main">{invoice.invoiceNo}</div>
+                                <h2 className="text-xs font-bold text-indigo-600 mb-2">INVOICE</h2>
+                                <div className="text-xs font-semibold  text-main">{invoice.invoiceNo}</div>
                             </div>
                             <div className="text-right">
                                 <div className="text-sm  text-secondary mb-1">Invoice Date</div>
@@ -186,7 +186,7 @@ const SalesInvoiceDetail = () => {
 
                         <div className="text-right">
                             <h3 className="text-sm font-semibold  text-muted uppercase mb-2">Payment Status</h3>
-                            <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(invoice.paymentStatus)}`}>
+                            <span className={`inline-block px-2 py-1 rounded-full text-sm font-semibold ${getStatusColor(invoice.paymentStatus)}`}>
                                 {invoice.paymentStatus.toUpperCase()}
                             </span>
                             <div className="mt-4">
@@ -201,21 +201,21 @@ const SalesInvoiceDetail = () => {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b-2 border-default">
-                                    <th className="text-left py-3 px-2 font-semibold  text-secondary">#</th>
-                                    <th className="text-left py-3 px-2 font-semibold  text-secondary">Item</th>
-                                    <th className="text-right py-3 px-2 font-semibold  text-secondary">Quantity</th>
-                                    <th className="text-right py-3 px-2 font-semibold  text-secondary">Price</th>
-                                    <th className="text-right py-3 px-2 font-semibold  text-secondary">Total</th>
+                                    <th className="text-left py-1.5 px-2 font-semibold  text-secondary">#</th>
+                                    <th className="text-left py-1.5 px-2 font-semibold  text-secondary">Item</th>
+                                    <th className="text-right py-1.5 px-2 font-semibold  text-secondary">Quantity</th>
+                                    <th className="text-right py-1.5 px-2 font-semibold  text-secondary">Price</th>
+                                    <th className="text-right py-1.5 px-2 font-semibold  text-secondary">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {invoice.items.map((item, index) => (
                                     <tr key={index} className="border-b border-default">
-                                        <td className="py-3 px-2  text-secondary">{index + 1}</td>
-                                        <td className="py-3 px-2  text-main">{item.name || 'Item'}</td>
-                                        <td className="py-3 px-2 text-right  text-main">{item.quantity}</td>
-                                        <td className="py-3 px-2 text-right  text-main">₹{item.price.toFixed(2)}</td>
-                                        <td className="py-3 px-2 text-right font-medium  text-main">
+                                        <td className="py-1.5 px-2  text-secondary">{index + 1}</td>
+                                        <td className="py-1.5 px-2  text-main">{item.name || 'Item'}</td>
+                                        <td className="py-1.5 px-2 text-right  text-main">{item.quantity}</td>
+                                        <td className="py-1.5 px-2 text-right  text-main">₹{item.price.toFixed(2)}</td>
+                                        <td className="py-1.5 px-2 text-right font-medium  text-main">
                                             ₹{item.total.toFixed(2)}
                                         </td>
                                     </tr>
@@ -227,29 +227,29 @@ const SalesInvoiceDetail = () => {
                     {/* Totals */}
                     <div className="flex justify-end">
                         <div className="w-64">
-                            <div className="flex justify-between py-2 border-b">
+                            <div className="flex justify-between py-1 border-b">
                                 <span className=" text-secondary">Subtotal:</span>
                                 <span className="font-medium  text-main">₹{invoice.subtotal.toFixed(2)}</span>
                             </div>
                             {invoice.tax > 0 && (
-                                <div className="flex justify-between py-2 border-b">
+                                <div className="flex justify-between py-1 border-b">
                                     <span className=" text-secondary">Tax:</span>
                                     <span className="font-medium text-green-600">+₹{invoice.tax.toFixed(2)}</span>
                                 </div>
                             )}
                             {invoice.discount > 0 && (
-                                <div className="flex justify-between py-2 border-b">
+                                <div className="flex justify-between py-1 border-b">
                                     <span className=" text-secondary">Discount:</span>
                                     <span className="font-medium text-red-600">-₹{invoice.discount.toFixed(2)}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between py-3 border-b-2 border-default">
-                                <span className="text-lg font-bold  text-main">Total Amount:</span>
-                                <span className="text-lg font-bold text-indigo-600">
+                            <div className="flex justify-between py-1.5 border-b-2 border-default">
+                                <span className="text-xs font-bold  text-main">Total Amount:</span>
+                                <span className="text-xs font-bold text-indigo-600">
                                     ₹{invoice.totalAmount.toFixed(2)}
                                 </span>
                             </div>
-                            <div className="flex justify-between py-2 border-b">
+                            <div className="flex justify-between py-1 border-b">
                                 <span className=" text-secondary">Paid Amount:</span>
                                 <span className="font-medium text-green-600">₹{invoice.paidAmount.toFixed(2)}</span>
                             </div>
@@ -272,9 +272,9 @@ const SalesInvoiceDetail = () => {
                 </div>
 
                 {/* Additional Info - Hidden on print */}
-                <div className="mt-6 bg-blue-50 rounded-lg p-4 print:hidden">
+                <div className="mt-6 bg-blue-50 rounded-lg p-2 print:hidden">
                     <div className="flex items-start">
-                        <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div className="flex-1">

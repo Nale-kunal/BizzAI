@@ -64,17 +64,17 @@ const PurchaseReturnDetail = () => {
 
     const getStatusBadge = (status) => {
         const badges = {
-            draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Draft' },
-            pending_approval: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pending Approval' },
-            approved: { bg: 'bg-green-100', text: 'text-green-800', label: 'Approved' },
-            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: 'Rejected' },
-            processing: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Processing' },
-            completed: { bg: 'bg-green-100', text: 'text-green-800', label: 'Completed' },
-            cancelled: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Cancelled' },
+            draft: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-800 dark:text-gray-200', label: 'Draft' },
+            pending_approval: { bg: 'bg-yellow-100 dark:bg-yellow-900', text: 'text-yellow-800 dark:text-yellow-200', label: 'Pending Approval' },
+            approved: { bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-800 dark:text-green-200', label: 'Approved' },
+            rejected: { bg: 'bg-red-100 dark:bg-red-900', text: 'text-red-800 dark:text-red-200', label: 'Rejected' },
+            processing: { bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-800 dark:text-blue-200', label: 'Processing' },
+            completed: { bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-800 dark:text-green-200', label: 'Completed' },
+            cancelled: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-800 dark:text-gray-200', label: 'Cancelled' },
         };
         const badge = badges[status] || badges.draft;
         return (
-            <span className={`px-3 py-1 text-sm font-medium rounded-full ${badge.bg} ${badge.text}`}>
+            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${badge.bg} ${badge.text}`}>
                 {badge.label}
             </span>
         );
@@ -84,7 +84,7 @@ const PurchaseReturnDetail = () => {
         return (
             <Layout>
                 <div className="flex items-center justify-center h-64">
-                    <p className="text-gray-500">Loading...</p>
+                    <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">Loading...</p>
                 </div>
             </Layout>
         );
@@ -94,7 +94,7 @@ const PurchaseReturnDetail = () => {
         return (
             <Layout>
                 <div className="flex items-center justify-center h-64">
-                    <p className="text-gray-500">Return not found</p>
+                    <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">Return not found</p>
                 </div>
             </Layout>
         );
@@ -118,41 +118,41 @@ const PurchaseReturnDetail = () => {
             />
 
             {/* Header Card */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <p className="text-sm text-gray-600 mb-1">Status</p>
+                        <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-1">Status</p>
                         {getStatusBadge(returnData.status)}
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600 mb-1">Supplier</p>
-                        <p className="font-semibold text-gray-900">{returnData.supplier?.businessName}</p>
+                        <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-1">Supplier</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))]">{returnData.supplier?.businessName}</p>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-                        <p className="text-xl font-bold text-gray-900">₹{returnData.totalAmount?.toFixed(2)}</p>
+                        <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-1">Total Amount</p>
+                        <p className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{returnData.totalAmount?.toFixed(2)}</p>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600 mb-1">Refund Mode</p>
-                        <p className="font-semibold text-gray-900 capitalize">
+                        <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-1">Refund Mode</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] capitalize">
                             {returnData.refundMode?.replace('_', ' ')}
                         </p>
                     </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mt-6 flex space-x-3">
+                <div className="mt-4 flex space-x-2">
                     {returnData.status === 'pending_approval' && (
                         <>
                             <button
                                 onClick={handleApprove}
-                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                                className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
                             >
                                 ✓ Approve
                             </button>
                             <button
                                 onClick={handleReject}
-                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                                className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
                             >
                                 ✗ Reject
                             </button>
@@ -161,14 +161,14 @@ const PurchaseReturnDetail = () => {
                     {['draft', 'approved', 'completed'].includes(returnData.status) && (
                         <button
                             onClick={handleCancel}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                            className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700"
                         >
                             Cancel Return
                         </button>
                     )}
                     <button
                         onClick={() => window.print()}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-[rgb(var(--color-text))] hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                         🖨️ Print
                     </button>
@@ -176,21 +176,21 @@ const PurchaseReturnDetail = () => {
             </div>
 
             {/* Tab Navigation */}
-            <div className="bg-white border-b mb-6">
-                <div className="flex space-x-8 px-6">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] border-b dark:border-gray-700 mb-4">
+                <div className="flex space-x-6 px-4">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            className={`py-3 px-2 border-b-2 font-medium text-xs transition-colors ${activeTab === tab.id
+                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                : 'border-transparent text-gray-500 dark:text-[rgb(var(--color-text-secondary))] hover:text-gray-700 dark:hover:text-[rgb(var(--color-text))]'
                                 }`}
                         >
-                            <span className="mr-2">{tab.icon}</span>
+                            <span className="mr-1.5">{tab.icon}</span>
                             {tab.label}
                             {tab.badge !== undefined && tab.badge > 0 && (
-                                <span className="ml-2 bg-blue-100 text-blue-600 py-0.5 px-2 rounded-full text-xs">
+                                <span className="ml-1.5 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-200 py-0.5 px-1.5 rounded-full text-xs">
                                     {tab.badge}
                                 </span>
                             )}
@@ -200,59 +200,59 @@ const PurchaseReturnDetail = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4">
                 {/* Summary Tab */}
                 {activeTab === 'summary' && (
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Return Information</h3>
-                                <dl className="space-y-3">
+                                <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Return Information</h3>
+                                <dl className="space-y-2">
                                     <div>
-                                        <dt className="text-sm text-gray-600">Return ID</dt>
-                                        <dd className="text-sm font-medium text-gray-900">{returnData.returnId}</dd>
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Return ID</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{returnData.returnId}</dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm text-gray-600">Return Date</dt>
-                                        <dd className="text-sm font-medium text-gray-900">
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Return Date</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                                             {new Date(returnData.returnDate).toLocaleDateString()}
                                         </dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm text-gray-600">Return Type</dt>
-                                        <dd className="text-sm font-medium text-gray-900 capitalize">{returnData.returnType}</dd>
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Return Type</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))] capitalize">{returnData.returnType}</dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm text-gray-600">Warehouse</dt>
-                                        <dd className="text-sm font-medium text-gray-900">{returnData.warehouse || 'N/A'}</dd>
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Warehouse</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{returnData.warehouse || 'N/A'}</dd>
                                     </div>
                                 </dl>
                             </div>
 
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Supplier Details</h3>
-                                <dl className="space-y-3">
+                                <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Supplier Details</h3>
+                                <dl className="space-y-2">
                                     <div>
-                                        <dt className="text-sm text-gray-600">Business Name</dt>
-                                        <dd className="text-sm font-medium text-gray-900">
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Business Name</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                                             {returnData.supplier?.businessName}
                                         </dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm text-gray-600">Contact Person</dt>
-                                        <dd className="text-sm font-medium text-gray-900">
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Contact Person</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                                             {returnData.supplier?.contactPersonName}
                                         </dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm text-gray-600">Contact Number</dt>
-                                        <dd className="text-sm font-medium text-gray-900">
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Contact Number</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                                             {returnData.supplier?.contactNo}
                                         </dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm text-gray-600">Email</dt>
-                                        <dd className="text-sm font-medium text-gray-900">
+                                        <dt className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Email</dt>
+                                        <dd className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                                             {returnData.supplier?.email || 'N/A'}
                                         </dd>
                                     </div>
@@ -261,16 +261,16 @@ const PurchaseReturnDetail = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Return Reason</h3>
-                            <p className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">Return Reason</h3>
+                            <p className="text-xs text-gray-700 dark:text-[rgb(var(--color-text-secondary))] bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                                 {returnData.returnReason}
                             </p>
                         </div>
 
                         {returnData.notes && (
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Notes</h3>
-                                <p className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg">
+                                <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">Notes</h3>
+                                <p className="text-xs text-gray-700 dark:text-[rgb(var(--color-text-secondary))] bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                                     {returnData.notes}
                                 </p>
                             </div>
@@ -281,45 +281,45 @@ const PurchaseReturnDetail = () => {
                 {/* Items Tab */}
                 {activeTab === 'items' && (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead className="bg-gray-50 dark:bg-gray-800">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Batch/Expiry</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tax</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Condition</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Disposition</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Item</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Batch/Expiry</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Qty</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Rate</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Tax</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Total</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Condition</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">Disposition</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-white dark:bg-[rgb(var(--color-card))] divide-y divide-gray-200 dark:divide-gray-700">
                                 {returnData.items?.map((item, index) => (
-                                    <tr key={index}>
-                                        <td className="px-4 py-3">
-                                            <p className="font-medium text-gray-900">{item.itemName}</p>
-                                            <p className="text-xs text-gray-500">{item.sku || 'N/A'}</p>
+                                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        <td className="px-3 py-2">
+                                            <p className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{item.itemName}</p>
+                                            <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">{item.sku || 'N/A'}</p>
                                         </td>
-                                        <td className="px-4 py-3 text-sm">
+                                        <td className="px-3 py-2 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">
                                             <p>{item.batchNo || 'N/A'}</p>
                                             {item.expiryDate && (
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
                                                     {new Date(item.expiryDate).toLocaleDateString()}
                                                 </p>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-sm">{item.returnQty || item.quantity}</td>
-                                        <td className="px-4 py-3 text-sm">₹{item.rate?.toFixed(2)}</td>
-                                        <td className="px-4 py-3 text-sm">{item.taxRate}%</td>
-                                        <td className="px-4 py-3 text-sm font-semibold">₹{item.total?.toFixed(2)}</td>
-                                        <td className="px-4 py-3">
-                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                        <td className="px-3 py-2 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">{item.returnQty || item.quantity}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">₹{item.rate?.toFixed(2)}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">{item.taxRate}%</td>
+                                        <td className="px-3 py-2 text-xs font-semibold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{item.total?.toFixed(2)}</td>
+                                        <td className="px-3 py-2">
+                                            <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                                 {item.condition}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                                        <td className="px-3 py-2">
+                                            <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                                 {item.disposition}
                                             </span>
                                         </td>

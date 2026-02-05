@@ -172,7 +172,10 @@ const purchaseSlice = createSlice({
             })
             .addCase(getAllPurchases.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.purchases = action.payload;
+                state.isSuccess = true;
+                // Backend returns { success: true, purchases: [...] }
+                // Extract just the purchases array
+                state.purchases = action.payload.purchases || action.payload || [];
             })
             .addCase(getAllPurchases.rejected, (state, action) => {
                 state.isLoading = false;

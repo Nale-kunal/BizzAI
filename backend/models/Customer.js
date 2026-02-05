@@ -41,9 +41,15 @@ const customerSchema = new mongoose.Schema(
       default: null,
     },
     // Link customer to shop owner
-    owner: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+    },
+    // Multi-tenancy
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      index: true,
       required: true,
     },
   },

@@ -7,6 +7,7 @@ import {
     getCustomerPaymentInfo,
 } from "../controllers/paymentInController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { validatePeriodLock } from "../middlewares/periodLockingMiddleware.js";
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ const router = express.Router();
 router.use(protect);
 
 // Payment In routes
-router.post("/", createPaymentIn);
+router.post("/", validatePeriodLock, createPaymentIn);
 router.get("/", getPaymentInRecords);
 router.get("/:id", getPaymentInById);
 

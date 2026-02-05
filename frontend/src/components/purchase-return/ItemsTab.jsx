@@ -1,3 +1,5 @@
+import React from 'react';
+
 const ItemsTab = ({ items, onItemUpdate, onRemoveItem }) => {
     const conditionOptions = [
         { value: 'resalable', label: 'Resalable', color: 'green' },
@@ -42,29 +44,28 @@ const ItemsTab = ({ items, onItemUpdate, onRemoveItem }) => {
 
     return (
         <div className="space-y-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3 mb-3">
+                <p className="text-xs text-gray-700 dark:text-[rgb(var(--color-text-secondary))]">
                     <strong>Note:</strong> Specify return quantity, condition, and disposition for each item.
-                    Only items with return quantity &gt; 0 will be included in the return.
                 </p>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Item</th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Batch/Expiry</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Purchased</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Return Qty</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Condition</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Disposition</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Purchased</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Return Qty</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Rate</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Condition</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Disposition</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Reason</th>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-[rgb(var(--color-card))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                         {items.map((item, index) => (
                             <tr key={index} className={item.returnQty > 0 ? 'bg-green-50' : ''}>
                                 <td className="px-4 py-3">
@@ -73,7 +74,7 @@ const ItemsTab = ({ items, onItemUpdate, onRemoveItem }) => {
                                         <p className="text-xs text-gray-500">{item.sku || 'N/A'}</p>
                                     </div>
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-2">
                                     <div className="text-sm">
                                         <p className="text-gray-900">{item.batchNo || 'N/A'}</p>
                                         {item.expiryDate && (
@@ -84,24 +85,24 @@ const ItemsTab = ({ items, onItemUpdate, onRemoveItem }) => {
                                     </div>
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900">
-                                    {item.purchasedQty}
+                                    {item.purchasedQty || 0}
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-2">
                                     <input
                                         type="number"
                                         min="0"
-                                        max={item.availableReturnQty}
-                                        value={item.returnQty}
+                                        max={item.availableReturnQty || item.purchasedQty || 0}
+                                        value={item.returnQty || 0}
                                         onChange={(e) => onItemUpdate(index, 'returnQty', parseFloat(e.target.value) || 0)}
                                         className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900">
-                                    ₹{item.rate.toFixed(2)}
+                                    ₹{(item.rate || 0).toFixed(2)}
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-2">
                                     <select
-                                        value={item.condition}
+                                        value={item.condition || 'resalable'}
                                         onChange={(e) => {
                                             const newCondition = e.target.value;
                                             onItemUpdate(index, 'condition', newCondition);
@@ -120,9 +121,9 @@ const ItemsTab = ({ items, onItemUpdate, onRemoveItem }) => {
                                         ))}
                                     </select>
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-2">
                                     <select
-                                        value={item.disposition}
+                                        value={item.disposition || 'restock'}
                                         onChange={(e) => onItemUpdate(index, 'disposition', e.target.value)}
                                         className="w-40 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
@@ -133,16 +134,16 @@ const ItemsTab = ({ items, onItemUpdate, onRemoveItem }) => {
                                         ))}
                                     </select>
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-2">
                                     <input
                                         type="text"
-                                        value={item.returnReason}
+                                        value={item.returnReason || ''}
                                         onChange={(e) => onItemUpdate(index, 'returnReason', e.target.value)}
                                         placeholder="Reason..."
                                         className="w-40 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-2">
                                     <button
                                         onClick={() => onRemoveItem(index)}
                                         className="text-red-600 hover:text-red-800"

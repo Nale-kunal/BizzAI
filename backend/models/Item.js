@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import tenantScopingPlugin from "../utils/tenantScopingPlugin.js";
 
 const itemSchema = new mongoose.Schema(
   {
@@ -104,9 +105,31 @@ const itemSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    // Multi-tenancy
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      index: true
+    },
+    // Soft delete fields
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
+    deletedAt: {
+      type: Date
+    }
   },
   { timestamps: true }
 );
+
+// Apply tenant scoping plugin
+itemSchema.plugin(tenantScopingPlugin);
 
 // Virtual field for available stock (never negative)
 itemSchema.virtual("availableStock").get(function () {

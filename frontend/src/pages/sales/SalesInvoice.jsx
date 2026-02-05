@@ -93,7 +93,7 @@ const SalesInvoice = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
             Sales Invoices
           </h1>
           <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
@@ -103,26 +103,18 @@ const SalesInvoice = () => {
 
         {/* Error Message */}
         {isError && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="mb-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <p className="text-red-600 dark:text-red-400 text-sm">{message}</p>
           </div>
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">
-                  Total Invoices
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">
-                  {totalInvoices}
-                </p>
-              </div>
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
                 <svg
-                  className="w-8 h-8 text-blue-600 dark:text-blue-400"
+                  className="w-6 h-6 text-blue-600 dark:text-blue-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -135,65 +127,19 @@ const SalesInvoice = () => {
                   />
                 </svg>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-                Customer Filter
-              </h2>
-            </div>
-            {selectedCustomer ? (
-              <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
-                      {selectedCustomer.name}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
-                      {selectedCustomer.phone}
-                    </p>
-                    {selectedCustomer.email && (
-                      <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
-                        {selectedCustomer.email}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => setSelectedCustomer(null)}
-                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-500 text-sm font-medium"
-                  >
-                    Clear Filter
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowCustomerModal(true)}
-                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 dark:hover:border-[rgb(var(--color-primary))] hover:text-indigo-600 dark:hover:text-[rgb(var(--color-primary))] transition flex flex-col items-center justify-center gap-2"
-              >
-                <span className="font-medium">Click to filter by customer</span>
-                <span className="text-sm text-gray-400 dark:text-[rgb(var(--color-text-muted))]">
-                  Show invoices for specific customer
-                </span>
-              </button>
-            )}
-          </div>
-
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
-            <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">
-                  Amount Collected
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">
-                  ₹{totalPaid.toFixed(0)}
-                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{totalInvoices}</p>
+                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Invoices</p>
               </div>
-              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+            </div>
+          </div>
+
+
+          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-full">
                 <svg
-                  className="w-8 h-8 text-purple-600 dark:text-purple-400"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -206,22 +152,18 @@ const SalesInvoice = () => {
                   />
                 </svg>
               </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totalPaid.toFixed(0)}</p>
+                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Amount Collected</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">
-                  Outstanding Dues
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">
-                  ₹{totalDue.toFixed(0)}
-                </p>
-              </div>
-              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
+          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-full">
                 <svg
-                  className="w-8 h-8 text-red-600 dark:text-red-400"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -234,12 +176,16 @@ const SalesInvoice = () => {
                   />
                 </svg>
               </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totalDue.toFixed(0)}</p>
+                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Outstanding Dues</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 mb-6">
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-2 mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <div className="w-full sm:w-96">
               <div className="relative">
@@ -248,10 +194,10 @@ const SalesInvoice = () => {
                   placeholder="Search by invoice number or customer..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                 />
                 <svg
-                  className="absolute left-3 top-2.5 w-5 h-5 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
+                  className="absolute left-3 top-2.5 w-4 h-4 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -270,7 +216,7 @@ const SalesInvoice = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                className="px-2 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 <option value="paid">Paid</option>
@@ -312,31 +258,31 @@ const SalesInvoice = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))] border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Invoice No
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Date
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Customer
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Items
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Total
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Paid
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                         Payment
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
@@ -348,12 +294,12 @@ const SalesInvoice = () => {
                         className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-table-row-hover))]"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-indigo-600 dark:text-[rgb(var(--color-primary))]">
+                          <div className="text-xs font-medium text-indigo-600 dark:text-[rgb(var(--color-primary))]">
                             {invoice.invoiceNo}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
+                          <div className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">
                             {new Date(invoice.createdAt).toLocaleDateString(
                               "en-IN"
                             )}
@@ -363,7 +309,7 @@ const SalesInvoice = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
+                          <div className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">
                             {invoice.customer?.name || "Walk-in"}
                           </div>
                           {invoice.customer?.phone && (
@@ -373,17 +319,17 @@ const SalesInvoice = () => {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
+                          <div className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">
                             {invoice.items.length} items
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                          <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                             ₹{invoice.totalAmount.toFixed(2)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
+                          <div className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">
                             ₹{invoice.paidAmount.toFixed(2)}
                           </div>
                         </td>
@@ -397,11 +343,11 @@ const SalesInvoice = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))] capitalize">
+                          <span className="text-xs text-gray-900 dark:text-[rgb(var(--color-text))] capitalize">
                             {invoice.paymentMethod}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-xs font-medium">
                           <button
                             onClick={() =>
                               navigate(`/sales/invoice/${invoice._id}`)
@@ -425,8 +371,8 @@ const SalesInvoice = () => {
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="px-6 py-4 border-t border-gray-200 dark:border-[rgb(var(--color-border))] flex items-center justify-between">
-                  <div className="text-sm text-gray-700 dark:text-[rgb(var(--color-text-secondary))]">
+                <div className="px-3 py-2 border-t border-gray-200 dark:border-[rgb(var(--color-border))] flex items-center justify-between">
+                  <div className="text-xs text-gray-700 dark:text-[rgb(var(--color-text-secondary))]">
                     Showing {startIndex + 1} to{" "}
                     {Math.min(endIndex, filteredInvoices.length)} of{" "}
                     {filteredInvoices.length} results
@@ -492,8 +438,8 @@ const SalesInvoice = () => {
         {/* Delete Confirmation Modal */}
         {deleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-6 max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-1.5 max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-xs font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4">
                 Confirm Delete
               </h3>
               <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-6">
@@ -503,13 +449,13 @@ const SalesInvoice = () => {
               <div className="flex space-x-4">
                 <button
                   onClick={() => setDeleteConfirm(null)}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
+                  className="flex-1 px-2 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleDelete(deleteConfirm)}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-2 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Delete
                 </button>

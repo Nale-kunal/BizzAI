@@ -15,6 +15,7 @@ import {
     getUnappliedAdvancesReport,
 } from "../controllers/paymentOutController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { validatePeriodLock } from "../middlewares/periodLockingMiddleware.js";
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ router.get("/supplier/:supplierId/info", protect, getSupplierPaymentInfo);
 
 // CRUD operations
 router.get("/", protect, getPaymentOutRecords);
-router.post("/", protect, createPaymentOut);
+router.post("/", protect, validatePeriodLock, createPaymentOut);
 router.get("/:id", protect, getPaymentOutById);
 router.delete("/:id", protect, cancelPaymentOut);
 

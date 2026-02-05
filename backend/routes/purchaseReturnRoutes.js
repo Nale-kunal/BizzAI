@@ -18,6 +18,8 @@ import {
     getItemReturnReport,
 } from "../controllers/purchaseReturnAnalyticsController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { validatePeriodLock, validatePeriodLockForUpdate } from "../middlewares/periodLockingMiddleware.js";
+import PurchaseReturn from "../models/PurchaseReturn.js";
 
 const router = express.Router();
 
@@ -33,10 +35,10 @@ router.get("/purchases-for-return", protect, getPurchasesForReturn);
 router.post("/validate-quantities", protect, validateReturnQuantitiesAPI);
 
 // CRUD operations
-router.post("/", protect, createPurchaseReturn);
+router.post("/", protect, validatePeriodLock, createPurchaseReturn);
 router.get("/", protect, getAllPurchaseReturns);
 router.get("/:id", protect, getPurchaseReturnById);
-router.put("/:id", protect, updatePurchaseReturn);
+router.put("/:id", protect, validatePeriodLockForUpdate(PurchaseReturn), updatePurchaseReturn);
 router.delete("/:id", protect, deletePurchaseReturn);
 
 // Approval workflow

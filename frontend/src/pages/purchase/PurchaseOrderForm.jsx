@@ -24,8 +24,8 @@ const PurchaseOrderForm = () => {
     const { currentPO, isLoading, isError, isSuccess, message } = useSelector(
         (state) => state.purchaseOrder
     );
-    const { suppliers } = useSelector((state) => state.suppliers);
-    const { items } = useSelector((state) => state.inventory);
+    const { suppliers = [] } = useSelector((state) => state.suppliers);
+    const { items = [] } = useSelector((state) => state.inventory);
 
     const [formData, setFormData] = useState({
         poDate: new Date().toISOString().split("T")[0],
@@ -85,7 +85,7 @@ const PurchaseOrderForm = () => {
 
     // Auto-save draft
     useEffect(() => {
-        if (!isEditMode && (formData.supplier || formData.items.length > 0)) {
+        if (!isEditMode && (formData.supplier || formData.items?.length > 0)) {
             const timer = setTimeout(() => {
                 localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
                 setHasDraft(true);
@@ -331,6 +331,17 @@ const PurchaseOrderForm = () => {
     };
 
     const calculateTotals = () => {
+        // Safety check: ensure items array exists
+        if (!formData.items || !Array.isArray(formData.items)) {
+            return {
+                subtotal: '0.00',
+                itemDiscount: '0.00',
+                taxableValue: '0.00',
+                totalTax: '0.00',
+                totalAmount: 0,
+            };
+        }
+
         const subtotal = formData.items.reduce((sum, item) => {
             const qty = parseFloat(item.quantity) || 0;
             const rate = parseFloat(item.rate) || 0;
@@ -396,7 +407,7 @@ const PurchaseOrderForm = () => {
             return;
         }
 
-        if (formData.items.length === 0) {
+        if (!formData.items || formData.items.length === 0) {
             toast.error("Please add at least one item");
             return;
         }
@@ -427,483 +438,496 @@ const PurchaseOrderForm = () => {
 
     return (
         <Layout>
-            <div className="container mx-auto px-4 py-6">
-                {/* Header */}
-                <div className="mb-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                                {isEditMode ? "Edit Purchase Order" : "Purchase Order"}
-                            </h1>
-                            <p className="text-gray-600">Create and manage purchase orders</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            {/* Draft indicator */}
-                            {hasDraft && !isEditMode && (formData.supplier || formData.items.length > 0) && (
-                                <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
-                                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-sm font-medium text-green-700">Draft Auto-Saved</span>
-                                </div>
-                            )}
-                            {/* View All Purchase Orders Button */}
-                            <button
-                                onClick={() => navigate('/purchase-orders')}
-                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            {/* Header */}
+            <div className="mb-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1">
+                            {isEditMode ? "Edit Purchase Order" : "Purchase Order"}
+                        </h1>
+                        <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Create and manage purchase orders</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {/* Draft indicator */}
+                        {hasDraft && !isEditMode && (formData.supplier || formData.items?.length > 0) && (
+                            <div className="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+                                <svg className="w-3 h-3 text-green-600 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                View All Purchase Orders
+                                <span className="text-xs font-medium text-green-700 dark:text-green-200">Draft Auto-Saved</span>
+                            </div>
+                        )}
+                        {/* View All Purchase Orders Button */}
+                        <button
+                            onClick={() => navigate('/purchase-orders')}
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium transition"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            View All Purchase Orders
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* Left Side - Form Inputs */}
+                    <div className="lg:col-span-2 space-y-4">
+                        {/* Basic Details */}
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                            <h2 className="text-sm font-semibold mb-3 text-gray-900 dark:text-[rgb(var(--color-text))]">Basic Details</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                                        PO Date <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="poDate"
+                                        value={formData.poDate}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                                        Expected Delivery Date <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="expectedDeliveryDate"
+                                        value={formData.expectedDeliveryDate}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                                        Supplier <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        name="supplier"
+                                        value={formData.supplier}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    >
+                                        <option value="">Select Supplier</option>
+                                        {suppliers.map((supplier) => (
+                                            <option key={supplier._id} value={supplier._id}>
+                                                {supplier.businessName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Warehouse</label>
+                                    <input
+                                        type="text"
+                                        name="warehouse"
+                                        value={formData.warehouse}
+                                        onChange={handleInputChange}
+                                        placeholder="Optional"
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Add Items */}
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                            <h2 className="text-sm font-semibold mb-3 text-gray-900 dark:text-[rgb(var(--color-text))]">Add Items</h2>
+
+                            {/* Barcode Scan Input */}
+                            <div className="mb-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-2">
+                                    🔍 Scan Item (Barcode / SKU)
+                                </label>
+                                <input
+                                    ref={scanInputRef}
+                                    type="text"
+                                    value={scanInput}
+                                    onChange={(e) => setScanInput(e.target.value)}
+                                    onKeyDown={handleScanKeyDown}
+                                    placeholder="Scan barcode or enter SKU, then press Enter..."
+                                    className="w-full px-3 py-2 text-sm border-2 border-indigo-300 dark:border-indigo-700 bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-indigo-500"
+                                />
+                                {scanError && (
+                                    <p className="text-sm text-red-600 dark:text-red-400 mt-1">{scanError}</p>
+                                )}
+                                <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mt-1">
+                                    💡 Tip: Use a USB barcode scanner or type manually and press Enter. Item not found? It will open quick-add dialog.
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                                <div className="md:col-span-2">
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Item</label>
+                                    <select
+                                        value={selectedItem}
+                                        onChange={handleItemSelect}
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    >
+                                        <option value="">Select Item</option>
+                                        {items.map((item) => (
+                                            <option key={item._id} value={item._id}>
+                                                {item.name} ({item.stockQty} in stock)
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Quantity</label>
+                                    <input
+                                        type="number"
+                                        name="quantity"
+                                        value={itemDetails.quantity}
+                                        onChange={handleItemDetailChange}
+                                        min="1"
+                                        step="1"
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Rate</label>
+                                    <input
+                                        type="number"
+                                        name="rate"
+                                        value={itemDetails.rate}
+                                        onChange={handleItemDetailChange}
+                                        min="0"
+                                        step="0.01"
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Discount</label>
+                                    <input
+                                        type="number"
+                                        name="discount"
+                                        value={itemDetails.discount}
+                                        onChange={handleItemDetailChange}
+                                        min="0"
+                                        step="0.01"
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Discount Type</label>
+                                    <select
+                                        name="discountType"
+                                        value={itemDetails.discountType}
+                                        onChange={handleItemDetailChange}
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    >
+                                        <option value="flat">Flat</option>
+                                        <option value="percentage">Percentage</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Tax Rate (%)</label>
+                                    <input
+                                        type="number"
+                                        name="taxRate"
+                                        value={itemDetails.taxRate}
+                                        onChange={handleItemDetailChange}
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Batch No</label>
+                                    <input
+                                        type="text"
+                                        name="batchNo"
+                                        value={itemDetails.batchNo}
+                                        onChange={handleItemDetailChange}
+                                        placeholder="Optional"
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Expiry Date</label>
+                                    <input
+                                        type="date"
+                                        name="expiryDate"
+                                        value={itemDetails.expiryDate}
+                                        onChange={handleItemDetailChange}
+                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={addItem}
+                                className="bg-indigo-600 dark:bg-[rgb(var(--color-primary))] hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] text-white px-4 py-1.5 text-sm rounded-lg flex items-center gap-2 font-medium"
+                            >
+                                <FiPlus /> Add Item
                             </button>
+                        </div>
+
+                        {/* Items Table */}
+                        {formData.items?.length > 0 && (
+                            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] overflow-hidden">
+                                <div className="p-3">
+                                    <h2 className="text-sm font-semibold mb-3 text-gray-900 dark:text-[rgb(var(--color-text))]">Items</h2>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
+                                        <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))]">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
+                                                    Item
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
+                                                    Qty
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
+                                                    Rate
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
+                                                    Discount
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
+                                                    Tax %
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
+                                                    Total
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
+                                            {formData.items.map((item, index) => (
+                                                <tr key={index} className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-table-row-hover))]">
+                                                    <td className="px-6 py-3 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">{item.itemName}</td>
+                                                    <td className="px-6 py-3 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">{item.quantity}</td>
+                                                    <td className="px-6 py-3 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">₹{item.rate}</td>
+                                                    <td className="px-6 py-3 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">
+                                                        {item.discount} {item.discountType === "percentage" ? "%" : ""}
+                                                    </td>
+                                                    <td className="px-6 py-3 text-xs text-gray-900 dark:text-[rgb(var(--color-text))]">{item.taxRate}%</td>
+                                                    <td className="px-6 py-3 text-xs font-semibold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                                                        ₹{calculateItemTotal(item).toFixed(2)}
+                                                    </td>
+                                                    <td className="px-6 py-3 text-xs">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeItem(index)}
+                                                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-500"
+                                                        >
+                                                            <FiTrash2 />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                    </div>
+                    {/* Right Side - Summary & Actions */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-4 space-y-4">
+                            {/* Additional Charges */}
+                            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                                <h2 className="text-sm font-semibold mb-3 text-gray-900 dark:text-[rgb(var(--color-text))]">Additional Charges & Discounts</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Bill Discount</label>
+                                        <input
+                                            type="number"
+                                            name="billDiscount"
+                                            value={formData.billDiscount}
+                                            onChange={handleInputChange}
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Shipping Charges</label>
+                                        <input
+                                            type="number"
+                                            name="shippingCharges"
+                                            value={formData.shippingCharges}
+                                            onChange={handleInputChange}
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Packing Charges</label>
+                                        <input
+                                            type="number"
+                                            name="packingCharges"
+                                            value={formData.packingCharges}
+                                            onChange={handleInputChange}
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Other Charges</label>
+                                        <input
+                                            type="number"
+                                            name="otherCharges"
+                                            value={formData.otherCharges}
+                                            onChange={handleInputChange}
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">TDS Amount</label>
+                                        <input
+                                            type="number"
+                                            name="tdsAmount"
+                                            value={formData.tdsAmount}
+                                            onChange={handleInputChange}
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Notes */}
+                            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                                <h2 className="text-sm font-semibold mb-3 text-gray-900 dark:text-[rgb(var(--color-text))]">Notes & Terms</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Notes</label>
+                                        <textarea
+                                            name="notes"
+                                            value={formData.notes}
+                                            onChange={handleInputChange}
+                                            rows="2"
+                                            className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                                            Terms & Conditions
+                                        </label>
+                                        <textarea
+                                            name="termsAndConditions"
+                                            value={formData.termsAndConditions}
+                                            onChange={handleInputChange}
+                                            rows="2"
+                                            className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Totals */}
+                            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                                <h2 className="text-sm font-semibold mb-3 text-gray-900 dark:text-[rgb(var(--color-text))]">Summary</h2>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Subtotal:</span>
+                                        <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totals.subtotal}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Item Discount:</span>
+                                        <span className="font-medium text-red-600 dark:text-red-400">-₹{totals.itemDiscount}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Taxable Value:</span>
+                                        <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totals.taxableValue}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Total Tax:</span>
+                                        <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totals.totalTax}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Bill Discount:</span>
+                                        <span className="font-medium text-red-600 dark:text-red-400">-₹{formData.billDiscount}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Additional Charges:</span>
+                                        <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                                            ₹
+                                            {(
+                                                parseFloat(formData.shippingCharges) +
+                                                parseFloat(formData.packingCharges) +
+                                                parseFloat(formData.otherCharges)
+                                            ).toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">TDS:</span>
+                                        <span className="font-medium text-red-600 dark:text-red-400">-₹{formData.tdsAmount}</span>
+                                    </div>
+                                    <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-[rgb(var(--color-border))] pt-2">
+                                        <span className="text-gray-900 dark:text-[rgb(var(--color-text))]">Total Amount:</span>
+                                        <span className="text-indigo-600 dark:text-[rgb(var(--color-primary))]">₹{totals.totalAmount}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex gap-4 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/purchase-orders")}
+                                    className="px-6 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="px-6 py-2 text-sm bg-indigo-600 dark:bg-[rgb(var(--color-primary))] hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] text-white rounded-lg flex items-center gap-2 disabled:opacity-50 font-medium"
+                                >
+                                    <FiSave /> {isLoading ? "Saving..." : isEditMode ? "Update PO" : "Create PO"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    {/* Basic Details */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-lg font-semibold mb-4">Basic Details</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    PO Date <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    name="poDate"
-                                    value={formData.poDate}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
+            </form>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Expected Delivery Date <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    name="expectedDeliveryDate"
-                                    value={formData.expectedDeliveryDate}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Supplier <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    name="supplier"
-                                    value={formData.supplier}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">Select Supplier</option>
-                                    {suppliers.map((supplier) => (
-                                        <option key={supplier._id} value={supplier._id}>
-                                            {supplier.businessName}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Warehouse</label>
-                                <input
-                                    type="text"
-                                    name="warehouse"
-                                    value={formData.warehouse}
-                                    onChange={handleInputChange}
-                                    placeholder="Optional"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Add Items */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-lg font-semibold mb-4">Add Items</h2>
-
-                        {/* Barcode Scan Input */}
-                        <div className="mb-4 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                🔍 Scan Item (Barcode / SKU)
-                            </label>
-                            <input
-                                ref={scanInputRef}
-                                type="text"
-                                value={scanInput}
-                                onChange={(e) => setScanInput(e.target.value)}
-                                onKeyDown={handleScanKeyDown}
-                                placeholder="Scan barcode or enter SKU, then press Enter..."
-                                className="w-full px-4 py-3 border-2 border-indigo-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
-                            />
-                            {scanError && (
-                                <p className="text-sm text-red-600 mt-1">{scanError}</p>
-                            )}
-                            <p className="text-xs text-gray-600 mt-1">
-                                💡 Tip: Use a USB barcode scanner or type manually and press Enter. Item not found? It will open quick-add dialog.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Item</label>
-                                <select
-                                    value={selectedItem}
-                                    onChange={handleItemSelect}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">Select Item</option>
-                                    {items.map((item) => (
-                                        <option key={item._id} value={item._id}>
-                                            {item.name} ({item.stockQty} in stock)
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                <input
-                                    type="number"
-                                    name="quantity"
-                                    value={itemDetails.quantity}
-                                    onChange={handleItemDetailChange}
-                                    min="1"
-                                    step="1"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Rate</label>
-                                <input
-                                    type="number"
-                                    name="rate"
-                                    value={itemDetails.rate}
-                                    onChange={handleItemDetailChange}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
-                                <input
-                                    type="number"
-                                    name="discount"
-                                    value={itemDetails.discount}
-                                    onChange={handleItemDetailChange}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Type</label>
-                                <select
-                                    name="discountType"
-                                    value={itemDetails.discountType}
-                                    onChange={handleItemDetailChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="flat">Flat</option>
-                                    <option value="percentage">Percentage</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Tax Rate (%)</label>
-                                <input
-                                    type="number"
-                                    name="taxRate"
-                                    value={itemDetails.taxRate}
-                                    onChange={handleItemDetailChange}
-                                    min="0"
-                                    max="100"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Batch No</label>
-                                <input
-                                    type="text"
-                                    name="batchNo"
-                                    value={itemDetails.batchNo}
-                                    onChange={handleItemDetailChange}
-                                    placeholder="Optional"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                                <input
-                                    type="date"
-                                    name="expiryDate"
-                                    value={itemDetails.expiryDate}
-                                    onChange={handleItemDetailChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={addItem}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                        >
-                            <FiPlus /> Add Item
-                        </button>
-                    </div>
-
-                    {/* Items Table */}
-                    {formData.items.length > 0 && (
-                        <div className="bg-white rounded-lg shadow-md p-6 mb-6 overflow-x-auto">
-                            <h2 className="text-lg font-semibold mb-4">Items</h2>
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Item
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Qty
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Rate
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Discount
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Tax %
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Total
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {formData.items.map((item, index) => (
-                                        <tr key={index}>
-                                            <td className="px-4 py-2 text-sm">{item.itemName}</td>
-                                            <td className="px-4 py-2 text-sm">{item.quantity}</td>
-                                            <td className="px-4 py-2 text-sm">₹{item.rate}</td>
-                                            <td className="px-4 py-2 text-sm">
-                                                {item.discount} {item.discountType === "percentage" ? "%" : ""}
-                                            </td>
-                                            <td className="px-4 py-2 text-sm">{item.taxRate}%</td>
-                                            <td className="px-4 py-2 text-sm font-semibold">
-                                                ₹{calculateItemTotal(item).toFixed(2)}
-                                            </td>
-                                            <td className="px-4 py-2 text-sm">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeItem(index)}
-                                                    className="text-red-600 hover:text-red-900"
-                                                >
-                                                    <FiTrash2 />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-
-                    {/* Additional Charges */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-lg font-semibold mb-4">Additional Charges & Discounts</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Bill Discount</label>
-                                <input
-                                    type="number"
-                                    name="billDiscount"
-                                    value={formData.billDiscount}
-                                    onChange={handleInputChange}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Charges</label>
-                                <input
-                                    type="number"
-                                    name="shippingCharges"
-                                    value={formData.shippingCharges}
-                                    onChange={handleInputChange}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Packing Charges</label>
-                                <input
-                                    type="number"
-                                    name="packingCharges"
-                                    value={formData.packingCharges}
-                                    onChange={handleInputChange}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Other Charges</label>
-                                <input
-                                    type="number"
-                                    name="otherCharges"
-                                    value={formData.otherCharges}
-                                    onChange={handleInputChange}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">TDS Amount</label>
-                                <input
-                                    type="number"
-                                    name="tdsAmount"
-                                    value={formData.tdsAmount}
-                                    onChange={handleInputChange}
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Notes */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-lg font-semibold mb-4">Notes & Terms</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                                <textarea
-                                    name="notes"
-                                    value={formData.notes}
-                                    onChange={handleInputChange}
-                                    rows="3"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Terms & Conditions
-                                </label>
-                                <textarea
-                                    name="termsAndConditions"
-                                    value={formData.termsAndConditions}
-                                    onChange={handleInputChange}
-                                    rows="3"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Totals */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-lg font-semibold mb-4">Summary</h2>
-                        <div className="space-y-2">
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Subtotal:</span>
-                                <span className="font-semibold">₹{totals.subtotal}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Item Discount:</span>
-                                <span className="font-semibold text-red-600">-₹{totals.itemDiscount}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Taxable Value:</span>
-                                <span className="font-semibold">₹{totals.taxableValue}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Total Tax:</span>
-                                <span className="font-semibold">₹{totals.totalTax}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Bill Discount:</span>
-                                <span className="font-semibold text-red-600">-₹{formData.billDiscount}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Additional Charges:</span>
-                                <span className="font-semibold">
-                                    ₹
-                                    {(
-                                        parseFloat(formData.shippingCharges) +
-                                        parseFloat(formData.packingCharges) +
-                                        parseFloat(formData.otherCharges)
-                                    ).toFixed(2)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">TDS:</span>
-                                <span className="font-semibold text-red-600">-₹{formData.tdsAmount}</span>
-                            </div>
-                            <div className="flex justify-between text-lg font-bold border-t pt-2">
-                                <span>Total Amount:</span>
-                                <span>₹{totals.totalAmount}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-4 justify-end">
-                        <button
-                            type="button"
-                            onClick={() => navigate("/purchase-orders")}
-                            className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <FiSave /> {isLoading ? "Saving..." : isEditMode ? "Update PO" : "Create PO"}
-                        </button>
-                    </div>
-                </form>
-
-                {/* Quick Add Item Modal */}
-                {showQuickAddModal && (
-                    <QuickAddItemModal
-                        isOpen={showQuickAddModal}
-                        onClose={() => setShowQuickAddModal(false)}
-                        onItemCreated={handleItemCreated}
-                        initialBarcode={quickAddBarcode}
-                    />
-                )}
-            </div>
+            {/* Quick Add Item Modal */}
+            {showQuickAddModal && (
+                <QuickAddItemModal
+                    isOpen={showQuickAddModal}
+                    onClose={() => setShowQuickAddModal(false)}
+                    onItemCreated={handleItemCreated}
+                    initialBarcode={quickAddBarcode}
+                />
+            )}
         </Layout>
     );
 };

@@ -14,6 +14,8 @@ import {
   exportExpenses,
 } from "../controllers/expenseController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { validatePeriodLock, validatePeriodLockForUpdate } from "../middlewares/periodLockingMiddleware.js";
+import Expense from "../models/Expense.js";
 
 const router = express.Router();
 
@@ -29,9 +31,9 @@ router.put("/bulk-update-category", protect, bulkUpdateCategory);
 
 // Standard CRUD routes
 router.get("/", protect, getAllExpenses);
-router.post("/", protect, createExpense);
+router.post("/", protect, validatePeriodLock, createExpense);
 router.get("/:id", protect, getExpenseById);
-router.put("/:id", protect, updateExpense);
+router.put("/:id", protect, validatePeriodLockForUpdate(Expense), updateExpense);
 router.delete("/:id", protect, deleteExpense);
 
 // Restore soft-deleted expense

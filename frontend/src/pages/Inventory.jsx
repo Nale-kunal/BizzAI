@@ -7,7 +7,7 @@ import Layout from '../components/Layout';
 const Inventory = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { items, lowStockItems, alerts, isLoading, isError, message } = useSelector(
+  const { items = [], lowStockItems = [], alerts = [], isLoading, isError, message } = useSelector(
     (state) => state.inventory
   );
 
@@ -30,20 +30,20 @@ const Inventory = () => {
   };
 
   // Get unique categories
-  const categories = ['all', ...new Set(items.map((item) => item.category).filter(Boolean))];
+  const categories = ['all', ...new Set(Array.isArray(items) ? items.map((item) => item.category).filter(Boolean) : [])];
 
-  const filteredItems = items.filter((item) => {
+  const filteredItems = Array.isArray(items) ? items.filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item.barcode && item.barcode.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
     return matchesSearch && matchesCategory;
-  });
+  }) : [];
 
   // Calculate inventory value
-  const inventoryValue = items.reduce((sum, item) => sum + item.costPrice * item.stockQty, 0);
-  const expectedRevenue = items.reduce((sum, item) => sum + item.sellingPrice * item.stockQty, 0);
+  const inventoryValue = Array.isArray(items) ? items.reduce((sum, item) => sum + item.costPrice * item.stockQty, 0) : 0;
+  const expectedRevenue = Array.isArray(items) ? items.reduce((sum, item) => sum + item.sellingPrice * item.stockQty, 0) : 0;
 
   return (
     <Layout>

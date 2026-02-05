@@ -15,6 +15,11 @@ router.post("/reset-password", passwordResetLimiter, resetPassword);
 
 // Protected routes
 router.get("/profile", protect, getProfile);
+router.get("/me", protect, getProfile); // Alias for /profile to match test expectations
+router.post("/logout", protect, (req, res) => {
+    // Simple logout - client should discard token
+    res.status(200).json({ success: true, message: "Logged out successfully" });
+});
 router.get("/csrf-token", protect, getCsrfToken); // CSRF token endpoint
 
 export default router;

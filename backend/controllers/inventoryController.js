@@ -12,17 +12,17 @@ export const addItem = async (req, res) => {
     const {
       name, sku, barcode, category, hsnCode, taxRate,
       costPrice, sellingPrice, stockQty, lowStockLimit, unit,
-      trackBatch, trackExpiry
+      trackBatch, trackExpiry, reservedStock
     } = req.body;
 
     if (!name || !costPrice || !sellingPrice) {
-      return res.status(400).json({ message: "Please fill all required fields" });
+      return res.status(400).json({ success: false, message: "Please fill all required fields" });
     }
 
     // Check if item already exists for this user
     const existing = await Item.findOne({ name, addedBy: req.user._id });
     if (existing) {
-      return res.status(400).json({ message: "Item already exists in your inventory" });
+      return res.status(400).json({ success: false, message: "Item already exists in your inventory" });
     }
 
     const item = await Item.create({
@@ -35,6 +35,7 @@ export const addItem = async (req, res) => {
       costPrice,
       sellingPrice,
       stockQty: stockQty || 0,
+      reservedStock: reservedStock || 0,
       lowStockLimit,
       unit,
       trackBatch: trackBatch || false,
@@ -45,7 +46,7 @@ export const addItem = async (req, res) => {
     info(`Item added by ${req.user.name}: ${item.name}`);
     const alerts = await checkStockAlerts(req.user._id);
 
-    res.status(201).json({ item, alerts });
+    res.status(201).json({ success: true, item, alerts });
   } catch (err) {
     console.error("Add Item Error:", err);
     error(`Add Item Error: ${err.message}`);
@@ -59,11 +60,24 @@ export const addItem = async (req, res) => {
  */
 export const getAllItems = async (req, res) => {
   try {
-    const items = await Item.find({ addedBy: req.user._id }).sort({ createdAt: -1 });
-    res.status(200).json(items);
+    const { category, search } = req.query;
+    let query = { addedBy: req.user._id };
+
+    // Apply category filter if provided
+    if (category) {
+      query.category = category;
+    }
+
+    // Apply search filter if provided (search by name)
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+
+    const items = await Item.find(query).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, items });
   } catch (err) {
     error(`Get All Items Error: ${err.message}`);
-    res.status(500).json({ message: "Server Error", error: err.message });
+    res.status(500).json({ success: false, message: "Server Error", error: err.message });
   }
 };
 
@@ -75,7 +89,7 @@ export const getSingleItem = async (req, res) => {
   try {
     // Validate ObjectId format
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Invalid item ID format" });
+      return res.status(400).json({ success: false, message: "Invalid item ID format" });
     }
 
     const item = await Item.findOne({
@@ -84,7 +98,7 @@ export const getSingleItem = async (req, res) => {
     });
 
     if (!item) {
-      return res.status(404).json({ message: "Item not found or unauthorized" });
+      return res.status(404).json({ success: false, message: "Item not found or unauthorized" });
     }
 
     res.status(200).json(item);
@@ -102,7 +116,7 @@ export const updateItem = async (req, res) => {
   try {
     // Validate ObjectId format
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Invalid item ID format" });
+      return res.status(400).json({ success: false, message: "Invalid item ID format" });
     }
 
     // First check if item belongs to this owner
@@ -112,7 +126,7 @@ export const updateItem = async (req, res) => {
     });
 
     if (!item) {
-      return res.status(404).json({ message: "Item not found or unauthorized" });
+      return res.status(404).json({ success: false, message: "Item not found or unauthorized" });
     }
 
     // Check for duplicate name if name is being updated
@@ -124,7 +138,7 @@ export const updateItem = async (req, res) => {
       });
 
       if (existingName) {
-        return res.status(400).json({ message: "Item name already exists in your inventory" });
+        return res.status(400).json({ success: false, message: "Item name already exists in your inventory" });
       }
     }
 
@@ -139,7 +153,7 @@ export const updateItem = async (req, res) => {
     info(`Item updated by ${req.user.name}: ${updated.name}`);
 
     const alerts = await checkStockAlerts(req.user._id);
-    res.status(200).json({ updated, alerts });
+    res.status(200).json({ success: true, item: updated, alerts });
   } catch (err) {
     error(`Update Item Error: ${err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });
@@ -154,7 +168,7 @@ export const deleteItem = async (req, res) => {
   try {
     // Validate ObjectId format
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Invalid item ID format" });
+      return res.status(400).json({ success: false, message: "Invalid item ID format" });
     }
 
     const item = await Item.findOne({
@@ -163,19 +177,24 @@ export const deleteItem = async (req, res) => {
     });
 
     if (!item) {
-      return res.status(404).json({ message: "Item not found or unauthorized" });
+      return res.status(404).json({ success: false, message: "Item not found or unauthorized" });
     }
 
     // Attach for audit middleware (before deletion)
     req.deletedEntity = item.toObject();
 
-    await Item.findByIdAndDelete(req.params.id);
+    // Soft delete - mark as deleted instead of removing
+    await Item.findByIdAndUpdate(req.params.id, {
+      isDeleted: true,
+      deletedBy: req.user._id,
+      deletedAt: new Date()
+    });
 
     info(`Item deleted by ${req.user.name}: ${item.name}`);
-    res.status(200).json({ message: "Item deleted" });
+    res.status(200).json({ success: true, message: "Item deleted" });
   } catch (err) {
     error(`Delete Item Error: ${err.message}`);
-    res.status(500).json({ message: "Server Error", error: err.message });
+    res.status(500).json({ success: false, message: "Server Error", error: err.message });
   }
 };
 
@@ -193,7 +212,7 @@ export const getLowStockItems = async (req, res) => {
       return availableStock <= item.lowStockLimit;
     });
 
-    res.status(200).json(lowStockItems);
+    res.status(200).json({ success: true, items: lowStockItems });
   } catch (err) {
     error(`Low Stock Item Error: ${err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });

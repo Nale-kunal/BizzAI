@@ -7,39 +7,56 @@ import Layout from "../../components/Layout";
 import api from '../../services/api';
 import { toast } from "react-toastify";
 import EstimateTemplate from "../../components/EstimateTemplate";
+import useDraftSave from "../../hooks/useDraftSave";
 
 const Estimate = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { items } = useSelector((state) => state.inventory);
-  const { customers } = useSelector((state) => state.customers);
+  const { items = [] } = useSelector((state) => state.inventory);
+  const { customers = [] } = useSelector((state) => state.customers);
 
   // State
-  const [customer, setCustomer] = useState(null);
-  const [cart, setCart] = useState([]);
-  const [discount, setDiscount] = useState(0);
+  const initialFormData = {
+    customer: null,
+    cart: [],
+    discount: 0,
+    notes: ""
+  };
+
+  const [formData, setFormData, clearDraft, hasDraft] = useDraftSave('estimateDraft', initialFormData);
   const [searchTerm, setSearchTerm] = useState("");
   const [customerSearchTerm, setCustomerSearchTerm] = useState("");
   const [showCustomerSelect, setShowCustomerSelect] = useState(false);
-  const [notes, setNotes] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Extract from formData for easier access
+  const customer = formData.customer;
+  const cart = formData.cart;
+  const discount = formData.discount;
+  const notes = formData.notes;
+
+  // Helper to update formData
+  const setCustomer = (c) => setFormData({ ...formData, customer: c });
+  const setCart = (c) => setFormData({ ...formData, cart: c });
+  const setDiscount = (d) => setFormData({ ...formData, discount: d });
+  const setNotes = (n) => setFormData({ ...formData, notes: n });
 
   useEffect(() => {
     dispatch(getAllItems());
     dispatch(getAllCustomers());
   }, [dispatch]);
 
-  const filteredItems = items.filter(
+  const filteredItems = Array.isArray(items) ? items.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  ) : [];
 
-  const filteredCustomers = customers.filter(
+  const filteredCustomers = Array.isArray(customers) ? customers.filter(
     (c) =>
       c.name.toLowerCase().includes(customerSearchTerm.toLowerCase()) ||
       c.phone.includes(customerSearchTerm)
-  );
+  ) : [];
 
   // Cart management (READ-ONLY for inventory)
   const addToCart = (item) => {
@@ -151,6 +168,9 @@ const Estimate = () => {
 
       toast.success("Estimate created successfully!");
 
+      // Clear auto-saved draft
+      clearDraft();
+
       // Navigate to estimate detail page
       navigate(`/sales/estimate/${response.data.estimate._id}`);
     } catch (error) {
@@ -196,49 +216,28 @@ const Estimate = () => {
       <div className="max-w-7xl mx-auto">
         <div className="print:hidden">
           {/* Header */}
-          <div className="mb-6 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-maindark:text-[rgb(var(--color-text))] mb-2">
-                Create Estimate / Proforma
-              </h1>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
-                Price approximation for customers
-              </p>
-            </div>
-            <button
-              onClick={() => navigate("/sales/estimates")}
-              className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              <span>View Estimates</span>
-            </button>
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
+              Create Estimate / Proforma
+            </h1>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+              Price approximation for customers
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Left Side - Products */}
             <div className="lg:col-span-2 space-y-4">
               {/* Customer Selection */}
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-2">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-2">
                   Customer
                 </label>
 
                 {customer ? (
-                  <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                  <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                     <div>
-                      <div className="font-medium text-maindark:text-[rgb(var(--color-text))]">
+                      <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                         {customer.name}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
@@ -274,7 +273,7 @@ const Estimate = () => {
                 )}
                 {/* Credit Balance Display */}
                 {customer && customer.dues < 0 && (
-                  <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-200">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <svg
@@ -303,7 +302,7 @@ const Estimate = () => {
 
                 {/* Pending Dues Display */}
                 {customer && customer?.dues > 0 && (
-                  <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="mt-2 p-2 bg-red-50 rounded-lg border border-red-200">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <svg
@@ -332,17 +331,17 @@ const Estimate = () => {
               </div>
 
               {/* Product Search */}
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4">
-                <div className="relative mb-4">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
+                <div className="relative mb-3">
                   <input
                     type="text"
                     placeholder="Search products by name or SKU..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                   />
                   <svg
-                    className="absolute left-3 top-2.5 w-5 h-5 text-muted dark:text-[rgb(var(--color-text-muted))]"
+                    className="absolute left-3 top-2.5 w-4 h-4 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -357,17 +356,17 @@ const Estimate = () => {
                 </div>
 
                 {/* Products Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-96 overflow-y-auto">
                   {filteredItems.map((item) => (
                     <button
                       key={item._id}
                       onClick={() => addToCart(item)}
-                      className="p-4 border-2 border-default rounded-lg text-left transition hover:border-indigo-500 hover:shadow-md"
+                      className="p-3 border-2 border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg text-left transition hover:border-indigo-500 hover:shadow-md"
                     >
-                      <div className="font-medium text-maindark:text-[rgb(var(--color-text))] mb-1 truncate">
+                      <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 truncate">
                         {item.name}
                       </div>
-                      <div className="text-lg font-bold text-indigo-600 dark:text-[rgb(var(--color-primary))]">
+                      <div className="text-sm font-bold text-indigo-600 dark:text-[rgb(var(--color-primary))]">
                         ₹{item.sellingPrice}
                       </div>
                       <div className="text-xs text-muted dark:text-[rgb(var(--color-text-secondary))] mt-1">
@@ -386,13 +385,13 @@ const Estimate = () => {
 
             {/* Right Side - Cart & Total */}
             <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6 sticky top-4">
-                <h2 className="text-xl font-bold text-maindark:text-[rgb(var(--color-text))] mb-4">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 sticky top-4">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
                   Estimate Cart
                 </h2>
 
                 {/* Cart Items */}
-                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                <div className="space-y-2 mb-3 max-h-64 overflow-y-auto">
                   {cart.length === 0 ? (
                     <p className="text-muted dark:text-[rgb(var(--color-text-secondary))] text-center py-8">
                       Cart is empty
@@ -401,7 +400,7 @@ const Estimate = () => {
                     cart.map((item) => (
                       <div
                         key={item.itemId}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[rgb(var(--color-input))] rounded-lg"
+                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-[rgb(var(--color-input))] rounded-lg"
                       >
                         <div className="flex-1">
                           <div className="font-medium text-maindark:text-[rgb(var(--color-text))] text-sm">
@@ -459,8 +458,8 @@ const Estimate = () => {
                 </div>
 
                 {/* Discount */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-2">
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                     Discount (₹)
                   </label>
                   <input
@@ -471,27 +470,27 @@ const Estimate = () => {
                     }
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                     placeholder="0.00"
                   />
                 </div>
 
                 {/* Notes */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-2">
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
                     Notes
                   </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows="2"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                     placeholder="Additional notes..."
                   />
                 </div>
 
                 {/* Totals */}
-                <div className="border-t border-default dark:border-[rgb(var(--color-border))] pt-4 mb-4 space-y-2">
+                <div className="border-t border-gray-200 dark:border-[rgb(var(--color-border))] pt-3 mb-3 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                       Subtotal:
@@ -523,7 +522,7 @@ const Estimate = () => {
                   <button
                     onClick={handlePrintPreview}
                     disabled={cart.length === 0}
-                    className="w-full py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 font-medium disabled:opacity-50 flex justify-center items-center gap-2"
+                    className="w-full py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 font-medium disabled:opacity-50 flex justify-center items-center gap-2 text-sm"
                   >
                     <svg
                       className="w-5 h-5"
@@ -543,14 +542,14 @@ const Estimate = () => {
                   <button
                     onClick={handleSaveEstimate}
                     disabled={isLoading || cart.length === 0 || !customer}
-                    className="w-full py-3 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     {isLoading ? "Saving..." : "Save Estimate"}
                   </button>
                   <button
                     onClick={handleClear}
                     disabled={cart.length === 0}
-                    className="w-full py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     Clear Cart
                   </button>
@@ -561,11 +560,11 @@ const Estimate = () => {
 
           {/* Customer Selection Modal */}
           {showCustomerSelect && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-2xl border dark:border-[rgb(var(--color-border))] max-w-2xl w-full max-h-[90vh] flex flex-col">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-1.5 max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-default dark:border-[rgb(var(--color-border))]">
-                  <h3 className="text-xl font-bold text-maindark:text-[rgb(var(--color-text))]">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
                     Select Customer
                   </h3>
                   <button
@@ -589,13 +588,13 @@ const Estimate = () => {
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="p-4 max-h-96 overflow-y-auto">
                   <input
                     type="text"
                     placeholder="Search by name or phone..."
                     value={customerSearchTerm}
                     onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg mb-4 focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))]"
+                    className="w-full px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg mb-3 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))]"
                   />
 
                   <div className="space-y-2">
@@ -603,9 +602,9 @@ const Estimate = () => {
                       <button
                         key={c._id}
                         onClick={() => selectCustomer(c)}
-                        className="w-full p-4 border border-default dark:border-[rgb(var(--color-border))] rounded-lg hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition"
+                        className="w-full p-3 border border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition"
                       >
-                        <div className="font-medium text-maindark:text-[rgb(var(--color-text))]">
+                        <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                           {c.name}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useSelector } from 'react-redux';
 import { ToastContainer } from "react-toastify"
 import { ThemeProvider } from './contexts/ThemeContext';
+import { migrateUserStorage } from './utils/migrateUserStorage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -128,6 +129,9 @@ const PublicRoute = ({ children }) => {
 };
 
 function App() {
+  // Run migration on app startup to fix user data structure
+  migrateUserStorage();
+
   console.log(import.meta.env.VITE_BACKEND_URL);
   return (
     <ThemeProvider>

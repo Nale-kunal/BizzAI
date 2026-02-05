@@ -23,7 +23,15 @@ export const register = createAsyncThunk(
     try {
       const response = await api.post(`${API_URL}/register`, userData);
       if (response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+        // Backend returns { success, token, refreshToken, user }
+        // Store { token, refreshToken, ...user } for easy access
+        const userToStore = {
+          token: response.data.token,
+          refreshToken: response.data.refreshToken,
+          ...response.data.user
+        };
+        localStorage.setItem('user', JSON.stringify(userToStore));
+        return userToStore;
       }
       return response.data;
     } catch (error) {
@@ -43,7 +51,15 @@ export const login = createAsyncThunk(
     try {
       const response = await api.post(`${API_URL}/login`, userData);
       if (response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+        // Backend returns { success, token, refreshToken, user }
+        // Store { token, refreshToken, ...user } for easy access
+        const userToStore = {
+          token: response.data.token,
+          refreshToken: response.data.refreshToken,
+          ...response.data.user
+        };
+        localStorage.setItem('user', JSON.stringify(userToStore));
+        return userToStore;
       }
       return response.data;
     } catch (error) {

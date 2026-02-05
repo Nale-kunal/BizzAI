@@ -351,10 +351,7 @@ export const createPurchase = async (req, res) => {
             .populate("items.item", "name sku")
             .populate({ path: "createdBy", select: "shopName name gstNumber" });
 
-        res.status(201).json({
-            message: "Purchase created successfully",
-            purchase: populatedPurchase,
-        });
+        res.status(201).json({ success: true, message: "Purchase created successfully", purchase: populatedPurchase });
     } catch (err) {
         error(`Purchase creation failed: ${err.message}`);
         res.status(500).json({ message: "Server Error", error: err.message });
@@ -389,7 +386,7 @@ export const getAllPurchases = async (req, res) => {
             .populate("supplier", "businessName contactPersonName contactNo")
             .sort({ purchaseDate: -1, createdAt: -1 });
 
-        res.status(200).json(purchases);
+        res.status(200).json({ success: true, purchases });
     } catch (err) {
         error(`Get purchases failed: ${err.message}`);
         res.status(500).json({ message: "Server Error", error: err.message });
@@ -1067,6 +1064,8 @@ export const cancelPurchase = async (req, res) => {
         res.status(500).json({ message: "Server Error", error: err.message });
     }
 };
+
+
 
 
 

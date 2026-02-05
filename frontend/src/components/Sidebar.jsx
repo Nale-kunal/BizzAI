@@ -246,21 +246,21 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className={`print:hidden fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-indigo-600 to-indigo-800 dark:from-[rgb(var(--color-card))] dark:to-[rgb(var(--color-card))] text-white dark:text-[rgb(var(--color-text))] flex flex-col shadow-2xl dark:border-r dark:border-[rgb(var(--color-border))] transition-all duration-200 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0 lg:shadow-none ${isEffectivelyExpanded ? 'w-64' : 'w-16'
+          } lg:translate-x-0 lg:shadow-none ${isEffectivelyExpanded ? 'w-48' : 'w-12'
           }`}
       >
         {/* Logo/Brand */}
-        <div className="p-4 border-b border-indigo-500 dark:border-[rgb(var(--color-border))] flex items-center justify-between">
+        <div className="p-2 border-b border-indigo-500 dark:border-[rgb(var(--color-border))] flex items-center justify-between">
           {isEffectivelyExpanded ? (
             <>
               <div className="flex items-center space-x-2">
-                <div className="p-1.5 bg-white dark:bg-[rgb(var(--color-primary))] rounded-lg">
-                  <svg className="w-6 h-6 text-indigo-600 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="p-1 bg-white dark:bg-[rgb(var(--color-primary))] rounded-lg">
+                  <svg className="w-4 h-4 text-indigo-600 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">BizzAI</h1>
+                  <h1 className="text-sm font-bold">BizzAI</h1>
                   <p className="text-xs text-indigo-200 dark:text-[rgb(var(--color-text-secondary))]">Billing System</p>
                 </div>
               </div>
@@ -270,15 +270,15 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
                 className="rounded-md p-1 text-white hover:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-white lg:hidden"
                 aria-label="Close navigation menu"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </>
           ) : (
             <div className="flex items-center justify-center w-full">
-              <div className="p-1.5 bg-white dark:bg-[rgb(var(--color-primary))] rounded-lg">
-                <svg className="w-5 h-5 text-indigo-600 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-1 bg-white dark:bg-[rgb(var(--color-primary))] rounded-lg">
+                <svg className="w-4 h-4 text-indigo-600 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -337,7 +337,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
             // Save to localStorage immediately on scroll
             localStorage.setItem('sidebarScrollPosition', scrollTop.toString());
           }}
-          className="flex-1 px-3 py-4 space-y-1 overflow-y-auto overflow-x-hidden"
+          className="flex-1 px-2 py-2 space-y-1 overflow-y-auto overflow-x-hidden"
         >
           {menuItems.map((item) => (
             <div key={item.name}>
@@ -345,7 +345,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
                 <div>
                   <button
                     onClick={() => toggleSubmenu(item.name)}
-                    className={`flex items-center w-full rounded-lg text-indigo-100 dark:text-[rgb(var(--color-text-secondary))] hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-input))] transition-all duration-150 ${isEffectivelyExpanded ? 'justify-between px-3 py-2' : 'justify-center px-2 py-2'
+                    className={`flex items-center w-full rounded-lg text-indigo-100 dark:text-[rgb(var(--color-text-secondary))] hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-input))] transition-all duration-150 ${isEffectivelyExpanded ? 'justify-between px-2 py-1' : 'justify-center px-2 py-1'
                       }`}
                     title={!isEffectivelyExpanded ? item.name : ''}
                   >
@@ -353,7 +353,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
                       <div className="flex-shrink-0">
                         {item.icon}
                       </div>
-                      {isEffectivelyExpanded && <span className="text-sm font-medium">{item.name}</span>}
+                      {isEffectivelyExpanded && <span className="text-xs font-medium">{item.name}</span>}
                     </div>
                     {isEffectivelyExpanded && (
                       <svg
@@ -373,7 +373,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
                           key={subItem.path}
                           to={subItem.path}
                           className={({ isActive }) =>
-                            `block px-3 py-1.5 rounded-lg text-sm transition-colors duration-150 ${isActive ? 'bg-white dark:bg-[rgb(var(--color-primary))] text-indigo-600 dark:text-white font-medium' : 'text-indigo-100 dark:text-[rgb(var(--color-text-secondary))] hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-input))]'
+                            `block px-2 py-1 rounded-lg text-xs transition-colors duration-150 ${isActive ? 'bg-white dark:bg-[rgb(var(--color-primary))] text-indigo-600 dark:text-white font-medium' : 'text-indigo-100 dark:text-[rgb(var(--color-text-secondary))] hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-input))]'
                             }`
                           }
                         >
@@ -388,7 +388,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
                   to={item.path}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center rounded-lg transition-all duration-150 ${isEffectivelyExpanded ? 'space-x-2 px-3 py-2' : 'justify-center px-2 py-2'
+                    `flex items-center rounded-lg transition-all duration-150 ${isEffectivelyExpanded ? 'space-x-2 px-2 py-1' : 'justify-center px-2 py-1'
                     } ${isActive ? 'bg-white dark:bg-[rgb(var(--color-primary))] text-indigo-600 dark:text-white shadow-lg' : 'text-indigo-100 dark:text-[rgb(var(--color-text-secondary))] hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-input))]'
                     }`
                   }
@@ -397,7 +397,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
                   <div className="flex-shrink-0">
                     {item.icon}
                   </div>
-                  {isEffectivelyExpanded && <span className="text-sm font-medium">{item.name}</span>}
+                  {isEffectivelyExpanded && <span className="text-xs font-medium">{item.name}</span>}
                 </NavLink>
               )}
             </div>
@@ -405,12 +405,12 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
         </nav>
 
         {/* User Profile & Logout */}
-        <div className="p-3 border-t border-indigo-500 dark:border-[rgb(var(--color-border))]">
+        <div className="p-2 border-t border-indigo-500 dark:border-[rgb(var(--color-border))]">
           {isEffectivelyExpanded ? (
             <>
-              <div className="flex items-center space-x-2 mb-3">
-                <div className="w-8 h-8 bg-indigo-400 dark:bg-[rgb(var(--color-primary))] rounded-full flex items-center justify-center">
-                  <span className="text-sm font-bold text-white">
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="w-6 h-6 bg-indigo-400 dark:bg-[rgb(var(--color-primary))] rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold text-white">
                     {user?.name?.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -421,18 +421,18 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
               </div>
               <button
                 onClick={onLogout}
-                className="w-full flex items-center justify-center space-x-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-lg transition-colors duration-150"
+                className="w-full flex items-center justify-center space-x-2 px-2 py-1 text-xs bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-lg transition-colors duration-150"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className="text-sm font-medium">Logout</span>
+                <span className="text-xs font-medium">Logout</span>
               </button>
             </>
           ) : (
             <div className="flex flex-col items-center space-y-2">
-              <div className="w-8 h-8 bg-indigo-400 dark:bg-[rgb(var(--color-primary))] rounded-full flex items-center justify-center" title={user?.name}>
-                <span className="text-sm font-bold text-white">
+              <div className="w-6 h-6 bg-indigo-400 dark:bg-[rgb(var(--color-primary))] rounded-full flex items-center justify-center" title={user?.name}>
+                <span className="text-xs font-bold text-white">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>

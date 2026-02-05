@@ -156,7 +156,9 @@ export const inventorySlice = createSlice({
       .addCase(getAllItems.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.items = action.payload;
+        // Backend returns { success: true, items: [...] }
+        // Extract just the items array
+        state.items = action.payload.items || action.payload || [];
       })
       .addCase(getAllItems.rejected, (state, action) => {
         state.isLoading = false;

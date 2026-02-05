@@ -14,9 +14,7 @@ import {
     FiSquare,
 } from 'react-icons/fi';
 import Layout from '../../components/Layout';
-import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
-import StatsCard from '../../components/StatsCard';
 import ExpenseForm from '../../components/expenses/ExpenseForm';
 import ExpenseFilterPanel from '../../components/expenses/ExpenseFilterPanel';
 import BulkActionBar from '../../components/expenses/BulkActionBar';
@@ -215,9 +213,14 @@ const Expenses = () => {
     };
 
     // Get category name
-    const getCategoryName = (categoryId) => {
-        const category = categories.find((cat) => cat._id === categoryId);
-        return category ? category.name : 'Unknown';
+    const getCategoryName = (categoryValue) => {
+        // If category is already a string name, return it directly
+        if (typeof categoryValue === 'string' && !categoryValue.match(/^[0-9a-fA-F]{24}$/)) {
+            return categoryValue;
+        }
+        // Otherwise, try to find it in categories array (if it's an ID)
+        const category = categories.find((cat) => cat._id === categoryValue || cat.name === categoryValue);
+        return category ? category.name : categoryValue || 'Unknown';
     };
 
     // Get status badge
@@ -228,7 +231,7 @@ const Expenses = () => {
             rejected: 'bg-red-100 text-red-800',
         };
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${badges[status] || badges.pending}`}>
+            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${badges[status] || badges.pending}`}>
                 {status}
             </span>
         );
@@ -242,7 +245,7 @@ const Expenses = () => {
             cheque: 'bg-indigo-100 text-indigo-800',
         };
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${badges[method] || badges.cash}`}>
+            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${badges[method] || badges.cash}`}>
                 {method}
             </span>
         );
@@ -335,55 +338,78 @@ const Expenses = () => {
 
     return (
         <Layout>
-            <div className="space-y-6">
+            <div className="space-y-4">
                 {/* Page Header */}
-                <PageHeader
-                    title="Expenses Management"
-                    subtitle="Track and manage all business expenses"
-                />
+                <div className="mb-4">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1">Expenses Management</h1>
+                    <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Track and manage all business expenses</p>
+                </div>
 
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatsCard
-                        title="Total Expenses"
-                        value={summary?.totalExpenses?.amount ? formatCurrency(summary.totalExpenses.amount) : formatCurrency(0)}
-                        subtitle={`${summary?.totalExpenses?.count || 0} entries`}
-                        icon="💰"
-                        color="blue"
-                    />
-                    <StatsCard
-                        title="This Month"
-                        value={summary?.thisMonth?.amount ? formatCurrency(summary.thisMonth.amount) : formatCurrency(0)}
-                        subtitle={`${summary?.thisMonth?.count || 0} expenses`}
-                        icon="📅"
-                        color="green"
-                    />
-                    <StatsCard
-                        title="Top Category"
-                        value={
-                            summary?.categoryBreakdown && summary.categoryBreakdown.length > 0
-                                ? summary.categoryBreakdown[0].categoryName
-                                : 'N/A'
-                        }
-                        subtitle={
-                            summary?.categoryBreakdown && summary.categoryBreakdown.length > 0
-                                ? formatCurrency(summary.categoryBreakdown[0].total)
-                                : 'No data'
-                        }
-                        icon="📊"
-                        color="purple"
-                    />
-                    <StatsCard
-                        title="Average Expense"
-                        value={
-                            summary?.totalExpenses?.count && summary?.totalExpenses?.amount
-                                ? formatCurrency(summary.totalExpenses.amount / summary.totalExpenses.count)
-                                : formatCurrency(0)
-                        }
-                        subtitle="Per transaction"
-                        icon="📈"
-                        color="orange"
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                    {/* Total Expenses */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{summary?.totalExpenses?.amount ? formatCurrency(summary.totalExpenses.amount) : formatCurrency(0)}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Expenses</p>
+                                <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{summary?.totalExpenses?.count || 0} entries</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* This Month */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{summary?.thisMonth?.amount ? formatCurrency(summary.thisMonth.amount) : formatCurrency(0)}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">This Month</p>
+                                <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{summary?.thisMonth?.count || 0} expenses</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Top Category */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] truncate">{summary?.categoryBreakdown && summary.categoryBreakdown.length > 0 ? summary.categoryBreakdown[0].categoryName : 'N/A'}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Top Category</p>
+                                <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{summary?.categoryBreakdown && summary.categoryBreakdown.length > 0 ? formatCurrency(summary.categoryBreakdown[0].total) : 'No data'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Average Expense */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{summary?.totalExpenses?.count && summary?.totalExpenses?.amount ? formatCurrency(summary.totalExpenses.amount / summary.totalExpenses.count) : formatCurrency(0)}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Average Expense</p>
+                                <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Per transaction</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Action Bar */}
@@ -459,7 +485,7 @@ const Expenses = () => {
                 )}
 
                 {/* Data Table */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))]">
                     <DataTable
                         columns={columns}
                         data={expenses || []}

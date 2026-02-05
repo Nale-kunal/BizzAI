@@ -63,7 +63,7 @@ const DataTable = ({
                                 <th
                                     key={column.key}
                                     onClick={() => column.sortable && handleSort(column.key)}
-                                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase ${column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-[rgb(var(--color-input))]' : ''
+                                    className={`px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase ${column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-[rgb(var(--color-input))]' : ''
                                         }`}
                                 >
                                     <div className="flex items-center space-x-1">
@@ -91,7 +91,7 @@ const DataTable = ({
                                 className={`${onRowClick ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]' : ''} text-gray-900 dark:text-[rgb(var(--color-text))]`}
                             >
                                 {columns.map((column) => (
-                                    <td key={column.key} className="px-6 py-4 whitespace-nowrap">
+                                    <td key={column.key} className="px-4 py-3 text-xs whitespace-nowrap">
                                         {column.render ? column.render(row[column.key], row) : row[column.key]}
                                     </td>
                                 ))}

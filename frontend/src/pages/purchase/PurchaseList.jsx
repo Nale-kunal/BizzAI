@@ -9,8 +9,8 @@ const PurchaseList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { purchases, isLoading } = useSelector((state) => state.purchase);
-    const { suppliers } = useSelector((state) => state.suppliers);
+    const { purchases = [], isLoading } = useSelector((state) => state.purchase);
+    const { suppliers = [] } = useSelector((state) => state.suppliers);
 
     const [filters, setFilters] = useState({
         status: '',
@@ -338,8 +338,8 @@ const PurchaseList = () => {
                                                     key={i + 1}
                                                     onClick={() => setCurrentPage(i + 1)}
                                                     className={`px-3 py-1 rounded-lg ${currentPage === i + 1
-                                                            ? 'bg-indigo-600 text-white'
-                                                            : 'border hover:bg-gray-50 dark:hover:bg-gray-800'
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : 'border hover:bg-gray-50 dark:hover:bg-gray-800'
                                                         }`}
                                                 >
                                                     {i + 1}

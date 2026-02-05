@@ -94,6 +94,12 @@ const supplierSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    // Multi-tenancy
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      index: true
+    },
   },
   { timestamps: true }
 );

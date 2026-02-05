@@ -293,29 +293,31 @@ const PaymentOut = () => {
 
     return (
         <Layout>
-            <PageHeader
-                title="Payment Out"
-                description="Record payments to suppliers"
-                actions={[
+            {/* Header */}
+            <div className="mb-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1">Payment Out</h1>
+                        <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Record payments to suppliers</p>
+                    </div>
                     <button
-                        key="list"
                         type="button"
                         onClick={() => navigate('/purchase/payment-out/list')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                        className="px-4 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
                     >
                         View Payment Out List
                     </button>
-                ]}
-            />
+                </div>
+            </div>
 
             <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-4">
                         {/* Payment Details */}
-                        <div className="bg-dark rounded-xl shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-main mb-4">Payment Details</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Payment Details</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <FormInput
                                     label="Payment Date"
                                     type="date"
@@ -336,21 +338,21 @@ const PaymentOut = () => {
                         </div>
 
                         {/* Supplier Selection */}
-                        <div className="bg-dark rounded-xl shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-main mb-4">Supplier</h2>
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Supplier</h2>
                             {selectedSupplier ? (
-                                <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                                <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
-                                            <p className="font-medium text-main">{selectedSupplier.businessName}</p>
-                                            <p className="text-sm text-muted">{selectedSupplier.contactPersonName} • {selectedSupplier.contactNo}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{selectedSupplier.businessName}</p>
+                                            <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{selectedSupplier.contactPersonName} • {selectedSupplier.contactNo}</p>
                                             {supplierInfo && (
                                                 <div className="mt-2 space-y-1">
-                                                    <p className="text-sm">
+                                                    <p className="text-xs">
                                                         <span className="font-medium">Outstanding:</span> ₹{supplierInfo.outstandingBalance.toFixed(2)}
                                                     </p>
                                                     {supplierInfo.advanceBalance > 0 && (
-                                                        <p className="text-sm text-green-600">
+                                                        <p className="text-xs text-green-600 dark:text-green-400">
                                                             <span className="font-medium">Advance Available:</span> ₹{supplierInfo.advanceBalance.toFixed(2)}
                                                         </p>
                                                     )}
@@ -364,9 +366,9 @@ const PaymentOut = () => {
                                                 setSupplierInfo(null);
                                                 setFormData(prev => ({ ...prev, supplierId: null, allocatedBills: [] }));
                                             }}
-                                            className="text-red-600 hover:text-red-800"
+                                            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                                         >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
@@ -376,7 +378,7 @@ const PaymentOut = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowSupplierModal(true)}
-                                    className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-muted hover:border-indigo-500 hover:text-indigo-600"
+                                    className="w-full px-3 py-2 text-sm border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 hover:text-indigo-600 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
                                 >
                                     Click to select supplier
                                 </button>
@@ -385,40 +387,40 @@ const PaymentOut = () => {
 
                         {/* Bill Allocation */}
                         {selectedSupplier && supplierInfo && supplierInfo.outstandingBills.length > 0 && (
-                            <div className="bg-dark rounded-xl shadow-sm p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-lg font-bold text-main">Bill Allocation</h2>
+                            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Bill Allocation</h2>
                                     <button
                                         type="button"
                                         onClick={handleAutoAllocate}
-                                        className="px-4 py-2 text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200"
+                                        className="px-3 py-2 text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
                                     >
                                         Auto Allocate
                                     </button>
                                 </div>
                                 <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead className="bg-gray-50">
+                                    <table className="w-full text-xs">
+                                        <thead className="bg-gray-50 dark:bg-gray-800">
                                             <tr>
-                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Bill No</th>
-                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-                                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Paid</th>
-                                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Outstanding</th>
-                                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Allocate</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Bill No</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
+                                                <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Total</th>
+                                                <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Paid</th>
+                                                <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Outstanding</th>
+                                                <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Allocate</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-200">
+                                        <tbody className="divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                                             {formData.allocatedBills.map((bill) => (
                                                 <tr key={bill.bill}>
-                                                    <td className="px-4 py-2 text-sm font-medium text-main">{bill.billNo}</td>
-                                                    <td className="px-4 py-2 text-sm text-muted">
+                                                    <td className="px-3 py-2 text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{bill.billNo}</td>
+                                                    <td className="px-3 py-2 text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                                                         {new Date(bill.billDate).toLocaleDateString()}
                                                     </td>
-                                                    <td className="px-4 py-2 text-sm text-right">₹{bill.totalAmount.toFixed(2)}</td>
-                                                    <td className="px-4 py-2 text-sm text-right">₹{bill.paidAmount.toFixed(2)}</td>
-                                                    <td className="px-4 py-2 text-sm text-right font-medium">₹{bill.outstandingAmount.toFixed(2)}</td>
-                                                    <td className="px-4 py-2 text-right">
+                                                    <td className="px-3 py-2 text-xs text-right">₹{bill.totalAmount.toFixed(2)}</td>
+                                                    <td className="px-3 py-2 text-xs text-right">₹{bill.paidAmount.toFixed(2)}</td>
+                                                    <td className="px-3 py-2 text-xs text-right font-medium">₹{bill.outstandingAmount.toFixed(2)}</td>
+                                                    <td className="px-3 py-2 text-right">
                                                         <input
                                                             type="number"
                                                             step="0.01"
@@ -426,7 +428,7 @@ const PaymentOut = () => {
                                                             max={bill.outstandingAmount}
                                                             value={bill.allocatedAmount || ''}
                                                             onChange={(e) => handleBillAllocationChange(bill.bill, e.target.value)}
-                                                            className="w-28 px-2 py-1 text-sm text-right border rounded"
+                                                            className="w-24 px-2 py-1 text-xs text-right border border-gray-300 dark:border-[rgb(var(--color-border))] rounded bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
                                                             placeholder="0.00"
                                                         />
                                                     </td>
@@ -440,9 +442,9 @@ const PaymentOut = () => {
 
                         {/* Advance Payment */}
                         {selectedSupplier && (
-                            <div className="bg-dark rounded-xl shadow-sm p-6">
-                                <h2 className="text-lg font-bold text-main mb-4">Advance Payment</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                                <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Advance Payment</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <FormInput
                                         label="Advance Amount"
                                         type="number"
@@ -452,10 +454,10 @@ const PaymentOut = () => {
                                         placeholder="0.00"
                                     />
                                     {supplierInfo?.advanceBalance > 0 && (
-                                        <div className="flex items-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                                        <div className="flex items-center p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                                             <div>
-                                                <p className="text-sm font-medium text-green-800">Available Advance</p>
-                                                <p className="text-lg font-bold text-green-600">₹{supplierInfo.advanceBalance.toFixed(2)}</p>
+                                                <p className="text-xs font-medium text-green-800 dark:text-green-300">Available Advance</p>
+                                                <p className="text-sm font-bold text-green-600 dark:text-green-400">₹{supplierInfo.advanceBalance.toFixed(2)}</p>
                                             </div>
                                         </div>
                                     )}
@@ -464,36 +466,36 @@ const PaymentOut = () => {
                         )}
 
                         {/* Payment Method */}
-                        <div className="bg-dark rounded-xl shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-main mb-4">Payment Method</h2>
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Payment Method</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3">
                                 {paymentMethods.map((method) => (
                                     <button
                                         key={method.value}
                                         type="button"
                                         onClick={() => setFormData({ ...formData, paymentMethod: method.value })}
-                                        className={`p-4 border-2 rounded-lg transition ${formData.paymentMethod === method.value
-                                            ? 'border-indigo-600 bg-indigo-50'
-                                            : 'border-gray-200 hover:border-indigo-300'
+                                        className={`p-3 border-2 rounded-lg transition ${formData.paymentMethod === method.value
+                                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-400'
+                                            : 'border-gray-200 dark:border-[rgb(var(--color-border))] hover:border-indigo-300 dark:hover:border-indigo-500'
                                             }`}
                                     >
-                                        <div className="text-3xl mb-2">{method.icon}</div>
-                                        <div className="text-sm font-medium text-main">{method.label}</div>
+                                        <div className="text-2xl mb-1">{method.icon}</div>
+                                        <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{method.label}</div>
                                     </button>
                                 ))}
                             </div>
 
                             {/* Bank Account Selection */}
                             {['bank', 'upi', 'card', 'cheque'].includes(formData.paymentMethod) && (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text))] mb-2">
                                             Select Bank Account *
                                         </label>
                                         <select
                                             value={formData.bankAccount}
                                             onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
                                             required
                                         >
                                             <option value="">Select bank account</option>
@@ -516,7 +518,7 @@ const PaymentOut = () => {
 
                             {/* Cheque Details */}
                             {formData.paymentMethod === 'cheque' && (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                                     <FormInput
                                         label="Cheque Number *"
                                         value={formData.chequeDetails.chequeNumber}
@@ -549,13 +551,13 @@ const PaymentOut = () => {
                         </div>
 
                         {/* Notes */}
-                        <div className="bg-dark rounded-xl shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-main mb-4">Notes</h2>
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Notes</h2>
                             <textarea
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                 rows="3"
-                                className="w-full px-4 py-2 border rounded-lg"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))]"
                                 placeholder="Add notes..."
                             />
                         </div>
@@ -563,35 +565,35 @@ const PaymentOut = () => {
 
                     {/* Sidebar - Payment Summary */}
                     <div className="lg:col-span-1">
-                        <div className="bg-dark rounded-xl shadow-sm p-6 sticky top-4">
-                            <h2 className="text-lg font-bold text-main mb-4">Payment Summary</h2>
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3 sticky top-4">
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Payment Summary</h2>
 
                             {/* Balance Display */}
-                            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <p className="text-sm font-medium text-blue-800">
+                            <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <p className="text-xs font-medium text-blue-800 dark:text-blue-300">
                                     {formData.paymentMethod === 'cash' ? 'Cash Balance' : 'Bank Balance'}
                                 </p>
-                                <p className="text-2xl font-bold text-blue-600">₹{availableBalance.toFixed(2)}</p>
+                                <p className="text-xl font-bold text-blue-600 dark:text-blue-400">₹{availableBalance.toFixed(2)}</p>
                             </div>
 
                             {/* Summary */}
-                            <div className="space-y-3 mb-6">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted">Total Payment</span>
-                                    <span className="font-bold text-main">₹{totals.totalAmount.toFixed(2)}</span>
+                            <div className="space-y-2 mb-4">
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Total Payment</span>
+                                    <span className="font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totals.totalAmount.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted">Allocated to Bills</span>
-                                    <span className="font-medium text-main">₹{totals.totalAllocatedToBills.toFixed(2)}</span>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Allocated to Bills</span>
+                                    <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totals.totalAllocatedToBills.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted">Advance Amount</span>
-                                    <span className="font-medium text-main">₹{totals.advanceAmount.toFixed(2)}</span>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Advance Amount</span>
+                                    <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totals.advanceAmount.toFixed(2)}</span>
                                 </div>
-                                <div className="pt-3 border-t border-gray-200">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted">Unallocated</span>
-                                        <span className={`font-bold ${totals.unallocated < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                <div className="pt-2 border-t border-gray-200 dark:border-[rgb(var(--color-border))]">
+                                    <div className="flex justify-between text-xs">
+                                        <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Unallocated</span>
+                                        <span className={`font-bold ${totals.unallocated < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                                             ₹{totals.unallocated.toFixed(2)}
                                         </span>
                                     </div>
@@ -600,34 +602,34 @@ const PaymentOut = () => {
 
                             {/* Validation Messages */}
                             {totals.unallocated < 0 && (
-                                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                    <p className="text-sm text-red-800">
+                                <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                                    <p className="text-xs text-red-800 dark:text-red-300">
                                         ⚠️ Total allocation exceeds payment amount
                                     </p>
                                 </div>
                             )}
 
                             {hasBalanceData && totals.totalAmount > availableBalance && formData.paymentMethod !== 'cheque' && (
-                                <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                    <p className="text-sm text-yellow-800">
+                                <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                                    <p className="text-xs text-yellow-800 dark:text-yellow-300">
                                         ⚠️ Payment amount exceeds available balance
                                     </p>
                                 </div>
                             )}
 
                             {/* Action Buttons */}
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 <button
                                     type="submit"
                                     disabled={submitting || totals.unallocated < 0}
-                                    className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {submitting ? 'Saving...' : 'Save Payment'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => navigate('/purchase/payment-out/list')}
-                                    className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                    className="w-full py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text-secondary))] rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                                 >
                                     Cancel
                                 </button>

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
-import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
@@ -146,69 +145,65 @@ const PaymentInList = () => {
 
     return (
         <Layout>
-            <PageHeader
-                title="Payment In Records"
-                description="View all customer payment receipts"
-                actions={[
-                    <button
-                        key="new"
-                        onClick={() => navigate('/sales/payment-in')}
-                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                    >
-                        + New Payment
-                    </button>
-                ]}
-            />
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
+                        Payment In Records
+                    </h1>
+                    <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                        View all customer payment receipts
+                    </p>
+                </div>
 
-            {/* Search Bar */}
-            <div className="mb-6">
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search by receipt number, customer name, or phone..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full px-4 py-3 pl-12 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                    <svg
-                        className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                {/* Search Bar */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-2 mb-6">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search by receipt number, customer name, or phone..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                        />
+                        <svg
+                            className="absolute left-3 top-2.5 w-4 h-4 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
                     {searchQuery && (
-                        <button
-                            onClick={() => setSearchQuery('')}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted hover:text-secondary"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                        <p className="mt-1 text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                            Found {filteredPayments.length} payment(s) matching "{searchQuery}"
+                        </p>
                     )}
                 </div>
-                {searchQuery && (
-                    <p className="mt-2 text-sm text-secondary">
-                        Found {filteredPayments.length} payment(s) matching "{searchQuery}"
-                    </p>
+
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
+                    </div>
+                ) : (
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))]">
+                        <DataTable
+                            columns={columns}
+                            data={filteredPayments}
+                            emptyMessage={searchQuery ? "No payments found matching your search" : "No payment records found"}
+                        />
+                    </div>
                 )}
             </div>
-
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <div className="text-secondary">Loading payments...</div>
-                </div>
-            ) : (
-                <div className="bg-card rounded-xl shadow-sm">
-                    <DataTable
-                        columns={columns}
-                        data={filteredPayments}
-                        emptyMessage={searchQuery ? "No payments found matching your search" : "No payment records found"}
-                    />
-                </div>
-            )}
         </Layout>
     );
 };

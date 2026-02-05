@@ -1,3 +1,5 @@
+import React from 'react';
+
 const InventoryImpactTab = ({ items }) => {
     const getDispositionColor = (disposition) => {
         const colors = {
@@ -43,22 +45,22 @@ const InventoryImpactTab = ({ items }) => {
     }, {});
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-3">
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <h3 className="text-sm font-medium text-blue-800 mb-1">Total Items Returning</h3>
-                    <p className="text-2xl font-bold text-blue-900">{returningItems.length}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                    <h3 className="text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Total Items Returning</h3>
+                    <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{returningItems.length}</p>
                 </div>
-                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h3 className="text-sm font-medium text-green-800 mb-1">Total Quantity</h3>
-                    <p className="text-2xl font-bold text-green-900">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                    <h3 className="text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Total Quantity</h3>
+                    <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
                         {returningItems.reduce((sum, item) => sum + item.returnQty, 0)}
                     </p>
                 </div>
-                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <h3 className="text-sm font-medium text-purple-800 mb-1">Dispositions</h3>
-                    <p className="text-2xl font-bold text-purple-900">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] p-3">
+                    <h3 className="text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Dispositions</h3>
+                    <p className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
                         {Object.keys(groupedByDisposition).length}
                     </p>
                 </div>
@@ -66,20 +68,20 @@ const InventoryImpactTab = ({ items }) => {
 
             {/* Disposition Breakdown */}
             <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Inventory Impact by Disposition</h3>
-                <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Inventory Impact by Disposition</h3>
+                <div className="space-y-3">
                     {Object.entries(groupedByDisposition).map(([disposition, items]) => (
-                        <div key={disposition} className="border border-gray-200 rounded-lg overflow-hidden">
+                        <div key={disposition} className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm border dark:border-[rgb(var(--color-border))] overflow-hidden">
                             <div className={`px-4 py-3 ${getDispositionColor(disposition)} font-semibold flex justify-between items-center`}>
                                 <span className="capitalize">{disposition.replace('_', ' ')}</span>
                                 <span>{items.length} items • {items.reduce((sum, item) => sum + item.returnQty, 0)} units</span>
                             </div>
                             <div className="bg-white">
                                 <table className="min-w-full">
-                                    <thead className="bg-gray-50">
+                                    <thead className="bg-gray-50 dark:bg-gray-800">
                                         <tr>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Item</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Quantity</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Item</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Quantity</th>
                                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Condition</th>
                                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Impact</th>
                                         </tr>
@@ -87,19 +89,19 @@ const InventoryImpactTab = ({ items }) => {
                                     <tbody className="divide-y divide-gray-200">
                                         {items.map((item, idx) => (
                                             <tr key={idx}>
-                                                <td className="px-4 py-2">
+                                                <td className="px-3 py-2">
                                                     <p className="font-medium text-gray-900">{item.itemName}</p>
                                                     <p className="text-xs text-gray-500">{item.sku || 'N/A'}</p>
                                                 </td>
-                                                <td className="px-4 py-2 text-sm text-gray-900">
+                                                <td className="px-3 py-2 text-sm text-gray-900">
                                                     {item.returnQty} {item.unit}
                                                 </td>
-                                                <td className="px-4 py-2">
+                                                <td className="px-3 py-2">
                                                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getConditionColor(item.condition)}`}>
                                                         {item.condition}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-2 text-sm text-gray-600">
+                                                <td className="px-3 py-2 text-sm text-gray-600">
                                                     {disposition === 'restock' && '✓ Will be added back to available stock'}
                                                     {disposition === 'quarantine' && '⚠️ Will be moved to quarantine'}
                                                     {disposition === 'scrap' && '🗑️ Will be removed from inventory'}

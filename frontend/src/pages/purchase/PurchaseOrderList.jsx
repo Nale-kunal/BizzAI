@@ -130,7 +130,7 @@ const PurchaseOrderList = () => {
         };
 
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[status] || "bg-gray-200"}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${statusColors[status] || "bg-gray-200"}`}>
                 {status}
             </span>
         );
@@ -138,25 +138,93 @@ const PurchaseOrderList = () => {
 
     return (
         <Layout>
-            <div className="container mx-auto px-4 py-6">
+            <div className="space-y-4">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Purchase Orders</h1>
-                    <button
-                        onClick={() => navigate("/purchase-orders/new")}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                    >
-                        <FiPlus /> New Purchase Order
-                    </button>
+                <div className="mb-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1">Purchase Orders</h1>
+                            <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Manage and track purchase orders</p>
+                        </div>
+                        <button
+                            onClick={() => navigate("/purchase-orders/new")}
+                            className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center gap-2"
+                        >
+                            <FiPlus /> New Purchase Order
+                        </button>
+                    </div>
+                </div>
+
+                {/* KPI Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                    {/* Total Orders */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{pagination?.total || 0}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Orders</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Total Amount */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{purchaseOrders.reduce((sum, po) => sum + (po.totalAmount || 0), 0).toLocaleString()}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Total Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Approved */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{purchaseOrders.filter(po => po.status === 'Approved' || po.status === 'Partially Received' || po.status === 'Fully Received').length}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Approved</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pending */}
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg p-4 border dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-full">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{purchaseOrders.filter(po => po.status === 'Draft' || po.status === 'Pending Approval').length}</p>
+                                <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase tracking-wide">Pending</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-lg font-semibold">Filters</h2>
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3 mb-4">
+                    <div className="flex justify-between items-center mb-3">
+                        <h2 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))]">Filters</h2>
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className="text-blue-600 hover:text-blue-800"
+                            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                         >
                             {showFilters ? "Hide" : "Show"} Filters
                         </button>
@@ -164,26 +232,26 @@ const PurchaseOrderList = () => {
 
                     {showFilters && (
                         <form onSubmit={handleSearch}>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Search</label>
                                     <input
                                         type="text"
                                         name="search"
                                         value={filters.search}
                                         onChange={handleFilterChange}
                                         placeholder="PO number, supplier..."
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Status</label>
                                     <select
                                         name="status"
                                         value={filters.status}
                                         onChange={handleFilterChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     >
                                         <option value="">All Statuses</option>
                                         <option value="Draft">Draft</option>
@@ -197,48 +265,48 @@ const PurchaseOrderList = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Start Date</label>
                                     <input
                                         type="date"
                                         name="startDate"
                                         value={filters.startDate}
                                         onChange={handleFilterChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">End Date</label>
                                     <input
                                         type="date"
                                         name="endDate"
                                         value={filters.endDate}
                                         onChange={handleFilterChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Min Amount</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Min Amount</label>
                                     <input
                                         type="number"
                                         name="minAmount"
                                         value={filters.minAmount}
                                         onChange={handleFilterChange}
                                         placeholder="0"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Max Amount</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">Max Amount</label>
                                     <input
                                         type="number"
                                         name="maxAmount"
                                         value={filters.maxAmount}
                                         onChange={handleFilterChange}
                                         placeholder="999999"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
                             </div>
@@ -246,14 +314,14 @@ const PurchaseOrderList = () => {
                             <div className="flex gap-2">
                                 <button
                                     type="submit"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+                                    className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
                                 >
                                     Apply Filters
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleClearFilters}
-                                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
+                                    className="px-3 py-1.5 text-sm bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md"
                                 >
                                     Clear Filters
                                 </button>
@@ -263,7 +331,7 @@ const PurchaseOrderList = () => {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] overflow-hidden">
                     {isLoading ? (
                         <div className="text-center py-8">Loading...</div>
                     ) : purchaseOrders.length === 0 ? (

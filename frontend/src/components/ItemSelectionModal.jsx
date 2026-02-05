@@ -41,8 +41,11 @@ const ItemSelectionModal = ({ isOpen, onClose, onSelect }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('Items fetched successfully:', response.data);
-            console.log('Number of items:', response.data.length);
-            setItems(response.data);
+            // Backend returns { success: true, items: [...] }
+            // Extract just the items array
+            const itemsData = response.data.items || response.data || [];
+            console.log('Number of items:', itemsData.length);
+            setItems(itemsData);
         } catch (error) {
             console.error('Error fetching items:', error);
             console.error('Error details:', error.response);
@@ -57,10 +60,10 @@ const ItemSelectionModal = ({ isOpen, onClose, onSelect }) => {
         }
     };
 
-    const filteredItems = items.filter(item =>
+    const filteredItems = Array.isArray(items) ? items.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    ) : [];
 
     const handleSelect = () => {
         if (selectedItem && quantity > 0) {
