@@ -132,13 +132,13 @@ describe('Multi-Tenancy Integration Tests', () => {
             const res = await request(app)
                 .put(`/api/inventory/${item1._id}`)
                 .set('Authorization', `Bearer ${user2Token}`)
-                .send({ currentStock: 999 });
+                .send({ stockQty: 999 });
 
             expect(res.status).toBe(404);
 
             // Verify item not modified
             const item = await Item.findById(item1._id);
-            expect(item.currentStock).toBe(100);
+            expect(item.stockQty).toBe(100);
         });
 
         test('user1 cannot delete org2 item', async () => {

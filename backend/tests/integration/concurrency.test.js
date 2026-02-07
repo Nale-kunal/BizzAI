@@ -45,7 +45,8 @@ describe('Concurrency Tests', () => {
         await User.deleteMany({});
         await Item.deleteMany({});
         await Invoice.deleteMany({});
-        await StockLedger.deleteMany({});
+        // StockLedger is append-only, cannot be deleted
+        // await StockLedger.deleteMany({});
         await FinancialPeriod.deleteMany({});
     });
 
@@ -58,7 +59,7 @@ describe('Concurrency Tests', () => {
                 costPrice: 50,
                 sellingPrice: 100,
                 purchasePrice: 50,
-                currentStock: 100,
+                stockQty: 100,
                 organization: organization._id,
                 createdBy: user._id,
                 organizationId: organization._id
@@ -90,7 +91,7 @@ describe('Concurrency Tests', () => {
 
             // Verify final stock
             const finalItem = await Item.findById(item._id);
-            expect(finalItem.currentStock).toBe(50); // 100 - (10 * 5)
+            expect(finalItem.stockQty).toBe(50); // 100 - (10 * 5)
         });
 
         test('should prevent race conditions in stock updates', async () => {
@@ -101,7 +102,7 @@ describe('Concurrency Tests', () => {
                 costPrice: 50,
                 sellingPrice: 100,
                 purchasePrice: 50,
-                currentStock: 10,
+                stockQty: 10,
                 organization: organization._id,
                 createdBy: user._id,
                 organizationId: organization._id
@@ -131,7 +132,7 @@ describe('Concurrency Tests', () => {
 
             // Final stock should never be negative
             const finalItem = await Item.findById(item._id);
-            expect(finalItem.currentStock).toBeGreaterThanOrEqual(0);
+            expect(finalItem.stockQty).toBeGreaterThanOrEqual(0);
         });
     });
 
@@ -211,7 +212,7 @@ describe('Concurrency Tests', () => {
                 costPrice: 50,
                 sellingPrice: 100,
                 purchasePrice: 50,
-                currentStock: 100,
+                stockQty: 100,
                 organization: organization._id,
                 createdBy: user._id,
                 organizationId: organization._id
@@ -227,7 +228,7 @@ describe('Concurrency Tests', () => {
                         await session.withTransaction(async () => {
                             await Item.findByIdAndUpdate(
                                 item._id,
-                                { $inc: { currentStock: -10 } },
+                                { $inc: { stockQty: -10 } },
                                 { session }
                             );
 
@@ -246,7 +247,7 @@ describe('Concurrency Tests', () => {
                         // Fallback for standalone MongoDB
                         await Item.findByIdAndUpdate(
                             item._id,
-                            { $inc: { currentStock: -10 } }
+                            { $inc: { stockQty: -10 } }
                         );
 
                         await StockLedger.create({
@@ -274,7 +275,7 @@ describe('Concurrency Tests', () => {
                         await session.withTransaction(async () => {
                             await Item.findByIdAndUpdate(
                                 item._id,
-                                { $inc: { currentStock: -15 } },
+                                { $inc: { stockQty: -15 } },
                                 { session }
                             );
 
@@ -293,7 +294,7 @@ describe('Concurrency Tests', () => {
                         // Fallback for standalone MongoDB
                         await Item.findByIdAndUpdate(
                             item._id,
-                            { $inc: { currentStock: -15 } }
+                            { $inc: { stockQty: -15 } }
                         );
 
                         await StockLedger.create({
@@ -316,7 +317,7 @@ describe('Concurrency Tests', () => {
 
             // Verify final stock
             const finalItem = await Item.findById(item._id);
-            expect(finalItem.currentStock).toBe(75); // 100 - 10 - 15
+            expect(finalItem.stockQty).toBe(75); // 100 - 10 - 15
 
             // Verify both ledger entries created
             const entries = await StockLedger.find({ item: item._id });
@@ -331,7 +332,7 @@ describe('Concurrency Tests', () => {
                 costPrice: 50,
                 sellingPrice: 100,
                 purchasePrice: 50,
-                currentStock: 50,
+                stockQty: 50,
                 organization: organization._id,
                 createdBy: user._id,
                 organizationId: organization._id
@@ -345,14 +346,14 @@ describe('Concurrency Tests', () => {
                         await session.withTransaction(async () => {
                             await Item.findByIdAndUpdate(
                                 item._id,
-                                { $inc: { currentStock: -5 } },
+                                { $inc: { stockQty: -5 } },
                                 { session }
                             );
                         });
                     } else {
                         await Item.findByIdAndUpdate(
                             item._id,
-                            { $inc: { currentStock: -5 } }
+                            { $inc: { stockQty: -5 } }
                         );
                     }
                 } finally {
@@ -368,7 +369,7 @@ describe('Concurrency Tests', () => {
                         await session.withTransaction(async () => {
                             await Item.findByIdAndUpdate(
                                 item._id,
-                                { $inc: { currentStock: -10 } },
+                                { $inc: { stockQty: -10 } },
                                 { session }
                             );
 
@@ -378,7 +379,7 @@ describe('Concurrency Tests', () => {
                     } else {
                         await Item.findByIdAndUpdate(
                             item._id,
-                            { $inc: { currentStock: -10 } }
+                            { $inc: { stockQty: -10 } }
                         );
                         // Force error
                         throw new Error('Simulated error');
@@ -395,7 +396,7 @@ describe('Concurrency Tests', () => {
 
             // Only successful transaction should affect stock
             const finalItem = await Item.findById(item._id);
-            expect(finalItem.currentStock).toBe(45); // 50 - 5 (failed transaction rolled back)
+            expect(finalItem.stockQty).toBe(45); // 50 - 5 (failed transaction rolled back)
         });
     });
 
@@ -408,7 +409,7 @@ describe('Concurrency Tests', () => {
                 costPrice: 50,
                 sellingPrice: 100,
                 purchasePrice: 50,
-                currentStock: 100,
+                stockQty: 100,
                 organization: organization._id,
                 createdBy: user._id,
                 organizationId: organization._id
@@ -421,7 +422,7 @@ describe('Concurrency Tests', () => {
                 costPrice: 50,
                 sellingPrice: 100,
                 purchasePrice: 50,
-                currentStock: 100,
+                stockQty: 100,
                 organization: organization._id,
                 createdBy: user._id,
                 organizationId: organization._id
@@ -436,7 +437,7 @@ describe('Concurrency Tests', () => {
                         await session.withTransaction(async () => {
                             await Item.findByIdAndUpdate(
                                 item1._id,
-                                { $inc: { currentStock: -5 } },
+                                { $inc: { stockQty: -5 } },
                                 { session }
                             );
 
@@ -444,21 +445,21 @@ describe('Concurrency Tests', () => {
 
                             await Item.findByIdAndUpdate(
                                 item2._id,
-                                { $inc: { currentStock: -5 } },
+                                { $inc: { stockQty: -5 } },
                                 { session }
                             );
                         });
                     } else {
                         await Item.findByIdAndUpdate(
                             item1._id,
-                            { $inc: { currentStock: -5 } }
+                            { $inc: { stockQty: -5 } }
                         );
 
                         await new Promise(resolve => setTimeout(resolve, 10));
 
                         await Item.findByIdAndUpdate(
                             item2._id,
-                            { $inc: { currentStock: -5 } }
+                            { $inc: { stockQty: -5 } }
                         );
                     }
                 } finally {
@@ -475,7 +476,7 @@ describe('Concurrency Tests', () => {
                         await session.withTransaction(async () => {
                             await Item.findByIdAndUpdate(
                                 item2._id,
-                                { $inc: { currentStock: -10 } },
+                                { $inc: { stockQty: -10 } },
                                 { session }
                             );
 
@@ -483,21 +484,21 @@ describe('Concurrency Tests', () => {
 
                             await Item.findByIdAndUpdate(
                                 item1._id,
-                                { $inc: { currentStock: -10 } },
+                                { $inc: { stockQty: -10 } },
                                 { session }
                             );
                         });
                     } else {
                         await Item.findByIdAndUpdate(
                             item2._id,
-                            { $inc: { currentStock: -10 } }
+                            { $inc: { stockQty: -10 } }
                         );
 
                         await new Promise(resolve => setTimeout(resolve, 10));
 
                         await Item.findByIdAndUpdate(
                             item1._id,
-                            { $inc: { currentStock: -10 } }
+                            { $inc: { stockQty: -10 } }
                         );
                     }
                 } finally {
@@ -515,8 +516,8 @@ describe('Concurrency Tests', () => {
             const finalItem1 = await Item.findById(item1._id);
             const finalItem2 = await Item.findById(item2._id);
 
-            expect(finalItem1.currentStock).toBeLessThan(100);
-            expect(finalItem2.currentStock).toBeLessThan(100);
+            expect(finalItem1.stockQty).toBeLessThan(100);
+            expect(finalItem2.stockQty).toBeLessThan(100);
         });
     });
 });
