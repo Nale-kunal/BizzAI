@@ -12,6 +12,7 @@ import User from '../../models/User.js';
 import Item from '../../models/Item.js';
 import Invoice from '../../models/Invoice.js';
 import Purchase from '../../models/Purchase.js';
+import Supplier from '../../models/Supplier.js';
 
 describe('Multi-Tenancy Integration Tests', () => {
     let org1, org2;
@@ -80,10 +81,8 @@ describe('Multi-Tenancy Integration Tests', () => {
                 addedBy: user1Id,
                 costPrice: 50,
                 sellingPrice: 100,
-                purchasePrice: 50,
-                currentStock: 100,
-                organization: org1._id,
-                createdBy: user1Id,
+                stockQty: 100,
+                lowStockLimit: 10,
                 organizationId: org1._id
             });
 
@@ -93,10 +92,8 @@ describe('Multi-Tenancy Integration Tests', () => {
                 addedBy: user2Id,
                 costPrice: 100,
                 sellingPrice: 200,
-                purchasePrice: 100,
-                currentStock: 50,
-                organization: org2._id,
-                createdBy: user2Id,
+                stockQty: 50,
+                lowStockLimit: 5,
                 organizationId: org2._id
             });
         });
@@ -161,20 +158,58 @@ describe('Multi-Tenancy Integration Tests', () => {
         let invoice1, invoice2;
 
         beforeAll(async () => {
+            // Create a test item for invoice
+            const invoiceItem1 = await Item.create({
+                name: 'Invoice Item 1',
+                sku: 'INV-ITEM-1',
+                addedBy: user1Id,
+                costPrice: 50,
+                sellingPrice: 100,
+                stockQty: 100,
+                lowStockLimit: 10,
+                organizationId: org1._id
+            });
+
             invoice1 = await Invoice.create({
                 invoiceNo: 'INV-ORG1-001',
-                customerName: 'Customer Org 1',
-                items: [{ itemName: 'Test', quantity: 1, rate: 100 }],
+                items: [{
+                    item: invoiceItem1._id,
+                    quantity: 1,
+                    price: 100,
+                    tax: 0,
+                    discount: 0,
+                    total: 100
+                }],
+                subtotal: 100,
                 totalAmount: 100,
                 paymentStatus: 'paid',
                 createdBy: user1Id,
                 organizationId: org1._id
             });
 
+            // Create a test item for invoice
+            const invoiceItem2 = await Item.create({
+                name: 'Invoice Item 2',
+                sku: 'INV-ITEM-2',
+                addedBy: user2Id,
+                costPrice: 100,
+                sellingPrice: 200,
+                stockQty: 50,
+                lowStockLimit: 5,
+                organizationId: org2._id
+            });
+
             invoice2 = await Invoice.create({
                 invoiceNo: 'INV-ORG2-001',
-                customerName: 'Customer Org 2',
-                items: [{ itemName: 'Test', quantity: 1, rate: 200 }],
+                items: [{
+                    item: invoiceItem2._id,
+                    quantity: 1,
+                    price: 200,
+                    tax: 0,
+                    discount: 0,
+                    total: 200
+                }],
+                subtotal: 200,
                 totalAmount: 200,
                 paymentStatus: 'paid',
                 createdBy: user2Id,
@@ -209,20 +244,94 @@ describe('Multi-Tenancy Integration Tests', () => {
         let purchase1, purchase2;
 
         beforeAll(async () => {
+            // Create supplier and item for purchase
+            const supplier1 = await Supplier.create({
+                supplierId: 'SUP-ORG1-001',
+                businessName: 'Supplier Org 1',
+                contactPersonName: 'Contact 1',
+                contactNo: '1234567890',
+                email: 'supplier1@org1.com',
+                physicalAddress: 'Address 1',
+                gstNo: '29ABCDE1234F1Z5',
+                state: 'Karnataka',
+                supplierType: 'wholesaler',
+                owner: user1Id,
+                organizationId: org1._id
+            });
+
+            const purchaseItem1 = await Item.create({
+                name: 'Purchase Item 1',
+                sku: 'PUR-ITEM-1',
+                addedBy: user1Id,
+                costPrice: 50,
+                sellingPrice: 100,
+                stockQty: 100,
+                lowStockLimit: 10,
+                organizationId: org1._id
+            });
+
             purchase1 = await Purchase.create({
                 purchaseNo: 'PUR-ORG1-001',
-                supplierName: 'Supplier Org 1',
-                items: [{ itemName: 'Test', quantity: 10, rate: 50 }],
+                purchaseDate: new Date(),
+                supplier: supplier1._id,
+                supplierInvoiceNo: 'SI-ORG1-001',
+                supplierInvoiceDate: new Date(),
+                items: [{
+                    item: purchaseItem1._id,
+                    itemName: 'Purchase Item 1',
+                    quantity: 10,
+                    purchaseRate: 50,
+                    taxableValue: 500,
+                    total: 500
+                }],
+                subtotal: 500,
                 totalAmount: 500,
                 purchaseType: 'credit',
                 createdBy: user1Id,
                 organizationId: org1._id
             });
 
+            // Create supplier and item for purchase
+            const supplier2 = await Supplier.create({
+                supplierId: 'SUP-ORG2-001',
+                businessName: 'Supplier Org 2',
+                contactPersonName: 'Contact 2',
+                contactNo: '0987654321',
+                email: 'supplier2@org2.com',
+                physicalAddress: 'Address 2',
+                gstNo: '27XYZAB1234C1Z5',
+                state: 'Maharashtra',
+                supplierType: 'retailer',
+                owner: user2Id,
+                organizationId: org2._id
+            });
+
+            const purchaseItem2 = await Item.create({
+                name: 'Purchase Item 2',
+                sku: 'PUR-ITEM-2',
+                addedBy: user2Id,
+                costPrice: 100,
+                sellingPrice: 200,
+                stockQty: 50,
+                lowStockLimit: 5,
+                organizationId: org2._id
+            });
+
             purchase2 = await Purchase.create({
                 purchaseNo: 'PUR-ORG2-001',
-                supplierName: 'Supplier Org 2',
-                items: [{ itemName: 'Test', quantity: 20, rate: 100 }],
+                purchaseDate: new Date(),
+                supplier: supplier2._id,
+                supplierInvoiceNo: 'SI-ORG2-001',
+                supplierInvoiceDate: new Date(),
+                items: [{
+                    item: purchaseItem2._id,
+                    itemName: 'Purchase Item 2',
+                    quantity: 20,
+                    purchaseRate: 100,
+                    taxableValue: 2000,
+                    total: 2000
+                }],
+                subtotal: 2000,
                 totalAmount: 2000,
                 purchaseType: 'credit',
                 createdBy: user2Id,
