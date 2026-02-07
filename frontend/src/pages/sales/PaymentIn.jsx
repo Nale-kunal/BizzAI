@@ -407,23 +407,35 @@ const PaymentIn = () => {
     <Layout>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
-            Payment In
-          </h1>
-          <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+        <div className="mb-1 md:mb-8">
+          <div className="flex items-center justify-between mb-0.5 md:mb-2">
+            <h1 className="text-sm md:text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              Payment In
+            </h1>
+            <button
+              onClick={() => navigate('/sales/payment-in-list')}
+              className="px-2 py-1 md:px-4 md:py-2 text-[10px] md:text-sm bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded md:rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium transition-colors flex items-center gap-1 md:gap-2"
+            >
+              <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span className="hidden md:inline">View All Payments</span>
+              <span className="md:hidden">All Payments</span>
+            </button>
+          </div>
+          <p className="text-[10px] md:text-base text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
             Record customer payments and receipts
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 md:gap-4">
+          <div className="lg:col-span-2 space-y-1 md:space-y-4">
             {/* Payment Details */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+              <h2 className="text-[10px] md:text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 md:mb-3">
                 Payment Details
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-3">
                 <FormInput
                   label="Receipt Number"
                   value={formData.receiptNo}
@@ -446,24 +458,24 @@ const PaymentIn = () => {
             </div>
 
             {/* Customer Selection */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Customer</h2>
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+              <h2 className="text-[10px] md:text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 md:mb-3">Customer</h2>
               {formData.customer ? (
-                <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                <div className="p-1 md:p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded md:rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                      <p className="text-[10px] md:text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                         {formData.customer.name}
                       </p>
-                      <p className="text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                      <p className="text-[9px] md:text-xs text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                         {formData.customer.phone}
                       </p>
-                      <div className="flex gap-3 mt-1">
-                        <p className="text-xs text-orange-600 font-medium">
+                      <div className="flex gap-1 md:gap-3 mt-0.5 md:mt-1">
+                        <p className="text-[8px] md:text-xs text-orange-600 font-medium">
                           Outstanding: ₹{customerInfo.outstandingDue.toFixed(2)}
                         </p>
                         {customerInfo.availableCredit > 0 && (
-                          <p className="text-xs text-green-600 font-medium">
+                          <p className="text-[8px] md:text-xs text-green-600 font-medium">
                             Credit: ₹{customerInfo.availableCredit.toFixed(2)}
                           </p>
                         )}
@@ -471,7 +483,7 @@ const PaymentIn = () => {
                     </div>
                     <button
                       onClick={() => setFormData({ ...formData, customer: null })}
-                      className="text-red-600 hover:text-red-700 text-xs"
+                      className="text-red-600 hover:text-red-700 text-[9px] md:text-xs"
                     >
                       Remove
                     </button>
@@ -480,7 +492,7 @@ const PaymentIn = () => {
               ) : (
                 <button
                   onClick={() => setShowCustomerModal(true)}
-                  className="w-full px-3 py-2 border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 hover:text-indigo-600 transition text-xs"
+                  className="w-full px-1 py-1 md:px-3 md:py-2 border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 hover:text-indigo-600 transition text-[9px] md:text-xs"
                 >
                   Click to select customer
                 </button>
@@ -488,25 +500,25 @@ const PaymentIn = () => {
             </div>
 
             {/* Payment Methods */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Payment Methods</h2>
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+              <div className="flex items-center justify-between mb-1 md:mb-3">
+                <h2 className="text-[10px] md:text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Payment Methods</h2>
                 <button
                   onClick={addPaymentMethod}
-                  className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                  className="text-[9px] md:text-xs text-indigo-600 hover:text-indigo-700 font-medium"
                 >
                   + Add Method
                 </button>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-1 md:space-y-3">
                 {formData.paymentMethods.map((pm, index) => (
                   <div
                     key={index}
-                    className="p-2 border border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg"
+                    className="p-1 md:p-2 border border-gray-200 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-1 md:gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                        <label className="block text-[9px] md:text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-0.5 md:mb-1">
                           Method
                         </label>
                         <select
@@ -514,7 +526,7 @@ const PaymentIn = () => {
                           onChange={(e) =>
                             updatePaymentMethod(index, "method", e.target.value)
                           }
-                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg"
+                          className="w-full px-1 py-0.5 md:px-2 md:py-1 text-[9px] md:text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg"
                         >
                           {paymentMethodOptions.map((opt) => (
                             <option key={opt.value} value={opt.value}>
@@ -524,7 +536,7 @@ const PaymentIn = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                        <label className="block text-[9px] md:text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-0.5 md:mb-1">
                           Amount
                         </label>
                         <input
@@ -537,7 +549,7 @@ const PaymentIn = () => {
                               parseFloat(e.target.value) || 0
                             )
                           }
-                          className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg"
+                          className="w-full px-1 py-0.5 md:px-2 md:py-1 text-[9px] md:text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg"
                           placeholder="0.00"
                           min="0"
                           step="0.01"
@@ -547,7 +559,7 @@ const PaymentIn = () => {
                         {formData.paymentMethods.length > 1 && (
                           <button
                             onClick={() => removePaymentMethod(index)}
-                            className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded-lg"
+                            className="px-1 py-0.5 md:px-2 md:py-1 text-[9px] md:text-xs text-red-600 hover:bg-red-50 rounded md:rounded-lg"
                           >
                             Remove
                           </button>
@@ -669,8 +681,8 @@ const PaymentIn = () => {
             </div>
 
             {/* Deposit To */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Deposit To</h2>
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+              <h2 className="text-[10px] md:text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 md:mb-3">Deposit To</h2>
               {(() => {
                 // Check if any payment method is not cash
                 const hasNonCashMethod = formData.paymentMethods.some(
@@ -721,27 +733,27 @@ const PaymentIn = () => {
 
             {/* Outstanding Invoices */}
             {formData.customer && customerInfo.outstandingInvoices.length > 0 && (
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-                <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+                <h2 className="text-[10px] md:text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 md:mb-3">
                   Outstanding Invoices
                 </h2>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                        <th className="px-1 py-1 md:px-4 md:py-3 text-left text-[8px] md:text-xs font-medium text-muted uppercase">
                           Invoice No
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                        <th className="px-1 py-1 md:px-4 md:py-3 text-left text-[8px] md:text-xs font-medium text-muted uppercase">
                           Date
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                        <th className="px-1 py-1 md:px-4 md:py-3 text-left text-[8px] md:text-xs font-medium text-muted uppercase">
                           Total
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                        <th className="px-1 py-1 md:px-4 md:py-3 text-left text-[8px] md:text-xs font-medium text-muted uppercase">
                           Balance
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                        <th className="px-1 py-1 md:px-4 md:py-3 text-left text-[8px] md:text-xs font-medium text-muted uppercase">
                           Pay Amount
                         </th>
                       </tr>
@@ -749,19 +761,19 @@ const PaymentIn = () => {
                     <tbody className="divide-y">
                       {customerInfo.outstandingInvoices.map((invoice) => (
                         <tr key={invoice._id}>
-                          <td className="px-4 py-3 font-medium text-indigo-600">
+                          <td className="px-1 py-1 md:px-4 md:py-3 text-[9px] md:text-sm font-medium text-indigo-600">
                             {invoice.invoiceNo}
                           </td>
-                          <td className="px-4 py-3 text-sm text-secondary">
+                          <td className="px-1 py-1 md:px-4 md:py-3 text-[9px] md:text-sm text-secondary">
                             {new Date(invoice.date).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-3 font-medium">
+                          <td className="px-1 py-1 md:px-4 md:py-3 text-[9px] md:text-sm font-medium">
                             ₹{invoice.total.toFixed(2)}
                           </td>
-                          <td className="px-4 py-3 font-medium text-orange-600">
+                          <td className="px-1 py-1 md:px-4 md:py-3 text-[9px] md:text-sm font-medium text-orange-600">
                             ₹{invoice.balance.toFixed(2)}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-1 py-1 md:px-4 md:py-3">
                             <input
                               type="number"
                               value={invoiceAllocations[invoice._id] || 0}
@@ -771,7 +783,7 @@ const PaymentIn = () => {
                                   e.target.value
                                 )
                               }
-                              className="w-32 px-3 py-1 border border-default rounded-lg"
+                              className="w-16 md:w-32 px-1 py-0.5 md:px-3 md:py-1 text-[9px] md:text-sm border border-default rounded md:rounded-lg"
                               placeholder="0.00"
                               max={invoice.balance}
                               min="0"
@@ -787,15 +799,15 @@ const PaymentIn = () => {
             )}
 
             {/* Notes */}
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-              <h2 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">Notes</h2>
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+              <h2 className="text-[10px] md:text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 md:mb-3">Notes</h2>
               <textarea
                 value={formData.notes}
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
                 }
                 rows="2"
-                className="w-full px-3 py-1 text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-1 py-0.5 md:px-3 md:py-1 text-[9px] md:text-xs border border-gray-300 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg focus:ring-2 focus:ring-indigo-500"
                 placeholder="Add any notes about this payment..."
               />
             </div>
@@ -803,22 +815,24 @@ const PaymentIn = () => {
 
           {/* Summary Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 sticky top-4">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-4 sticky top-4">
+              <h2 className="text-[10px] md:text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 md:mb-3">
                 Payment Summary
               </h2>
 
-              <div className="space-y-3 mb-6 p-4 bg-surface rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <span className="text-secondary">Total Payment:</span>
-                  <span className="font-medium text-green-600">
-                    ₹{totalPayment.toFixed(2)}
-                  </span>
+              <div className="grid grid-cols-2 gap-1 md:gap-3 mb-2 md:mb-6 p-1 md:p-4 bg-surface rounded md:rounded-lg">
+                <div className="col-span-2">
+                  <div className="flex justify-between text-[9px] md:text-sm">
+                    <span className="text-secondary">Total Payment:</span>
+                    <span className="font-medium text-green-600">
+                      ₹{totalPayment.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
 
                 {customerInfo.availableCredit > 0 && (
-                  <div className="border-t pt-3">
-                    <label className="block text-sm text-secondary mb-2">
+                  <div className="col-span-2 border-t pt-1 md:pt-3">
+                    <label className="block text-[9px] md:text-sm text-secondary mb-1 md:mb-2">
                       Use Customer Credit:
                     </label>
                     <input
@@ -832,66 +846,70 @@ const PaymentIn = () => {
                           )
                         )
                       }
-                      className="w-full px-3 py-2 border border-default rounded-lg"
+                      className="w-full px-1 py-0.5 md:px-3 md:py-2 text-[9px] md:text-sm border border-default rounded md:rounded-lg"
                       placeholder="0.00"
                       max={customerInfo.availableCredit}
                       min="0"
                       step="0.01"
                     />
-                    <p className="text-xs text-muted mt-1">
+                    <p className="text-[8px] md:text-xs text-muted mt-0.5 md:mt-1">
                       Available: ₹{customerInfo.availableCredit.toFixed(2)}
                     </p>
                   </div>
                 )}
 
-                <div className="flex justify-between text-sm border-t pt-3">
-                  <span className="text-secondary">Effective Payment:</span>
-                  <span className="font-medium">
-                    ₹{effectivePayment.toFixed(2)}
-                  </span>
+                <div className="col-span-2 border-t pt-1 md:pt-3">
+                  <div className="flex justify-between text-[9px] md:text-sm">
+                    <span className="text-secondary">Effective Payment:</span>
+                    <span className="font-medium">
+                      ₹{effectivePayment.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex justify-between text-sm">
-                  <span className="text-secondary">Allocated to Invoices:</span>
-                  <span className="font-medium">
-                    ₹{totalAllocated.toFixed(2)}
-                  </span>
+                <div className="col-span-2">
+                  <div className="flex justify-between text-[9px] md:text-sm">
+                    <span className="text-secondary">Allocated to Invoices:</span>
+                    <span className="font-medium">
+                      ₹{totalAllocated.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="border-t pt-3">
+                <div className="col-span-2 border-t pt-1 md:pt-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">Remaining:</span>
+                    <span className="text-[9px] md:text-sm font-medium">Remaining:</span>
                     <span
-                      className={`text-lg font-bold ${remainingAmount >= 0 ? "text-gray-900" : "text-red-600"
+                      className={`text-xs md:text-lg font-bold ${remainingAmount >= 0 ? "text-gray-900" : "text-red-600"
                         }`}
                     >
                       ₹{remainingAmount.toFixed(2)}
                     </span>
                   </div>
                   {remainingAmount > 0 && (
-                    <p className="text-xs text-green-600 mt-1">
+                    <p className="text-[8px] md:text-xs text-green-600 mt-0.5 md:mt-1">
                       Will be added as customer credit
                     </p>
                   )}
                   {remainingAmount < 0 && (
-                    <p className="text-xs text-red-600 mt-1">
+                    <p className="text-[8px] md:text-xs text-red-600 mt-0.5 md:mt-1">
                       Payment insufficient!
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-1 md:gap-2">
                 <button
                   onClick={handleSave}
                   disabled={loading}
-                  className="w-full py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
+                  className="col-span-2 py-1 md:py-2 text-[9px] md:text-sm bg-indigo-600 text-white rounded md:rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
                 >
                   {loading ? "Saving..." : "Save Payment"}
                 </button>
                 <button
                   onClick={handlePrint}
-                  className="w-full py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className="col-span-2 py-1 md:py-2 text-[9px] md:text-sm border border-gray-300 text-gray-700 rounded md:rounded-lg hover:bg-gray-50"
                 >
                   Print Receipt
                 </button>

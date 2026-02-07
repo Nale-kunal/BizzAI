@@ -113,6 +113,15 @@ const ReturnedItems = () => {
 
     return (
         <Layout>
+            <button
+                onClick={() => navigate('/sales/return')}
+                className="flex items-center text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:text-gray-900 dark:hover:text-[rgb(var(--color-text))] mb-4"
+            >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-base">Back to Return</span>
+            </button>
             <PageHeader
                 title="Returned Items"
                 description="View and manage all customer returns"

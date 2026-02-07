@@ -63,13 +63,13 @@ const DataTable = ({
                                 <th
                                     key={column.key}
                                     onClick={() => column.sortable && handleSort(column.key)}
-                                    className={`px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase ${column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-[rgb(var(--color-input))]' : ''
+                                    className={`px-1 md:px-4 py-1 md:py-2 text-left text-[8px] md:text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase ${column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-[rgb(var(--color-input))]' : ''
                                         }`}
                                 >
-                                    <div className="flex items-center space-x-1">
+                                    <div className="flex items-center space-x-0.5 md:space-x-1">
                                         <span>{column.label}</span>
                                         {column.sortable && sortColumn === column.key && (
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-2 h-2 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path
                                                     strokeLinecap="round"
                                                     strokeLinejoin="round"
@@ -91,7 +91,7 @@ const DataTable = ({
                                 className={`${onRowClick ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]' : ''} text-gray-900 dark:text-[rgb(var(--color-text))]`}
                             >
                                 {columns.map((column) => (
-                                    <td key={column.key} className="px-4 py-3 text-xs whitespace-nowrap">
+                                    <td key={column.key} className="px-1 md:px-4 py-1 md:py-3 text-[9px] md:text-xs whitespace-nowrap">
                                         {column.render ? column.render(row[column.key], row) : row[column.key]}
                                     </td>
                                 ))}

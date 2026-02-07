@@ -23,11 +23,21 @@ const Estimate = () => {
     notes: ""
   };
 
-  const [formData, setFormData, clearDraft, hasDraft] = useDraftSave('estimateDraft', initialFormData);
+  const [formData, setFormData, clearDraft, hasDraft, resetToInitial] = useDraftSave('estimateDraft', initialFormData);
   const [searchTerm, setSearchTerm] = useState("");
   const [customerSearchTerm, setCustomerSearchTerm] = useState("");
   const [showCustomerSelect, setShowCustomerSelect] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Detect window resize for responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Extract from formData for easier access
   const customer = formData.customer;
@@ -181,9 +191,8 @@ const Estimate = () => {
   };
 
   const handleClear = () => {
-    if (cart.length > 0 && confirm("Clear cart?")) {
-      setCart([]);
-      setDiscount(0);
+    if (cart.length > 0 && window.confirm("Clear cart?")) {
+      resetToInitial();
     }
   };
 
@@ -216,31 +225,43 @@ const Estimate = () => {
       <div className="max-w-7xl mx-auto">
         <div className="print:hidden">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
-              Create Estimate / Proforma
-            </h1>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
-              Price approximation for customers
-            </p>
+          <div className="mb-1 md:mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-sm md:text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-0.5 md:mb-2">
+                Create Estimate / Proforma
+              </h1>
+              <p className="text-[10px] md:text-base text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                Price approximation for customers
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/sales/estimates')}
+              className="px-2 py-1 md:px-4 md:py-2 text-[10px] md:text-sm bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded md:rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium transition-colors flex items-center gap-1 md:gap-2"
+            >
+              <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span className="hidden md:inline">View All Estimates</span>
+              <span className="md:hidden">All Estimates</span>
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-1 md:gap-4">
             {/* Left Side - Products */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="col-span-1 lg:col-span-2 space-y-1 md:space-y-4">
               {/* Customer Selection */}
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-                <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-2">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+                <label className="block text-[10px] md:text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1 md:mb-2">
                   Customer
                 </label>
 
                 {customer ? (
-                  <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                  <div className="flex items-center justify-between p-1 md:p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded md:rounded-lg">
                     <div>
-                      <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                      <div className="text-[10px] md:text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                         {customer.name}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                      <div className="text-[9px] md:text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                         {customer.phone}
                       </div>
                     </div>
@@ -249,7 +270,7 @@ const Estimate = () => {
                       className="text-red-600 dark:text-red-400 hover:text-red-700"
                     >
                       <svg
-                        className="w-5 h-5"
+                        className="w-3.5 h-3.5 md:w-5 md:h-5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -266,18 +287,18 @@ const Estimate = () => {
                 ) : (
                   <button
                     onClick={() => setShowCustomerSelect(true)}
-                    className="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 hover:text-indigo-600 transition"
+                    className="w-full px-2 py-1.5 md:px-4 md:py-3 border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg text-[10px] md:text-base text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 hover:text-indigo-600 transition"
                   >
                     Walk-in Customer (Click to select)
                   </button>
                 )}
                 {/* Credit Balance Display */}
                 {customer && customer.dues < 0 && (
-                  <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-200">
+                  <div className="mt-1 md:mt-2 p-1 md:p-2 bg-green-50 dark:bg-green-900/20 rounded md:rounded-lg border border-green-200 dark:border-green-800">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <svg
-                          className="w-5 h-5 text-green-600"
+                          className="w-3.5 h-3.5 md:w-5 md:h-5 text-green-600"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -289,11 +310,11 @@ const Estimate = () => {
                             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        <span className="text-sm font-medium text-green-800">
+                        <span className="text-[10px] md:text-sm font-medium text-green-800 dark:text-green-400">
                           Available Credit
                         </span>
                       </div>
-                      <span className="text-lg font-bold text-green-600">
+                      <span className="text-xs md:text-lg font-bold text-green-600 dark:text-green-400">
                         ₹{Math.abs(customer.dues.toFixed(2))}
                       </span>
                     </div>
@@ -302,11 +323,11 @@ const Estimate = () => {
 
                 {/* Pending Dues Display */}
                 {customer && customer?.dues > 0 && (
-                  <div className="mt-2 p-2 bg-red-50 rounded-lg border border-red-200">
+                  <div className="mt-1 md:mt-2 p-1 md:p-2 bg-red-50 dark:bg-red-900/20 rounded md:rounded-lg border border-red-200 dark:border-red-800">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <svg
-                          className="w-5 h-5 text-red-600"
+                          className="w-3.5 h-3.5 md:w-5 md:h-5 text-red-600"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -318,11 +339,11 @@ const Estimate = () => {
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                           />
                         </svg>
-                        <span className="text-sm font-medium text-red-800">
+                        <span className="text-[10px] md:text-sm font-medium text-red-800 dark:text-red-400">
                           Pending Dues
                         </span>
                       </div>
-                      <span className="text-lg font-bold text-red-600">
+                      <span className="text-xs md:text-lg font-bold text-red-600 dark:text-red-400">
                         ₹{customer.dues.toFixed(2)}
                       </span>
                     </div>
@@ -331,17 +352,17 @@ const Estimate = () => {
               </div>
 
               {/* Product Search */}
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-3">
-                <div className="relative mb-3">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1 md:p-3">
+                <div className="relative mb-1 md:mb-3">
                   <input
                     type="text"
                     placeholder="Search products by name or SKU..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full pl-6 md:pl-10 pr-2 md:pr-4 py-0.5 md:py-1 text-[10px] md:text-base border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded md:rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                   />
                   <svg
-                    className="absolute left-3 top-2.5 w-4 h-4 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
+                    className="absolute left-1.5 md:left-3 top-1.5 md:top-2.5 w-3 h-3 md:w-4 md:h-4 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -356,24 +377,24 @@ const Estimate = () => {
                 </div>
 
                 {/* Products Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-96 overflow-y-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-2 max-h-[calc(100vh-280px)] md:max-h-96 overflow-y-auto">
                   {filteredItems.map((item) => (
                     <button
                       key={item._id}
                       onClick={() => addToCart(item)}
-                      className="p-3 border-2 border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg text-left transition hover:border-indigo-500 hover:shadow-md"
+                      className="p-1 md:p-3 border-2 border-gray-200 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg text-left transition hover:border-indigo-500 hover:shadow-md"
                     >
-                      <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 truncate">
+                      <div className="text-[9px] md:text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))] mb-0.5 md:mb-1 truncate">
                         {item.name}
                       </div>
-                      <div className="text-sm font-bold text-indigo-600 dark:text-[rgb(var(--color-primary))]">
+                      <div className="text-[10px] md:text-sm font-bold text-indigo-600 dark:text-[rgb(var(--color-primary))]">
                         ₹{item.sellingPrice}
                       </div>
-                      <div className="text-xs text-muted dark:text-[rgb(var(--color-text-secondary))] mt-1">
+                      <div className="text-[8px] md:text-xs text-muted dark:text-[rgb(var(--color-text-secondary))] mt-0.5 md:mt-1">
                         Stock: {item.stockQty} {item.unit}
                       </div>
                       {item.sku && (
-                        <div className="text-xs text-muted dark:text-[rgb(var(--color-text-muted))] mt-1">
+                        <div className="text-[8px] md:text-xs text-muted dark:text-[rgb(var(--color-text-muted))] mt-0.5 md:mt-1">
                           SKU: {item.sku}
                         </div>
                       )}
@@ -384,58 +405,58 @@ const Estimate = () => {
             </div>
 
             {/* Right Side - Cart & Total */}
-            <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 sticky top-4">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-3">
+            <div className="col-span-1 lg:col-span-1">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-1.5 md:p-4 sticky top-4">
+                <h2 className="text-xs md:text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 md:mb-3">
                   Estimate Cart
                 </h2>
 
                 {/* Cart Items */}
-                <div className="space-y-2 mb-3 max-h-64 overflow-y-auto">
+                <div className="space-y-1 md:space-y-2 mb-1 md:mb-3 max-h-32 md:max-h-64 overflow-y-auto">
                   {cart.length === 0 ? (
-                    <p className="text-muted dark:text-[rgb(var(--color-text-secondary))] text-center py-8">
+                    <p className="text-[10px] md:text-base text-muted dark:text-[rgb(var(--color-text-secondary))] text-center py-4 md:py-8">
                       Cart is empty
                     </p>
                   ) : (
                     cart.map((item) => (
                       <div
                         key={item.itemId}
-                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-[rgb(var(--color-input))] rounded-lg"
+                        className="flex items-center justify-between p-1 md:p-2 bg-gray-50 dark:bg-[rgb(var(--color-input))] rounded md:rounded-lg"
                       >
                         <div className="flex-1">
-                          <div className="font-medium text-maindark:text-[rgb(var(--color-text))] text-sm">
+                          <div className="font-medium text-maindark:text-[rgb(var(--color-text))] text-[10px] md:text-sm">
                             {item.name}
                           </div>
-                          <div className="text-xs text-muted dark:text-[rgb(var(--color-text-secondary))]">
+                          <div className="text-[8px] md:text-xs text-muted dark:text-[rgb(var(--color-text-secondary))]">
                             ₹{item.price} each
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-0.5 md:space-x-2">
                           <button
                             onClick={() =>
                               updateQuantity(item.itemId, item.quantity - 1)
                             }
-                            className="w-7 h-7 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                            className="w-5 h-5 md:w-7 md:h-7 text-[10px] md:text-base bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
                           >
                             -
                           </button>
-                          <span className="w-8 text-center font-medium text-maindark:text-[rgb(var(--color-text))]">
+                          <span className="w-6 md:w-8 text-center font-medium text-[10px] md:text-base text-maindark:text-[rgb(var(--color-text))]">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() =>
                               updateQuantity(item.itemId, item.quantity + 1)
                             }
-                            className="w-7 h-7 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                            className="w-5 h-5 md:w-7 md:h-7 text-[10px] md:text-base bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
                           >
                             +
                           </button>
                           <button
                             onClick={() => removeFromCart(item.itemId)}
-                            className="ml-2 text-red-600 dark:text-red-400 hover:text-red-800"
+                            className="ml-1 md:ml-2 text-red-600 dark:text-red-400 hover:text-red-800"
                           >
                             <svg
-                              className="w-5 h-5"
+                              className="w-3.5 h-3.5 md:w-5 md:h-5"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -449,7 +470,7 @@ const Estimate = () => {
                             </svg>
                           </button>
                         </div>
-                        <div className="ml-3 font-bold text-maindark:text-[rgb(var(--color-text))] w-20 text-right">
+                        <div className="ml-1 md:ml-3 font-bold text-maindark:text-[rgb(var(--color-text))] w-14 md:w-20 text-right text-[10px] md:text-base">
                           ₹{item.total.toFixed(2)}
                         </div>
                       </div>
@@ -458,8 +479,8 @@ const Estimate = () => {
                 </div>
 
                 {/* Discount */}
-                <div className="mb-3">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                <div className="mb-1 md:mb-3">
+                  <label className="block text-[10px] md:text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-0.5 md:mb-1">
                     Discount (₹)
                   </label>
                   <input
@@ -470,28 +491,28 @@ const Estimate = () => {
                     }
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full px-1.5 md:px-3 py-0.5 md:py-1 text-[10px] md:text-base border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded md:rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                     placeholder="0.00"
                   />
                 </div>
 
                 {/* Notes */}
-                <div className="mb-3">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-1">
+                <div className="mb-1 md:mb-3">
+                  <label className="block text-[10px] md:text-xs font-medium text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-0.5 md:mb-1">
                     Notes
                   </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows="2"
-                    className="w-full px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full px-1.5 md:px-3 py-0.5 md:py-1 text-[10px] md:text-base border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded md:rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                     placeholder="Additional notes..."
                   />
                 </div>
 
                 {/* Totals */}
-                <div className="border-t border-gray-200 dark:border-[rgb(var(--color-border))] pt-3 mb-3 space-y-2">
-                  <div className="flex justify-between text-sm">
+                <div className="border-t border-gray-200 dark:border-[rgb(var(--color-border))] pt-1 md:pt-3 mb-1 md:mb-3 space-y-0.5 md:space-y-2">
+                  <div className="flex justify-between text-[10px] md:text-sm">
                     <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                       Subtotal:
                     </span>
@@ -499,7 +520,7 @@ const Estimate = () => {
                       ₹{subtotal.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-[10px] md:text-sm">
                     <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                       Discount:
                     </span>
@@ -507,7 +528,7 @@ const Estimate = () => {
                       -₹{discount.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-lg font-bold border-t border-default dark:border-[rgb(var(--color-border))] pt-2">
+                  <div className="flex justify-between text-xs md:text-lg font-bold border-t border-default dark:border-[rgb(var(--color-border))] pt-1 md:pt-2">
                     <span className="text-maindark:text-[rgb(var(--color-text))]">
                       Estimated Total:
                     </span>
@@ -518,14 +539,14 @@ const Estimate = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-2">
+                <div className="space-y-1 md:space-y-2">
                   <button
                     onClick={handlePrintPreview}
                     disabled={cart.length === 0}
-                    className="w-full py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 font-medium disabled:opacity-50 flex justify-center items-center gap-2 text-sm"
+                    className="w-full py-1 md:py-2 text-[10px] md:text-sm bg-gray-800 text-white rounded md:rounded-lg hover:bg-gray-900 font-medium disabled:opacity-50 flex justify-center items-center gap-1 md:gap-2"
                   >
                     <svg
-                      className="w-5 h-5"
+                      className="w-3.5 h-3.5 md:w-5 md:h-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -542,14 +563,14 @@ const Estimate = () => {
                   <button
                     onClick={handleSaveEstimate}
                     disabled={isLoading || cart.length === 0 || !customer}
-                    className="w-full py-2 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full py-1 md:py-2 text-[10px] md:text-sm bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded md:rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? "Saving..." : "Save Estimate"}
                   </button>
                   <button
                     onClick={handleClear}
                     disabled={cart.length === 0}
-                    className="w-full py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full py-1 md:py-2 text-[10px] md:text-sm bg-gray-600 text-white rounded md:rounded-lg hover:bg-gray-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Clear Cart
                   </button>
@@ -561,10 +582,10 @@ const Estimate = () => {
           {/* Customer Selection Modal */}
           {showCustomerSelect && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-1.5 max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded md:rounded-xl p-1 md:p-1.5 max-w-xs md:max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                <div className="flex items-center justify-between p-2 md:p-4 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
+                  <h3 className="text-xs md:text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
                     Select Customer
                   </h3>
                   <button
@@ -572,7 +593,7 @@ const Estimate = () => {
                     className="text-muted dark:text-[rgb(var(--color-text-muted))] hover:text-gray-600 dark:hover:text-[rgb(var(--color-text))]"
                   >
                     <svg
-                      className="w-6 h-6"
+                      className="w-4 h-4 md:w-6 md:h-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -588,26 +609,26 @@ const Estimate = () => {
                 </div>
 
                 {/* Body */}
-                <div className="p-4 max-h-96 overflow-y-auto">
+                <div className="p-2 md:p-4 max-h-64 md:max-h-96 overflow-y-auto">
                   <input
                     type="text"
                     placeholder="Search by name or phone..."
                     value={customerSearchTerm}
                     onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                    className="w-full px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg mb-3 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))]"
+                    className="w-full px-2 md:px-3 py-0.5 md:py-1 text-[10px] md:text-base border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded md:rounded-lg mb-1.5 md:mb-3 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))]"
                   />
 
-                  <div className="space-y-2">
+                  <div className="space-y-1 md:space-y-2">
                     {filteredCustomers.map((c) => (
                       <button
                         key={c._id}
                         onClick={() => selectCustomer(c)}
-                        className="w-full p-3 border border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition"
+                        className="w-full p-1.5 md:p-3 text-left border border-gray-200 dark:border-[rgb(var(--color-border))] rounded md:rounded-lg hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition"
                       >
-                        <div className="text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                        <div className="text-[10px] md:text-xs font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                           {c.name}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                        <div className="text-[9px] md:text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                           {c.phone}
                         </div>
                       </button>
