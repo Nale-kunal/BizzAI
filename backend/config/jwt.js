@@ -15,27 +15,83 @@ import crypto from "crypto";
 import { warn, error as logError } from "../utils/logger.js";
 
 /**
+ * CRITICAL: Validate JWT secrets at module load time
+ * Prevents runtime failures due to missing/invalid secrets
+ */
+const validateJWTSecrets = () => {
+  const errors = [];
+
+  if (!process.env.JWT_SECRET) {
+    errors.push('JWT_SECRET is not defined');
+  } else if (process.env.JWT_SECRET.length < 32) {
+    errors.push('JWT_SECRET must be at least 32 characters');
+  }
+
+  if (!process.env.JWT_REFRESH_SECRET) {
+    errors.push('JWT_REFRESH_SECRET is not defined');
+  } else if (process.env.JWT_REFRESH_SECRET.length < 32) {
+    errors.push('JWT_REFRESH_SECRET must be at least 32 characters');
+  }
+
+  if (errors.length > 0) {
+    const errorMsg = `JWT Configuration Error:\n${errors.map(e => `  - ${e}`).join('\n')}`;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
+  }
+};
+
+// Validate secrets on module load (except in development where dotenv may not be loaded yet)
+// In development, validation happens in validateEnv.js after dotenv.config()
+if (process.env.NODE_ENV === 'production') {
+  validateJWTSecrets();
+}
+
+/**
  * Generate JWT access token with jti (JWT ID) for replay protection
  * @param {string} userId - User ID
  * @param {Object} sessionContext - Session metadata (IP, UA)
  * @returns {string} JWT token
  */
 export const generateToken = (userId, sessionContext = {}) => {
-  const jti = crypto.randomBytes(16).toString("hex"); // Unique token ID
+  try {
+    // Runtime validation for test environment
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured');
+    }
 
-  return jwt.sign(
-    {
-      id: userId,
-      jti, // Token replay protection
-      iat: Math.floor(Date.now() / 1000), // Issued at
-      ctx: {
-        ip: sessionContext.ip || null,
-        ua: sessionContext.ua ? crypto.createHash('sha256').update(sessionContext.ua).digest('hex').substring(0, 16) : null
-      }
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "15m" } // 15 minutes - production security
-  );
+    if (!userId) {
+      throw new Error('userId is required for token generation');
+    }
+
+    const jti = crypto.randomBytes(16).toString("hex"); // Unique token ID
+
+    const token = jwt.sign(
+      {
+        id: userId,
+        jti, // Token replay protection
+        iat: Math.floor(Date.now() / 1000), // Issued at
+        ctx: {
+          ip: sessionContext.ip || null,
+          ua: sessionContext.ua ? crypto.createHash('sha256').update(sessionContext.ua).digest('hex').substring(0, 16) : null
+        }
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" } // 15 minutes - production security
+    );
+
+    // Validate token was generated
+    if (!token || typeof token !== 'string') {
+      throw new Error('Token generation failed - invalid token output');
+    }
+
+    return token;
+  } catch (error) {
+    logError('Token generation failed', {
+      error: error.message,
+      userId: userId ? userId.toString().substring(0, 8) + '...' : 'undefined'
+    });
+    throw error;
+  }
 };
 
 /**
@@ -45,20 +101,44 @@ export const generateToken = (userId, sessionContext = {}) => {
  * @returns {string} JWT refresh token
  */
 export const generateRefreshToken = (userId, sessionStart = new Date()) => {
-  const jti = crypto.randomBytes(16).toString("hex");
-  const absoluteExpiry = new Date(sessionStart);
-  absoluteExpiry.setDate(absoluteExpiry.getDate() + 30); // 30 days absolute max
+  try {
+    // Runtime validation
+    if (!process.env.JWT_REFRESH_SECRET) {
+      throw new Error('JWT_REFRESH_SECRET is not configured');
+    }
 
-  return jwt.sign(
-    {
-      id: userId,
-      jti,
-      sessionStart: sessionStart.toISOString(),
-      absoluteExpiry: absoluteExpiry.toISOString()
-    },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" } // 7 days rolling, but absolute max is 30 days
-  );
+    if (!userId) {
+      throw new Error('userId is required for refresh token generation');
+    }
+
+    const jti = crypto.randomBytes(16).toString("hex");
+    const absoluteExpiry = new Date(sessionStart);
+    absoluteExpiry.setDate(absoluteExpiry.getDate() + 30); // 30 days absolute max
+
+    const token = jwt.sign(
+      {
+        id: userId,
+        jti,
+        sessionStart: sessionStart.toISOString(),
+        absoluteExpiry: absoluteExpiry.toISOString()
+      },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" } // 7 days rolling, but absolute max is 30 days
+    );
+
+    // Validate token was generated
+    if (!token || typeof token !== 'string') {
+      throw new Error('Refresh token generation failed - invalid token output');
+    }
+
+    return token;
+  } catch (error) {
+    logError('Refresh token generation failed', {
+      error: error.message,
+      userId: userId ? userId.toString().substring(0, 8) + '...' : 'undefined'
+    });
+    throw error;
+  }
 };
 
 /**

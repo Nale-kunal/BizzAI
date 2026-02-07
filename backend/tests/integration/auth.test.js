@@ -38,7 +38,8 @@ describe('Authentication API Integration Tests', () => {
                 name: 'Another User',
                 email: 'duplicate@example.com',
                 password: 'Password123!',
-                shopName: 'Another Shop'
+                shopName: 'Another Shop',
+                phone: '9876543210'
             };
 
             const response = await request(app)

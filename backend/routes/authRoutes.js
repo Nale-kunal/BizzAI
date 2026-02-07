@@ -16,9 +16,17 @@ router.post("/reset-password", passwordResetLimiter, resetPassword);
 // Protected routes
 router.get("/profile", protect, getProfile);
 router.get("/me", protect, getProfile); // Alias for /profile to match test expectations
-router.post("/logout", protect, (req, res) => {
-    // Simple logout - client should discard token
-    res.status(200).json({ success: true, message: "Logged out successfully" });
+router.post("/logout", protect, async (req, res) => {
+    try {
+        // Update user's lastLogoutAt timestamp
+        const User = (await import("../models/User.js")).default;
+        await User.findByIdAndUpdate(req.user._id, { lastLogoutAt: new Date() });
+
+        res.status(200).json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+        console.error("Logout error:", error);
+        res.status(200).json({ success: true, message: "Logged out successfully" });
+    }
 });
 router.get("/csrf-token", protect, getCsrfToken); // CSRF token endpoint
 

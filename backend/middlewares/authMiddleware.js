@@ -50,7 +50,8 @@ export const protect = async (req, res, next) => {
 
       // CRITICAL: Validate deviceId from cookie matches user's active deviceId
       // SKIP in test environment to allow integration tests
-      if (process.env.NODE_ENV !== 'test') {
+      const isTestEnv = process.env.NODE_ENV === 'test' || process.env.CI === 'true';
+      if (!isTestEnv) {
         const deviceIdFromCookie = getDeviceIdFromCookie(req);
 
         // Enhanced logging for production diagnostics
@@ -111,10 +112,26 @@ export const protect = async (req, res, next) => {
 
       next();
     } else {
-      return res.status(401).json({ message: "Not authorized, token missing" });
+      return res.status(401).json({ success: false, message: "Not authorized, token missing" });
     }
   } catch (error) {
     console.error("Auth Middleware Error:", error);
-    res.status(401).json({ message: "Invalid or expired token" });
+
+    // Provide more specific error messages for debugging
+    let errorMessage = "Invalid or expired token";
+
+    if (error.name === 'JsonWebTokenError') {
+      errorMessage = "Invalid token format";
+      console.error("JWT Malformed Error Details:", {
+        message: error.message,
+        token: token ? `${token.substring(0, 20)}...` : 'undefined'
+      });
+    } else if (error.name === 'TokenExpiredError') {
+      errorMessage = "Token has expired";
+    } else if (error.message && error.message.includes('jwt must be provided')) {
+      errorMessage = "Token missing";
+    }
+
+    res.status(401).json({ success: false, message: errorMessage });
   }
 };

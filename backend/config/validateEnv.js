@@ -6,6 +6,7 @@ export const validateEnv = () => {
   const required = [
     'MONGO_URI',
     'JWT_SECRET',
+    'JWT_REFRESH_SECRET',
     'COOKIE_SECRET'
   ];
 
@@ -15,6 +16,17 @@ export const validateEnv = () => {
     console.error('❌ FATAL: Missing required environment variables:');
     missing.forEach(key => console.error(`   - ${key}`));
     console.error('\nServer cannot start without these variables.');
+    process.exit(1);
+  }
+
+  // Validate JWT secret lengths (security requirement)
+  if (process.env.JWT_SECRET.length < 32) {
+    console.error('❌ FATAL: JWT_SECRET must be at least 32 characters long');
+    process.exit(1);
+  }
+
+  if (process.env.JWT_REFRESH_SECRET.length < 32) {
+    console.error('❌ FATAL: JWT_REFRESH_SECRET must be at least 32 characters long');
     process.exit(1);
   }
 
