@@ -27,7 +27,7 @@ export const logAudit = async ({
     metadata = {},
 }) => {
     try {
-        await AuditLog.create({
+        await AuditLog.createAuditLog({
             userId,
             action,
             entityType,

@@ -36,7 +36,7 @@ export const mandatoryAudit = (entityType, action) => {
                     const afterSnapshot = req.updatedEntity || null;
 
                     // Create audit log (MANDATORY - cannot be skipped)
-                    await AuditLog.create({
+                    await AuditLog.createAuditLog({
                         userId: req.user._id,
                         action,
                         entityType,
