@@ -150,66 +150,56 @@ auditLogSchema.pre('save', async function (next) {
         this.currentHash = crypto.createHash('sha256').update(dataToHash).digest('hex');
     }
     next();
-});
 
-/**
- * Verify audit log chain integrity
- * @returns {Promise<Object>} Verification result
- */
-auditLogSchema.statics.verifyIntegrity = async function () {
-    const logs = await this.find().sort({ createdAt: 1 });
-    const errors = [];
+// ENTERPRISE: Handle insertMany (when using AuditLog.create([...]))
+auditLogSchema.pre('insertMany', async function (next, docs) {
+    if (Array.isArray(docs)) {
+        for (const doc of docs) {
+            if (!doc.createdAt) {
+                doc.createdAt = new Date();
+            }
+            
+            const previousLog = await this.findOne().sort({ createdAt: -1 });
+            doc.previousHash = previousLog ? previousLog.currentHash : null;
 
-    for (let i = 1; i < logs.length; i++) {
-        const current = logs[i];
-        const previous = logs[i - 1];
-
-        if (current.previousHash !== previous.currentHash) {
-            errors.push({
-                logId: current._id,
-                expected: previous.currentHash,
-                actual: current.previousHash,
-                message: 'Hash chain broken - possible tampering',
+            const dataToHash = JSON.stringify({
+                userId: doc.userId,
+                action: doc.action,
+                entityType: doc.entityType,
+                entityId: doc.entityId,
+                timestamp: doc.createdAt,
+                previousHash: doc.previousHash,
             });
+
+            doc.currentHash = crypto.createHash('sha256').update(dataToHash).digest('hex');
         }
     }
+    next();
+});
+});
 
-    return {
-        verified: errors.length === 0,
-        totalLogs: logs.length,
-        errors,
-    };
-};
+// ENTERPRISE: Handle insertMany (when using AuditLog.create([...]))
+auditLogSchema.pre('insertMany', async function (next, docs) {
+    if (Array.isArray(docs)) {
+        for (const doc of docs) {
+            if (!doc.createdAt) {
+                doc.createdAt = new Date();
+            }
+            
+            const previousLog = await this.findOne().sort({ createdAt: -1 });
+            doc.previousHash = previousLog ? previousLog.currentHash : null;
 
-/**
- * Export audit logs (read-only)
- * @param {Object} filter - MongoDB filter
- * @param {Object} options - Export options
- * @returns {Promise<Array>} Audit logs
- */
-auditLogSchema.statics.exportLogs = async function (filter = {}, options = {}) {
-    const {
-        startDate,
-        endDate,
-        userId,
-        action,
-        entityType,
-        limit = 10000,
-    } = options;
+            const dataToHash = JSON.stringify({
+                userId: doc.userId,
+                action: doc.action,
+                entityType: doc.entityType,
+                entityId: doc.entityId,
+                timestamp: doc.createdAt,
+                previousHash: doc.previousHash,
+            });
 
-    const query = { ...filter };
-
-    if (startDate) query.createdAt = { $gte: new Date(startDate) };
-    if (endDate) query.createdAt = { ...query.createdAt, $lte: new Date(endDate) };
-    if (userId) query.userId = userId;
-    if (action) query.action = action;
-    if (entityType) query.entityType = entityType;
-
-    return await this.find(query)
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .lean();
-};
-
-const AuditLog = mongoose.model("AuditLog", auditLogSchema);
-export default AuditLog;
+            doc.currentHash = crypto.createHash('sha256').update(dataToHash).digest('hex');
+        }
+    }
+    next();
+});
