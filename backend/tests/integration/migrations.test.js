@@ -122,10 +122,11 @@ describe('Migration Tests', () => {
             const item = await Item.create({
                 name: 'Test Item',
                 sku: 'TEST-001',
+                addedBy: testUser._id,
+                costPrice: 50,
                 sellingPrice: 100,
-                purchasePrice: 50,
-                currentStock: 10,
-                createdBy: testUser._id
+                stockQty: 10,
+                lowStockLimit: 5
             });
 
             // Run migration
@@ -138,10 +139,28 @@ describe('Migration Tests', () => {
 
         test('should add organizationId to invoices', async () => {
             // Create invoice without organizationId
+            // Create item for invoice
+            const invoiceItem = await Item.create({
+                name: 'Invoice Test Item',
+                sku: 'INV-ITEM-001',
+                addedBy: testUser._id,
+                costPrice: 50,
+                sellingPrice: 100,
+                stockQty: 100,
+                lowStockLimit: 10
+            });
+
             const invoice = await Invoice.create({
                 invoiceNo: 'INV-001',
-                customerName: 'Test Customer',
-                items: [{ itemName: 'Test', quantity: 1, rate: 100 }],
+                items: [{
+                    item: invoiceItem._id,
+                    quantity: 1,
+                    price: 100,
+                    tax: 0,
+                    discount: 0,
+                    total: 100
+                }],
+                subtotal: 100,
                 totalAmount: 100,
                 paymentStatus: 'paid',
                 createdBy: testUser._id
@@ -181,10 +200,11 @@ describe('Migration Tests', () => {
             const item = await Item.create({
                 name: 'Test Item',
                 sku: 'TEST-002',
+                addedBy: testUser._id,
+                costPrice: 50,
                 sellingPrice: 100,
-                purchasePrice: 50,
-                currentStock: 10,
-                createdBy: testUser._id
+                stockQty: 10,
+                lowStockLimit: 5
             });
 
             // Run migration
@@ -200,10 +220,11 @@ describe('Migration Tests', () => {
             const item = await Item.create({
                 name: 'Test Item',
                 sku: 'TEST-003',
+                addedBy: testUser._id,
+                costPrice: 50,
                 sellingPrice: 100,
-                purchasePrice: 50,
-                currentStock: 10,
-                createdBy: testUser._id
+                stockQty: 10,
+                lowStockLimit: 5
             });
 
             // Run migration
@@ -224,10 +245,11 @@ describe('Migration Tests', () => {
             const items = Array.from({ length: 100 }, (_, i) => ({
                 name: `Item ${i}`,
                 sku: `BULK-${i}`,
+                addedBy: testUser._id,
+                costPrice: 50,
                 sellingPrice: 100,
-                purchasePrice: 50,
-                currentStock: 10,
-                createdBy: testUser._id
+                stockQty: 10,
+                lowStockLimit: 5
             }));
 
             await Item.insertMany(items);
@@ -257,11 +279,11 @@ describe('Migration Tests', () => {
             const item = await Item.create({
                 name: 'Safety Test Item',
                 sku: 'SAFE-001',
+                addedBy: testUser._id,
+                costPrice: 50,
                 sellingPrice: 100,
-                purchasePrice: 50,
-                currentStock: 10,
-                minStockLevel: 5,
-                createdBy: testUser._id
+                stockQty: 10,
+                lowStockLimit: 5
             });
 
             const originalData = item.toObject();
@@ -275,17 +297,35 @@ describe('Migration Tests', () => {
             expect(updatedItem.name).toBe(originalData.name);
             expect(updatedItem.sku).toBe(originalData.sku);
             expect(updatedItem.sellingPrice).toBe(originalData.sellingPrice);
-            expect(updatedItem.purchasePrice).toBe(originalData.purchasePrice);
-            expect(updatedItem.currentStock).toBe(originalData.currentStock);
-            expect(updatedItem.minStockLevel).toBe(originalData.minStockLevel);
+            expect(updatedItem.costPrice).toBe(originalData.costPrice);
+            expect(updatedItem.stockQty).toBe(originalData.stockQty);
+            expect(updatedItem.lowStockLimit).toBe(originalData.lowStockLimit);
         });
 
         test('should maintain referential integrity', async () => {
             // Create related data
+            // Create item for invoice
+            const refItem = await Item.create({
+                name: 'Ref Test Item',
+                sku: 'REF-ITEM-001',
+                addedBy: testUser._id,
+                costPrice: 50,
+                sellingPrice: 100,
+                stockQty: 100,
+                lowStockLimit: 10
+            });
+
             const invoice = await Invoice.create({
                 invoiceNo: 'REF-001',
-                customerName: 'Test Customer',
-                items: [{ itemName: 'Test', quantity: 1, rate: 100 }],
+                items: [{
+                    item: refItem._id,
+                    quantity: 1,
+                    price: 100,
+                    tax: 0,
+                    discount: 0,
+                    total: 100
+                }],
+                subtotal: 100,
                 totalAmount: 100,
                 paymentStatus: 'paid',
                 createdBy: testUser._id
