@@ -128,6 +128,11 @@ auditLogSchema.pre('findOneAndDelete', function (next) {
 // ENTERPRISE: Hash chaining for integrity
 auditLogSchema.pre('save', async function (next) {
     if (this.isNew) {
+        // Ensure createdAt is defined for hashing (set explicitly if not yet set by Mongoose)
+        if (!this.createdAt) {
+            this.createdAt = new Date();
+        }
+
         // Get previous log entry
         const previousLog = await this.constructor.findOne().sort({ createdAt: -1 });
         this.previousHash = previousLog ? previousLog.currentHash : null;
@@ -138,7 +143,7 @@ auditLogSchema.pre('save', async function (next) {
             action: this.action,
             entityType: this.entityType,
             entityId: this.entityId,
-            timestamp: this.createdAt || new Date(),
+            timestamp: this.createdAt,
             previousHash: this.previousHash,
         });
 
