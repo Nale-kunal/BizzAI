@@ -93,8 +93,8 @@ export const createPurchase = async (req, res) => {
             });
 
             if (!item) {
-                return res.status(404).json({
-                    message: `Item not found or unauthorized: ${itemData.item}`,
+                return res.status(400).json({
+                    message: `Invalid item ID or item not found: ${itemData.item}`,
                 });
             }
 
@@ -511,7 +511,7 @@ export const updatePurchase = async (req, res) => {
                 });
 
                 if (!item) {
-                    return res.status(404).json({ message: `Item not found: ${itemData.item}` });
+                    return res.status(400).json({ message: `Invalid item ID or item not found: ${itemData.item}` });
                 }
 
                 const calculation = calculatePurchaseItemTotal(

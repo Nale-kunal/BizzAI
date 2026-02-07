@@ -215,3 +215,16 @@ export const createTestEnvironment = async () => {
         bankAccount
     };
 };
+
+/**
+ * Generate valid JWT token for testing
+ */
+export const generateAuthToken = (userId) => {
+    const jwt = require('jsonwebtoken');
+    return jwt.sign(
+        { id: userId },
+        process.env.JWT_SECRET || 'test-jwt-secret-key-for-ci-pipeline-minimum-32-characters-required',
+        { expiresIn: '1d' }
+    );
+};
+
