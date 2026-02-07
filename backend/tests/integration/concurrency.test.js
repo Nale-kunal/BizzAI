@@ -112,11 +112,15 @@ describe('Concurrency Tests', () => {
             const oversells = Array.from({ length: 5 }, () => {
                 return StockLedger.create({
                     item: item._id,
-                    transactionType: 'sale',
+                    transactionType: 'SALE',
                     quantityChange: -5,
                     runningBalance: 0,
                     costPerUnit: 50,
                     totalValue: -250,
+                    sourceDocument: {
+                        type: 'Invoice',
+                        id: new mongoose.Types.ObjectId()
+                    },
                     organizationId: organization._id,
                     createdBy: user._id
                 });
@@ -234,11 +238,15 @@ describe('Concurrency Tests', () => {
 
                             await StockLedger.create([{
                                 item: item._id,
-                                transactionType: 'sale',
+                                transactionType: 'SALE',
                                 quantityChange: -10,
                                 runningBalance: 90,
                                 costPerUnit: 50,
                                 totalValue: -500,
+                                sourceDocument: {
+                                    type: 'Invoice',
+                                    id: new mongoose.Types.ObjectId()
+                                },
                                 organizationId: organization._id,
                                 createdBy: user._id
                             }], { session });
@@ -252,11 +260,15 @@ describe('Concurrency Tests', () => {
 
                         await StockLedger.create({
                             item: item._id,
-                            transactionType: 'sale',
+                            transactionType: 'SALE',
                             quantityChange: -10,
                             runningBalance: 90,
                             costPerUnit: 50,
                             totalValue: -500,
+                            sourceDocument: {
+                                type: 'Invoice',
+                                id: new mongoose.Types.ObjectId()
+                            },
                             organizationId: organization._id,
                             createdBy: user._id
                         });
@@ -281,11 +293,15 @@ describe('Concurrency Tests', () => {
 
                             await StockLedger.create([{
                                 item: item._id,
-                                transactionType: 'sale',
+                                transactionType: 'SALE',
                                 quantityChange: -15,
                                 runningBalance: 85,
                                 costPerUnit: 50,
                                 totalValue: -750,
+                                sourceDocument: {
+                                    type: 'Invoice',
+                                    id: new mongoose.Types.ObjectId()
+                                },
                                 organizationId: organization._id,
                                 createdBy: user._id
                             }], { session });
@@ -299,11 +315,15 @@ describe('Concurrency Tests', () => {
 
                         await StockLedger.create({
                             item: item._id,
-                            transactionType: 'sale',
+                            transactionType: 'SALE',
                             quantityChange: -15,
                             runningBalance: 85,
                             costPerUnit: 50,
                             totalValue: -750,
+                            sourceDocument: {
+                                type: 'Invoice',
+                                id: new mongoose.Types.ObjectId()
+                            },
                             organizationId: organization._id,
                             createdBy: user._id
                         });
