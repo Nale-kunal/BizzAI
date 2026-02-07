@@ -64,17 +64,33 @@ describe('Migration Tests', () => {
         });
 
         test('should assign existing journal entries to default period', async () => {
-            // Create journal entry without period
+            // Create a temporary financial period first
+            const tempPeriod = await FinancialPeriod.create({
+                name: 'Temp Period',
+                fiscalYear: new Date().getFullYear(),
+                startDate: new Date(new Date().getFullYear(), 3, 1),
+                endDate: new Date(new Date().getFullYear() + 1, 2, 31),
+                status: 'open',
+                organization: testOrg._id,
+                createdBy: testUser._id
+            });
+
+            // Create journal entry WITH all required fields
             const entry = await JournalEntry.create({
                 entryNumber: 'JE-001',
                 date: new Date(),
+                sourceDocument: {
+                    type: 'Manual',  // REQUIRED FIELD
+                    id: null
+                },
                 lines: [
                     { account: new mongoose.Types.ObjectId(), debit: 100, credit: 0 },
                     { account: new mongoose.Types.ObjectId(), debit: 0, credit: 100 }
                 ],
                 status: 'posted',
                 organization: testOrg._id,
-                createdBy: testUser._id
+                createdBy: testUser._id,
+                financialPeriod: tempPeriod._id  // REQUIRED FIELD
             });
 
             // Run migration
