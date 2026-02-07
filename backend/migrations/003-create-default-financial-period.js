@@ -13,14 +13,21 @@ import JournalEntry from '../models/JournalEntry.js';
 import Organization from '../models/Organization.js';
 
 export async function up() {
+    // Check if MongoDB is running as a replica set
+    const mongoUri = process.env.MONGO_URI || '';
+    const isReplicaSet = mongoUri.includes('replicaSet=') || mongoUri.startsWith('mongodb+srv://');
+
     const session = await mongoose.startSession();
 
     try {
-        await session.withTransaction(async () => {
+        // Define migration logic
+        const runMigration = async (session) => {
             console.log('📅 Creating default financial periods...');
 
             // Get all organizations
-            const organizations = await Organization.find({}).session(session);
+            const organizations = isReplicaSet
+                ? await Organization.find({}).session(session)
+                : await Organization.find({});
 
             if (organizations.length === 0) {
                 console.log('⚠️  No organizations found. Skipping period creation.');
@@ -48,10 +55,9 @@ export async function up() {
                 const fiscalYearEndDate = new Date(fiscalYear + 1, fiscalYearStart - 1, 0);
 
                 // Check if period already exists
-                const existingPeriod = await FinancialPeriod.findOne({
-                    organization: org._id,
-                    fiscalYear
-                }).session(session);
+                const existingPeriod = isReplicaSet
+                    ? await FinancialPeriod.findOne({ organization: org._id, fiscalYear }).session(session)
+                    : await FinancialPeriod.findOne({ organization: org._id, fiscalYear });
 
                 if (existingPeriod) {
                     console.log(`✅ Period already exists for FY ${fiscalYear}`);
@@ -59,6 +65,7 @@ export async function up() {
                 }
 
                 // Create default period
+                const createOptions = isReplicaSet ? { session } : {};
                 const period = await FinancialPeriod.create(
                     [
                         {
@@ -72,12 +79,13 @@ export async function up() {
                             notes: 'Default period created by migration'
                         }
                     ],
-                    { session }
+                    createOptions
                 );
 
                 console.log(`✅ Created default period: ${period[0].name}`);
 
                 // Update all existing journal entries to reference this period
+                const updateOptions = isReplicaSet ? { session } : {};
                 const updateResult = await JournalEntry.updateMany(
                     {
                         organization: org._id,
@@ -86,14 +94,25 @@ export async function up() {
                     {
                         $set: { financialPeriod: period[0]._id }
                     },
-                    { session }
+                    updateOptions
                 );
 
                 console.log(`✅ Updated ${updateResult.modifiedCount} journal entries`);
             }
 
             console.log('\n✅ Default financial periods created successfully');
-        });
+        };
+
+        // Use transactions only if replica set is available
+        if (isReplicaSet) {
+            console.log('🔄 Running migration with transactions (replica set detected)');
+            await session.withTransaction(async () => {
+                await runMigration(session);
+            });
+        } else {
+            console.log('🔄 Running migration without transactions (standalone MongoDB)');
+            await runMigration(null);
+        }
     } catch (error) {
         console.error('❌ Migration failed:', error);
         throw error;
@@ -103,25 +122,42 @@ export async function up() {
 }
 
 export async function down() {
+    // Check if MongoDB is running as a replica set
+    const mongoUri = process.env.MONGO_URI || '';
+    const isReplicaSet = mongoUri.includes('replicaSet=') || mongoUri.startsWith('mongodb+srv://');
+
     const session = await mongoose.startSession();
 
     try {
-        await session.withTransaction(async () => {
+        // Define rollback logic
+        const runRollback = async (session) => {
             console.log('🔄 Rolling back default financial periods...');
 
             // Remove financialPeriod from journal entries
+            const updateOptions = isReplicaSet ? { session } : {};
             await JournalEntry.updateMany(
                 {},
                 { $unset: { financialPeriod: '' } },
-                { session }
+                updateOptions
             );
 
             // Delete all financial periods
-            const result = await FinancialPeriod.deleteMany({}, { session });
+            const result = await FinancialPeriod.deleteMany({}, updateOptions);
 
             console.log(`✅ Removed ${result.deletedCount} financial periods`);
             console.log('✅ Rollback complete');
-        });
+        };
+
+        // Use transactions only if replica set is available
+        if (isReplicaSet) {
+            console.log('🔄 Running rollback with transactions (replica set detected)');
+            await session.withTransaction(async () => {
+                await runRollback(session);
+            });
+        } else {
+            console.log('🔄 Running rollback without transactions (standalone MongoDB)');
+            await runRollback(null);
+        }
     } catch (error) {
         console.error('❌ Rollback failed:', error);
         throw error;

@@ -301,7 +301,7 @@ describe('Multi-Tenancy Integration Tests', () => {
                 physicalAddress: 'Address 2',
                 gstNo: '27XYZAB1234C1Z5',
                 state: 'Maharashtra',
-                supplierType: 'retailer',
+                supplierType: 'distributor',
                 owner: user2Id,
                 organizationId: org2._id
             });
