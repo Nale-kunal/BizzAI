@@ -16,6 +16,7 @@ const router = express.Router();
 router.get("/sales", protect, getSalesReport);
 router.get("/stock", protect, getStockReport);
 router.get("/customers", protect, getCustomerReport);
+router.get("/dashboard", protect, getDashboardStats); // Add dashboard route
 router.get("/dashboard-stats", protect, getDashboardStats);
 
 // New Sales Report Endpoints

@@ -118,6 +118,86 @@ export const createTestBankAccount = async (userId, overrides = {}) => {
 };
 
 /**
+ * Create test invoice with all required fields
+ */
+export const createTestInvoice = async (userId, customerId, itemId, overrides = {}) => {
+    const Invoice = (await import('../../models/Invoice.js')).default;
+
+    const defaultInvoice = {
+        invoiceNo: `INV-${Date.now()}`,
+        customer: customerId,
+        items: [{
+            item: itemId,
+            quantity: 10,
+            price: 150,
+            tax: 27,
+            discount: 0,
+            total: 1770
+        }],
+        subtotal: 1500,
+        tax: 270,
+        discount: 0,
+        totalAmount: 1770,
+        paidAmount: 0,
+        paymentStatus: 'unpaid',
+        paymentMethod: 'cash',
+        createdBy: userId,
+        ...overrides
+    };
+
+    const invoice = await Invoice.create(defaultInvoice);
+    return invoice;
+};
+
+/**
+ * Create test purchase with all required fields
+ */
+export const createTestPurchase = async (userId, supplierId, itemId, overrides = {}) => {
+    const Purchase = (await import('../../models/Purchase.js')).default;
+
+    const defaultPurchase = {
+        purchaseNo: `PUR-${Date.now()}`,
+        purchaseDate: new Date(),
+        supplierInvoiceNo: `SI-${Date.now()}`,
+        supplierInvoiceDate: new Date(),
+        supplier: supplierId,
+        purchaseType: 'cash',
+        items: [{
+            item: itemId,
+            itemName: 'Test Item',
+            quantity: 100,
+            purchaseRate: 100,
+            sellingPrice: 150,
+            taxRate: 18,
+            discount: 0,
+            taxableValue: 10000,
+            cgst: 900,
+            sgst: 900,
+            igst: 0,
+            total: 11800
+        }],
+        subtotal: 10000,
+        itemDiscount: 0,
+        billDiscount: 0,
+        shippingCharges: 0,
+        totalCGST: 900,
+        totalSGST: 900,
+        totalIGST: 0,
+        roundOff: 0,
+        totalAmount: 11800,
+        paidAmount: 0,
+        paymentStatus: 'unpaid',
+        paymentMethod: 'cash',
+        status: 'draft',
+        createdBy: userId,
+        ...overrides
+    };
+
+    const purchase = await Purchase.create(defaultPurchase);
+    return purchase;
+};
+
+/**
  * Helper to create a complete test environment
  */
 export const createTestEnvironment = async () => {
