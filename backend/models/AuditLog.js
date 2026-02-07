@@ -228,6 +228,18 @@ auditLogSchema.statics.verifyIntegrity = async function () {
     return { valid: true, message: 'Audit log chain is valid' };
 };
 
+/**
+ * Create audit log with proper hash calculation
+ * @param {Object} data - Audit log data
+ * @returns {Promise<AuditLog>} Created audit log
+ */
+auditLogSchema.statics.createAuditLog = async function (data) {
+    const doc = new this(data);
+    // Pre-save hook will calculate currentHash
+    await doc.save();
+    return doc;
+};
+
 const AuditLog = mongoose.model('AuditLog', auditLogSchema);
 
 export default AuditLog;
