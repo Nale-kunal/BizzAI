@@ -75,7 +75,7 @@ const auditLogSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.Mixed,
             default: {},
         },
-        // ENTERPRISE: Integrity protection
+        // ENTERPRISE: Hash chaining for tamper detection
         previousHash: {
             type: String,
             default: null,
@@ -83,7 +83,7 @@ const auditLogSchema = new mongoose.Schema(
         },
         currentHash: {
             type: String,
-            required: true,
+            required: false, // Calculated by pre-save hook
             index: true,
         },
         // ENTERPRISE: Retention
