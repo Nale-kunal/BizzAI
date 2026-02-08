@@ -26,6 +26,6 @@ router.put("/:id", validatePeriodLockForUpdate(Purchase), updatePurchase);
 
 // Purchase actions
 router.post("/:id/finalize", validatePeriodLock, finalizePurchase);
-router.post("/:id/cancel", cancelPurchase);
+router.put("/:id/cancel", cancelPurchase);
 
 export default router;

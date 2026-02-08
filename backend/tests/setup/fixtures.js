@@ -4,6 +4,7 @@ import Customer from '../../models/Customer.js';
 import Supplier from '../../models/Supplier.js';
 import BankAccount from '../../models/BankAccount.js';
 import Organization from '../../models/Organization.js';
+import ChartOfAccounts from '../../models/ChartOfAccounts.js';
 
 /**
  * Test fixtures for consistent test data
@@ -228,3 +229,38 @@ export const generateAuthToken = (userId) => {
     );
 };
 
+
+/**
+ * Create default Chart of Accounts for testing auto-posting
+ */
+export const createDefaultChartOfAccounts = async (organizationId) => {
+    const accounts = [
+        // Assets
+        { code: '1110', name: 'Cash', accountType: 'ASSET', normalBalance: 'DEBIT' },
+        { code: '1120', name: 'Bank Account', accountType: 'ASSET', normalBalance: 'DEBIT' },
+        { code: '1130', name: 'Accounts Receivable', accountType: 'ASSET', normalBalance: 'DEBIT' },
+        { code: '1140', name: 'Inventory', accountType: 'ASSET', normalBalance: 'DEBIT' },
+        
+        // Liabilities
+        { code: '2110', name: 'Accounts Payable', accountType: 'LIABILITY', normalBalance: 'CREDIT' },
+        
+        // Revenue
+        { code: '4100', name: 'Sales Revenue', accountType: 'REVENUE', normalBalance: 'CREDIT' },
+        
+        // Expenses
+        { code: '5100', name: 'Cost of Goods Sold', accountType: 'COGS', normalBalance: 'DEBIT' },
+        { code: '6000', name: 'Operating Expenses', accountType: 'EXPENSE', normalBalance: 'DEBIT' },
+    ];
+
+    const createdAccounts = {};
+    
+    for (const accountData of accounts) {
+        const account = await ChartOfAccounts.create({
+            ...accountData,
+            organization: organizationId
+        });
+        createdAccounts[accountData.name.toLowerCase().replace(/\s+/g, '_')] = account;
+    }
+
+    return createdAccounts;
+};
