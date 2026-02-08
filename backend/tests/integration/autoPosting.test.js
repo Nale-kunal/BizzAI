@@ -49,7 +49,7 @@ describe('Auto-Posting Service Integration Tests', () => {
         inventoryAccount = await ChartOfAccounts.create({
             code: '1140',
             name: 'Inventory',
-            accountType: 'ASSET',
+            accountaccountType: 'ASSET', normalBalance: 'DEBIT',
             normalBalance: 'DEBIT',
             organization: organization._id
         });
@@ -57,7 +57,7 @@ describe('Auto-Posting Service Integration Tests', () => {
         apAccount = await ChartOfAccounts.create({
             code: '2110',
             name: 'Accounts Payable',
-            accountType: 'LIABILITY',
+            accountaccountType: 'LIABILITY', normalBalance: 'CREDIT',
             normalBalance: 'CREDIT',
             organization: organization._id
         });
@@ -65,7 +65,7 @@ describe('Auto-Posting Service Integration Tests', () => {
         cashAccount = await ChartOfAccounts.create({
             code: '1110',
             name: 'Cash',
-            accountType: 'ASSET',
+            accountaccountType: 'ASSET', normalBalance: 'DEBIT',
             normalBalance: 'DEBIT',
             organization: organization._id
         });
@@ -73,7 +73,7 @@ describe('Auto-Posting Service Integration Tests', () => {
         arAccount = await ChartOfAccounts.create({
             code: '1130',
             name: 'Accounts Receivable',
-            accountType: 'ASSET',
+            accountaccountType: 'ASSET', normalBalance: 'DEBIT',
             normalBalance: 'DEBIT',
             organization: organization._id
         });
@@ -89,7 +89,7 @@ describe('Auto-Posting Service Integration Tests', () => {
         cogsAccount = await ChartOfAccounts.create({
             code: '6000',
             name: 'Cost of Goods Sold',
-            accountType: 'EXPENSE',
+            accountaccountType: 'EXPENSE', normalBalance: 'DEBIT',
             normalBalance: 'DEBIT',
             organization: organization._id
         });
@@ -98,7 +98,7 @@ describe('Auto-Posting Service Integration Tests', () => {
         const bankAccount = await ChartOfAccounts.create({
             code: '1120',
             name: 'Bank Account',
-            accountType: 'ASSET',
+            accountaccountType: 'ASSET', normalBalance: 'DEBIT',
             normalBalance: 'DEBIT',
             organization: organization._id
         });
@@ -550,11 +550,12 @@ describe('Auto-Posting Service Integration Tests', () => {
 
             expect(journalEntry).toBeNull();
 
-            // Restore account for other tests
+            // Restore inventory account for next test
             inventoryAccount = await ChartOfAccounts.create({
                 code: '1140',
                 name: 'Inventory',
-                type: 'asset',
+                accountaccountType: 'ASSET', normalBalance: 'DEBIT',
+                normalBalance: 'DEBIT',
                 organization: organization._id
             });
         });
